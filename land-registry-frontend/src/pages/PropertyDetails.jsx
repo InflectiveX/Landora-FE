@@ -101,7 +101,7 @@ const PropertyDetails = () => {
   return (
     <Box>
       {/* Header */}
-      <Paper sx={{ p: 3, mb: 3, bgcolor: 'primary.main', color: 'white' }}>
+  <Paper sx={{ p: 3, mb: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box>
             <Typography variant="h4" gutterBottom>
@@ -139,204 +139,195 @@ const PropertyDetails = () => {
         </Box>
       </Paper>
 
-      <Grid container spacing={3}>
-        {/* Property Information */}
-        <Grid item xs={12} md={8}>
-          <Grid container spacing={3}>
-            {/* Location Details */}
-            <Grid item xs={12}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-                    <LocationIcon sx={{ mr: 1, color: 'primary.main' }} />
-                    Location Details
-                  </Typography>
-                  <Divider sx={{ mb: 2 }} />
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} md={6}>
-                      <List dense>
-                        <ListItem>
-                          <ListItemText primary="Address" secondary={property.location.address} />
-                        </ListItem>
-                        <ListItem>
-                          <ListItemText primary="District" secondary={property.location.district} />
-                        </ListItem>
-                        <ListItem>
-                          <ListItemText primary="Province" secondary={property.location.province} />
-                        </ListItem>
-                      </List>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <List dense>
-                        <ListItem>
-                          <ListItemText primary="Coordinates" secondary={property.location.coordinates} />
-                        </ListItem>
-                        <ListItem>
-                          <ListItemText primary="Land Area" secondary={property.details.landArea} />
-                        </ListItem>
-                        <ListItem>
-                          <ListItemText primary="Property Type" secondary={property.details.propertyType} />
-                        </ListItem>
-                      </List>
-                    </Grid>
+      {/* 3 rows, 2 columns each, equal width/height, stacked vertically */}
+  <Grid container spacing={3} direction="column" sx={{ maxWidth: 1200, width: '100%', justifyContent: 'center', alignItems: 'center', mx: 'auto' }}>
+        {/* Row 1: Location & Blockchain */}
+        <Grid container item spacing={3} alignItems="stretch" sx={{ maxWidth: 1000, width: '100%', mx: 'auto' }}>
+          <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Card sx={{ width: 420, display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                  <LocationIcon sx={{ mr: 1, color: 'primary.main' }} />
+                  Location Details
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6}>
+                    <List dense>
+                      <ListItem>
+                        <ListItemText primary="Address" secondary={property.location.address} />
+                      </ListItem>
+                      <ListItem>
+                        <ListItemText primary="District" secondary={property.location.district} />
+                      </ListItem>
+                      <ListItem>
+                        <ListItemText primary="Province" secondary={property.location.province} />
+                      </ListItem>
+                    </List>
                   </Grid>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            {/* Owner Information */}
-            <Grid item xs={12}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-                    <PersonIcon sx={{ mr: 1, color: 'primary.main' }} />
-                    Owner Information
-                  </Typography>
-                  <Divider sx={{ mb: 2 }} />
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} md={4}>
-                      <Typography variant="subtitle2">Full Name</Typography>
-                      <Typography variant="body1">{property.owner.name}</Typography>
-                    </Grid>
-                    <Grid item xs={12} md={4}>
-                      <Typography variant="subtitle2">NIC Number</Typography>
-                      <Typography variant="body1">{property.owner.nic}</Typography>
-                    </Grid>
-                    <Grid item xs={12} md={4}>
-                      <Typography variant="subtitle2">Email</Typography>
-                      <Typography variant="body1">{property.owner.email}</Typography>
-                    </Grid>
+                  <Grid item xs={12} md={6}>
+                    <List dense>
+                      <ListItem>
+                        <ListItemText primary="Coordinates" secondary={property.location.coordinates} />
+                      </ListItem>
+                      <ListItem>
+                        <ListItemText primary="Land Area" secondary={property.details.landArea} />
+                      </ListItem>
+                      <ListItem>
+                        <ListItemText primary="Property Type" secondary={property.details.propertyType} />
+                      </ListItem>
+                    </List>
                   </Grid>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            {/* Documents */}
-            <Grid item xs={12}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-                    <DescriptionIcon sx={{ mr: 1, color: 'primary.main' }} />
-                    Property Documents
-                  </Typography>
-                  <Divider sx={{ mb: 2 }} />
-                  <List>
-                    {property.documents.map((doc, index) => (
-                      <React.Fragment key={doc.id}>
-                        <ListItem>
-                          <ListItemIcon>
-                            <DescriptionIcon color="primary" />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={doc.name}
-                            secondary={`${doc.type} • ${doc.size} • IPFS: ${doc.ipfsHash}`}
-                          />
-                          <Box>
-                            <Tooltip title="View Document">
-                              <IconButton onClick={() => handleViewDocument(doc)}>
-                                <VisibilityIcon />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title="Download">
-                              <IconButton>
-                                <DownloadIcon />
-                              </IconButton>
-                            </Tooltip>
-                          </Box>
-                        </ListItem>
-                        {index < property.documents.length - 1 && <Divider />}
-                      </React.Fragment>
-                    ))}
-                  </List>
-                </CardContent>
-              </Card>
-            </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Card sx={{ width: 420, display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                  <SecurityIcon sx={{ mr: 1, color: 'primary.main' }} />
+                  Blockchain Information
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <List dense>
+                  <ListItem>
+                    <ListItemText 
+                      primary="NFT Token ID" 
+                      secondary={property.nftTokenId}
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText 
+                      primary="Transaction Hash" 
+                      secondary={property.blockchainTxHash}
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText 
+                      primary="Network" 
+                      secondary="Polygon Mainnet"
+                    />
+                  </ListItem>
+                </List>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  startIcon={<AccountBalanceIcon />}
+                  sx={{ mt: 2 }}
+                >
+                  View on Blockchain
+                </Button>
+              </CardContent>
+            </Card>
           </Grid>
         </Grid>
 
-        {/* Sidebar */}
-        <Grid item xs={12} md={4}>
-          <Grid container spacing={3}>
-            {/* Blockchain Information */}
-            <Grid item xs={12}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-                    <SecurityIcon sx={{ mr: 1, color: 'primary.main' }} />
-                    Blockchain Information
-                  </Typography>
-                  <Divider sx={{ mb: 2 }} />
-                  <List dense>
-                    <ListItem>
-                      <ListItemText 
-                        primary="NFT Token ID" 
-                        secondary={property.nftTokenId}
-                      />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText 
-                        primary="Transaction Hash" 
-                        secondary={property.blockchainTxHash}
-                      />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText 
-                        primary="Network" 
-                        secondary="Polygon Mainnet"
-                      />
-                    </ListItem>
-                  </List>
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    startIcon={<AccountBalanceIcon />}
-                    sx={{ mt: 2 }}
-                  >
-                    View on Blockchain
-                  </Button>
-                </CardContent>
-              </Card>
-            </Grid>
+        {/* Row 2: Owner & Estimated Value */}
+        <Grid container item spacing={3} alignItems="stretch" sx={{ maxWidth: 1000, width: '100%', mx: 'auto' }}>
+          <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Card sx={{ width: 420, display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                  <PersonIcon sx={{ mr: 1, color: 'primary.main' }} />
+                  Owner Information
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={4}>
+                    <Typography variant="subtitle2">Full Name</Typography>
+                    <Typography variant="body1">{property.owner.name}</Typography>
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <Typography variant="subtitle2">NIC Number</Typography>
+                    <Typography variant="body1">{property.owner.nic}</Typography>
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <Typography variant="subtitle2">Email</Typography>
+                    <Typography variant="body1">{property.owner.email}</Typography>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Card sx={{ width: 420, bgcolor: 'rgba(3, 255, 108, 0.29)', color: 'success.contrastText', borderRadius: 1, boxShadow: '0 2px 12px rgba(39,174,96,0.10)', display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom fontWeight={700}>
+                  Estimated Value
+                </Typography>
+                <Typography variant="h4" fontWeight={900}>
+                  {property.details.estimatedValue}
+                </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.8, mt: 1 }}>
+                  Based on current market rates
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
 
-            {/* Registration Timeline */}
-            <Grid item xs={12}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-                    <ScheduleIcon sx={{ mr: 1, color: 'primary.main' }} />
-                    Registration Timeline
-                  </Typography>
-                  <Divider sx={{ mb: 2 }} />
-                  <List dense>
-                    {property.history.map((event, index) => (
-                      <ListItem key={index}>
+        {/* Row 3: Documents & Registration Timeline */}
+        <Grid container item spacing={3} alignItems="stretch" sx={{ maxWidth: 1000, width: '100%', mx: 'auto' }}>
+          <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Card sx={{ width: 420, display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                  <DescriptionIcon sx={{ mr: 1, color: 'primary.main' }} />
+                  Property Documents
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <List>
+                  {property.documents.map((doc, index) => (
+                    <React.Fragment key={doc.id}>
+                      <ListItem>
+                        <ListItemIcon>
+                          <DescriptionIcon color="primary" />
+                        </ListItemIcon>
                         <ListItemText
-                          primary={event.action}
-                          secondary={`${event.date} • ${event.actor}`}
+                          primary={doc.name}
+                          secondary={`${doc.type} • ${doc.size} • IPFS: ${doc.ipfsHash}`}
                         />
+                        <Box>
+                          <Tooltip title="View Document">
+                            <IconButton onClick={() => handleViewDocument(doc)}>
+                              <VisibilityIcon />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Download">
+                            <IconButton>
+                              <DownloadIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
                       </ListItem>
-                    ))}
-                  </List>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            {/* Property Value */}
-            <Grid item xs={12}>
-              <Card sx={{ bgcolor: 'success.light', color: 'success.contrastText' }}>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Estimated Value
-                  </Typography>
-                  <Typography variant="h4" fontWeight="bold">
-                    {property.details.estimatedValue}
-                  </Typography>
-                  <Typography variant="body2" sx={{ opacity: 0.8, mt: 1 }}>
-                    Based on current market rates
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
+                      {index < property.documents.length - 1 && <Divider />}
+                    </React.Fragment>
+                  ))}
+                </List>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Card sx={{ width: 420, display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                  <ScheduleIcon sx={{ mr: 1, color: 'primary.main' }} />
+                  Registration Timeline
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <List dense>
+                  {property.history.map((event, index) => (
+                    <ListItem key={index}>
+                      <ListItemText
+                        primary={event.action}
+                        secondary={`${event.date} • ${event.actor}`}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              </CardContent>
+            </Card>
           </Grid>
         </Grid>
       </Grid>

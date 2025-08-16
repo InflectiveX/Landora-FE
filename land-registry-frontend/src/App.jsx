@@ -25,6 +25,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminPropertySearch from './pages/AdminPropertySearch';
 import AllProperties from './pages/AllProperties';
 import Profile from './pages/Profile';
+import TransactionHistory from './pages/TransactionHistory';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -54,6 +55,14 @@ function App() {
               {/* User Layout */}
               <Route path="/" element={<Layout />}>
                 <Route index element={<Navigate to="/dashboard" replace />} />
+                <Route 
+                  path="/transactions" 
+                  element={
+                    <ProtectedRoute>
+                      <TransactionHistory />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route 
                   path="/dashboard" 
                   element={

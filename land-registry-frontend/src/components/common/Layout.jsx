@@ -56,6 +56,7 @@ const Layout = () => {
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
     { text: 'Register Property', icon: <AddBoxIcon />, path: '/register' },
     { text: 'All Properties', icon: <DescriptionIcon />, path: '/properties' },
+    { text: 'Transaction History', icon: <AccountBalanceIcon />, path: '/transactions' },
     { text: 'Public Verification', icon: <SearchIcon />, path: '/verify' },
   ];
 

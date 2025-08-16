@@ -57,6 +57,7 @@ const Layout = () => {
     { text: 'Register Property', icon: <AddBoxIcon />, path: '/register' },
     { text: 'All Properties', icon: <DescriptionIcon />, path: '/properties' },
     { text: 'Transaction History', icon: <AccountBalanceIcon />, path: '/transactions' },
+    { text: 'Help & Support', icon: <VerifiedUserIcon />, path: '/help' },
     { text: 'Public Verification', icon: <SearchIcon />, path: '/verify' },
   ];
 

@@ -164,7 +164,6 @@ const LandRegistration = () => {
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Property Type"
                   select
                   SelectProps={{ native: true }}
                   {...register('propertyType', { required: 'Property type is required' })}

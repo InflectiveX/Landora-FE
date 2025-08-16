@@ -20,9 +20,11 @@ import PropertyDetails from './pages/PropertyDetails';
 import PropertyTransfer from './pages/PropertyTransfer';
 import PublicVerification from './pages/PublicVerification';
 
+
 import AdminDashboard from './pages/AdminDashboard';
 import AdminPropertySearch from './pages/AdminPropertySearch';
 import AllProperties from './pages/AllProperties';
+import Profile from './pages/Profile';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -95,6 +97,15 @@ function App() {
                 <Route 
                   path="/verify" 
                   element={<PublicVerification />} 
+                />
+
+                <Route 
+                  path="/profile" 
+                  element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  } 
                 />
               </Route>
 

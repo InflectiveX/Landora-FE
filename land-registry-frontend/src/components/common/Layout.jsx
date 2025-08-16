@@ -252,7 +252,7 @@ const Layout = () => {
               },
             }}
           >
-            <MenuItem onClick={handleProfileMenuClose}>
+            <MenuItem onClick={() => { handleProfileMenuClose(); navigate('/profile'); }}>
               <ListItemIcon><PersonIcon sx={{ color: 'black' }} /></ListItemIcon>
               Profile
             </MenuItem>

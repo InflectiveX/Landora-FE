@@ -19,8 +19,9 @@ import VerificationQueue from './pages/VerificationQueue';
 import PropertyDetails from './pages/PropertyDetails';
 import PropertyTransfer from './pages/PropertyTransfer';
 import PublicVerification from './pages/PublicVerification';
-import AdminDashboard from './pages/AdminDashboard';
 
+import AdminDashboard from './pages/AdminDashboard';
+import AdminPropertySearch from './pages/AdminPropertySearch';
 import AllProperties from './pages/AllProperties';
 
 const queryClient = new QueryClient({
@@ -112,6 +113,14 @@ function App() {
                   element={
                     <ProtectedRoute adminOnly={true}>
                       <VerificationQueue />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route 
+                  path="property-search"
+                  element={
+                    <ProtectedRoute adminOnly={true}>
+                      <AdminPropertySearch />
                     </ProtectedRoute>
                   }
                 />

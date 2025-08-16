@@ -80,13 +80,38 @@ const Layout = () => {
   };
 
   const drawer = (
-    <Box sx={{ height: '100%', bgcolor: 'background.paper' }}>
-      <Box sx={{ p: 3, textAlign: 'center' }}>
-        <AccountBalanceIcon sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
-        <Typography variant="h6" color="primary" fontWeight="bold">
+    <Box sx={{ 
+      height: '100%', 
+      bgcolor: '#FFFFFF',
+      borderRight: '1px solid #E5E7E9',
+    }}>
+      <Box sx={{ 
+        p: 4, 
+        textAlign: 'center',
+        color: '#FFFFFF',
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%)',
+          zIndex: 1
+        }
+      }}>
+        <AccountBalanceIcon sx={{ 
+          fontSize: 52, 
+          color: 'primary.main', 
+          mb: 2,
+          filter: 'drop-shadow(0 2px 4px rgba(44,62,80,0.2))'
+        }} />
+        <Typography variant="h5" color="primary" fontWeight="bold" sx={{ mb: 1 }}>
           Land Registry
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" color="text.secondary" sx={{ letterSpacing: '0.5px' }}>
           Government of Sri Lanka
         </Typography>
       </Box>
@@ -101,12 +126,36 @@ const Layout = () => {
             onClick={() => navigate(item.path)}
             sx={{
               borderRadius: 2,
-              mb: 0.5,
-              bgcolor: location.pathname === item.path ? 'primary.light' : 'transparent',
-              color: location.pathname === item.path ? 'white' : 'text.primary',
+              mb: 1,
+              py: 1.8,
+              px: 2,
+              bgcolor: location.pathname === item.path ? 'rgba(23,165,137,0.1)' : 'transparent',
+              color: location.pathname === item.path ? '#17A589' : '#4A4A4A',
+              position: 'relative',
+              '&:before': location.pathname === item.path ? {
+                content: '""',
+                position: 'absolute',
+                left: 0,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                height: '70%',
+                width: 3,
+                background: 'linear-gradient(180deg, #17A589, #5DADE2)',
+                borderRadius: '0 4px 4px 0',
+              } : {},
               '&:hover': {
-                bgcolor: location.pathname === item.path ? 'primary.main' : 'grey.100',
+                bgcolor: location.pathname === item.path ? 'rgba(23,165,137,0.12)' : 'rgba(93,173,226,0.08)',
+                color: location.pathname === item.path ? '#17A589' : '#5DADE2',
+                '& .MuiListItemIcon-root': {
+                  color: '#5DADE2',
+                },
               },
+              '& .MuiListItemIcon-root': {
+                color: location.pathname === item.path ? '#17A589' : '#4A4A4A',
+                minWidth: 40,
+                transition: 'color 0.3s ease',
+              },
+              transition: 'all 0.3s ease',
             }}
           >
             <ListItemIcon sx={{ color: 'inherit', minWidth: 40 }}>
@@ -127,8 +176,8 @@ const Layout = () => {
         display: 'flex',
         minHeight: '100vh',
         background: {
-          xs: 'linear-gradient(135deg, #f8f9fa 60%, #e3f2fd 100%)',
-          md: 'linear-gradient(120deg, #f8f9fa 70%, #e3f2fd 100%)',
+          xs: 'linear-gradient(135deg, #F5F6FA 60%, #ECF0F1 100%)',
+          md: 'linear-gradient(120deg, #F5F6FA 70%, #ECF0F1 100%)',
         },
       }}
     >
@@ -138,8 +187,11 @@ const Layout = () => {
         sx={{
           width: { md: `calc(100% - ${drawerWidth}px)` },
           ml: { md: `${drawerWidth}px` },
-          borderBottom: '1.5px solid #e3eaf2',
-          boxShadow: '0 2px 12px rgba(21,101,192,0.08)',
+          background: 'rgba(255,255,255,0.95)',
+          backdropFilter: 'blur(10px)',
+          borderBottom: '1px solid #E5E7E9',
+          color: '#1F3A93',
+          boxShadow: '0 4px 20px rgba(31,58,147,0.06)',
         }}
       >
         <Toolbar sx={{ minHeight: 72 }}>
@@ -226,9 +278,8 @@ const Layout = () => {
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               width: drawerWidth,
-              borderTopRightRadius: 18,
-              borderBottomRightRadius: 18,
-              boxShadow: '0 4px 24px rgba(21,101,192,0.10)',
+              borderRadius: 0,
+              boxShadow: '0 4px 24px rgba(31,58,147,0.10)',
             },
           }}
         >
@@ -242,9 +293,8 @@ const Layout = () => {
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               width: drawerWidth,
-              borderTopRightRadius: 18,
-              borderBottomRightRadius: 18,
-              boxShadow: '0 4px 24px rgba(21,101,192,0.10)',
+              borderRadius: 0,
+              boxShadow: '0 4px 24px rgba(31,58,147,0.10)',
             },
           }}
           open
@@ -268,16 +318,24 @@ const Layout = () => {
         <Container
           maxWidth="xl"
           sx={{
-            py: { xs: 2, md: 5 },
-            px: { xs: 1, md: 4 },
-            borderRadius: 5,
-            boxShadow: {
-              xs: '0 2px 8px rgba(21,101,192,0.05)',
-              md: '0 4px 24px rgba(21,101,192,0.08)',
-            },
-            background: 'rgba(255,255,255,0.95)',
+            py: { xs: 3, md: 5 },
+            px: { xs: 2, md: 4 },
+            borderRadius: 4,
+            boxShadow: '0 4px 24px rgba(31,58,147,0.06)',
+            background: '#FFFFFF',
             minHeight: 'calc(100vh - 100px)',
-            mt: 2,
+            mt: 3,
+            position: 'relative',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '4px',
+              background: 'linear-gradient(90deg, #17A589, #5DADE2)',
+              borderRadius: '4px 4px 0 0',
+            },
           }}
         >
           <Outlet />

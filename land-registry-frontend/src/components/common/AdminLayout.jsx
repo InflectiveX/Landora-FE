@@ -60,36 +60,76 @@ const AdminLayout = () => {
   };
 
   const drawer = (
-    <Box sx={{ height: '100%', bgcolor: 'background.paper' }}>
-      <Box sx={{ p: 3, textAlign: 'center' }}>
-        <AdminIcon sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
-        <Typography variant="h6" color="primary" fontWeight="bold">
+    <Box sx={{ 
+      height: '100%', 
+      bgcolor: '#FFFFFF',
+      borderRight: '1px solid #E5E7E9',
+    }}>
+      <Box sx={{ 
+        p: 4, 
+        textAlign: 'center',
+
+        color: '#000000ff',
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%)',
+          zIndex: 1
+        }
+      }}>
+        <AdminIcon color="primary"  sx={{ fontSize: 52, mb: 2, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
+        <Typography  color="primary" variant="h5" fontWeight="bold" sx={{ mb: 1,  }}>
           Admin Panel
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{  color:"primary", letterSpacing: '0.5px' }}>
           Land Registry Admin
         </Typography>
       </Box>
-      <Divider />
-      <List sx={{ px: 2 }}>
+      <List sx={{ px: 2, py: 2 }}>
         {adminMenuItems.map((item) => (
           <ListItem
             key={item.text}
             button
             onClick={() => navigate(item.path)}
             sx={{
-              borderRadius: 2,
-              mb: 0.5,
-              bgcolor: location.pathname === item.path ? 'secondary.light' : 'transparent',
-              color: location.pathname === item.path ? 'white' : 'text.primary',
+              py: 1.8,
+              px: 2,
+              mb: 1,
+              bgcolor: location.pathname === item.path ? 'rgba(23,165,137,0.1)' : 'transparent',
+              color: location.pathname === item.path ? '#17A589' : '#4A4A4A',
+              position: 'relative',
+              '&:before': location.pathname === item.path ? {
+                content: '""',
+                position: 'absolute',
+                left: 0,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                height: '70%',
+                width: 3,
+                background: 'linear-gradient(180deg, #17A589, #5DADE2)',
+              } : {},
               '&:hover': {
-                bgcolor: location.pathname === item.path ? 'secondary.main' : 'grey.100',
+                bgcolor: location.pathname === item.path ? 'rgba(23,165,137,0.12)' : 'rgba(93,173,226,0.08)',
+                color: location.pathname === item.path ? '#17A589' : '#5DADE2',
+                '& .MuiListItemIcon-root': {
+                  color: '#5DADE2',
+                },
               },
+              '& .MuiListItemIcon-root': {
+                color: location.pathname === item.path ? '#17A589' : '#4A4A4A',
+                minWidth: 40,
+                transition: 'color 0.3s ease',
+              },
+              transition: 'all 0.3s ease',
             }}
           >
-            <ListItemIcon sx={{ color: 'inherit', minWidth: 40 }}>
-              {item.icon}
-            </ListItemIcon>
+            <ListItemIcon>{item.icon}</ListItemIcon>
             <ListItemText primary={item.text} />
           </ListItem>
         ))}
@@ -101,12 +141,18 @@ const AdminLayout = () => {
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <AppBar
         position="fixed"
+        elevation={0}
         sx={{
           width: { md: `calc(100% - ${drawerWidth}px)` },
           ml: { md: `${drawerWidth}px` },
+          background: 'rgba(255,255,255,0.95)',
+          backdropFilter: 'blur(10px)',
+          borderBottom: '1px solid #E5E7E9',
+          color: '#1F3A93',
+          boxShadow: '0 4px 20px rgba(31,58,147,0.06)',
         }}
       >
-        <Toolbar>
+        <Toolbar sx={{ minHeight: 72 }}>
           <IconButton
             color="inherit"
             edge="start"
@@ -115,13 +161,27 @@ const AdminLayout = () => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+          <Typography variant="h5" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 700, letterSpacing: '-0.5px' }}>
             Land Registry Admin
           </Typography>
           <Button
-            color="inherit"
             onClick={handleProfileMenuOpen}
-            startIcon={<Avatar sx={{ width: 32, height: 32 }}><PersonIcon /></Avatar>}
+            startIcon={
+              <Avatar sx={{ width: 36, height: 36, bgcolor: '#17A589' }}>
+                <PersonIcon />
+              </Avatar>
+            }
+            sx={{
+              color: '#4A4A4A',
+              fontWeight: 600,
+              fontSize: '1rem',
+              px: 2,
+              boxShadow: '0 2px 8px rgba(31,58,147,0.10)',
+              background: 'rgba(255,255,255,0.8)',
+              '&:hover': {
+                background: 'rgba(23,165,137,0.08)',
+              },
+            }}
           >
             {user.name}
           </Button>
@@ -155,7 +215,12 @@ const AdminLayout = () => {
           ModalProps={{ keepMounted: true }}
           sx={{
             display: { xs: 'block', md: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              width: drawerWidth,
+              borderRadius: 0,
+              boxShadow: '0 4px 24px rgba(31,58,147,0.10)',
+            },
           }}
         >
           {drawer}
@@ -164,7 +229,12 @@ const AdminLayout = () => {
           variant="permanent"
           sx={{
             display: { xs: 'none', md: 'block' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              width: drawerWidth,
+              borderRadius: 0,
+              boxShadow: '0 4px 24px rgba(31,58,147,0.10)',
+            },
           }}
           open
         >
@@ -176,12 +246,34 @@ const AdminLayout = () => {
         sx={{
           flexGrow: 1,
           width: { md: `calc(100% - ${drawerWidth}px)` },
-          bgcolor: 'background.default',
+          bgcolor: '#FAFAFA',
           minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
-        <Toolbar />
-        <Container maxWidth="xl" sx={{ py: 4 }}>
+        <Toolbar sx={{ minHeight: 72 }} />
+        <Container
+          maxWidth="xl"
+          sx={{
+            py: { xs: 3, md: 5 },
+            px: { xs: 2, md: 4 },
+            boxShadow: '0 4px 24px rgba(31,58,147,0.06)',
+            background: '#FFFFFF',
+            minHeight: 'calc(100vh - 100px)',
+            mt: 3,
+            position: 'relative',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '4px',
+              background: 'linear-gradient(90deg, #17A589, #5DADE2)',
+            },
+          }}
+        >
           <Outlet />
         </Container>
       </Box>

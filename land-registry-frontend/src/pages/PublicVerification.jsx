@@ -53,10 +53,11 @@ function getStatusColor(status) {
   }
 }
 
+
 export default function PublicVerification() {
-  const [searchResult, setSearchResult] = useState(null);
+  const [searchResult, setSearchResult] = useState(undefined); // undefined = not searched yet
   const [loading, setLoading] = useState(false);
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm();
 
   // --- Handlers ---
   const onSearch = async (data) => {
@@ -64,7 +65,7 @@ export default function PublicVerification() {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
-      if (data.searchQuery) {
+      if (data.searchQuery && data.searchQuery.trim() !== '') {
         setSearchResult(mockProperty);
       } else {
         setSearchResult(null);
@@ -76,19 +77,25 @@ export default function PublicVerification() {
     }
   };
 
+  // Clear result if input is cleared
+  const handleInputChange = (e) => {
+    if (e.target.value.trim() === '') {
+      setSearchResult(undefined);
+      reset({ searchQuery: '' });
+    }
+  };
+
   // --- Render ---
   return (
     <Box sx={{
       minHeight: '100vh',
-      height: '100vh',
       bgcolor: 'background.default',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      justifyContent: 'center',
-      overflow: 'hidden',
+      // Remove height: '100vh' and overflow: 'hidden' to allow scrolling
     }}>
-      <Container maxWidth="md" sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', py: 0 }}>
+      <Container maxWidth="md" sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', py: 0, minHeight: '100vh' }}>
         {/* Search Section */}
         <Paper sx={{
           p: { xs: 2, sm: 4 },
@@ -123,6 +130,7 @@ export default function PublicVerification() {
                   error={!!errors.searchQuery}
                   helperText={errors.searchQuery?.message || 'Example: COL-07-2024-001 or 0x1234...5678'}
                   sx={{ bgcolor: 'background.paper', borderRadius: 2 }}
+                  onChange={handleInputChange}
                 />
               </Grid>
               <Grid item xs={6} md={2}>
@@ -154,7 +162,7 @@ export default function PublicVerification() {
         </Paper>
 
         {/* Search Results */}
-        {searchResult && (
+  {searchResult && searchResult !== null && (
           <Paper sx={{ p: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
               <VerifiedIcon sx={{ mr: 2, color: 'success.main' }} />
@@ -355,7 +363,7 @@ export default function PublicVerification() {
         )}
 
         {/* No Results */}
-        {searchResult === null && !loading && (
+  {searchResult === null && !loading && (
           <Paper sx={{ p: 4, textAlign: 'center' }}>
             <SearchIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
             <Typography variant="h6" color="text.secondary" gutterBottom>

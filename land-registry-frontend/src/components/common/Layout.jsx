@@ -226,6 +226,7 @@ const Layout = () => {
               fontWeight: 600,
               fontSize: '1rem',
               px: 2,
+              my: 1,
               borderRadius: 3,
               boxShadow: '0 2px 8px rgba(21,101,192,0.10)',
               background: 'rgba(255,255,255,0.04)',
@@ -245,19 +246,19 @@ const Layout = () => {
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             PaperProps={{
               sx: {
-                borderRadius: 3,
+                borderRadius: 1,
                 minWidth: 180,
                 boxShadow: '0 4px 24px rgba(21,101,192,0.13)',
               },
             }}
           >
             <MenuItem onClick={handleProfileMenuClose}>
-              <ListItemIcon><PersonIcon /></ListItemIcon>
+              <ListItemIcon><PersonIcon sx={{ color: 'black' }} /></ListItemIcon>
               Profile
             </MenuItem>
             <Divider />
             <MenuItem onClick={handleLogout}>
-              <ListItemIcon><ExitToAppIcon /></ListItemIcon>
+              <ListItemIcon><ExitToAppIcon sx={{ color: 'error.main' }}/></ListItemIcon>
               Logout
             </MenuItem>
           </Menu>

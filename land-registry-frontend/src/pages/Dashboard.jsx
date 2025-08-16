@@ -225,7 +225,7 @@ const Dashboard = () => {
       </Grid>
 
       {/* Information Section */}
-      <Paper sx={{ p: 3, mt: 4, bgcolor: 'info.light', color: 'info.contrastText' }}>
+      <Paper sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 3, mt: 4, bgcolor: 'rgba(3, 205, 255, 0.07)', color: 'black' }}>
         <Typography variant="h6" gutterBottom>
           How It Works
         </Typography>
@@ -241,7 +241,7 @@ const Dashboard = () => {
           </Grid>
           <Grid item xs={12} md={4}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-              <VerifiedIcon sx={{ mr: 1 }} />
+              <VerifiedIcon sx={{ mr: 1, color: 'success.main' }} />
               <Typography variant="subtitle2">2. Government Verification</Typography>
             </Box>
             <Typography variant="body2" sx={{ opacity: 0.8 }}>
@@ -250,7 +250,7 @@ const Dashboard = () => {
           </Grid>
           <Grid item xs={12} md={4}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-              <AccountBalanceIcon sx={{ mr: 1 }} />
+              <AccountBalanceIcon sx={{ mr: 1, color: 'primary.main' }} />
               <Typography variant="subtitle2">3. Blockchain Registration</Typography>
             </Box>
             <Typography variant="body2" sx={{ opacity: 0.8 }}>

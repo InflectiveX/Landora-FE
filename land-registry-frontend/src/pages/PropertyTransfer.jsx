@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import transferDocuments from '../data/transferDocuments.json';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -50,7 +51,7 @@ const PropertyTransfer = () => {
   const { register, handleSubmit, formState: { errors }, watch } = useForm();
   const { enqueueSnackbar } = useSnackbar();
 
-  // Mock property data
+  // Mock property data (for demo, only static fields; in real app, fetch by id)
   const property = {
     id: id,
     title: 'Residential Plot - Colombo 07',
@@ -58,13 +59,7 @@ const PropertyTransfer = () => {
     currentOwner: 'John Doe',
     nftTokenId: '0x1234...5678',
   };
-
-  const transferDocuments = [
-    { id: 'transferDeed', name: 'Transfer Deed', required: true },
-    { id: 'buyerNIC', name: 'Buyer NIC Copy', required: true },
-    { id: 'paymentProof', name: 'Payment Proof', required: true },
-    { id: 'legalClearance', name: 'Legal Clearance Certificate', required: false },
-  ];
+  // transferDocuments imported from JSON
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);

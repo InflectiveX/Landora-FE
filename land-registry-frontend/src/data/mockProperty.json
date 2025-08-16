@@ -1,0 +1,28 @@
+{
+  "id": 1,
+  "title": "Residential Plot - Colombo 07",
+  "plotNumber": "COL-07-2024-001",
+  "status": "verified",
+  "registrationDate": "2024-08-10",
+  "verificationDate": "2024-08-12",
+  "nftTokenId": "0x1234...5678",
+  "owner": {
+    "name": "John D***",
+    "nic": "1990*****678"
+  },
+  "location": {
+    "address": "No. 123, Galle Road, Colombo 07",
+    "district": "Colombo",
+    "province": "Western Province"
+  },
+  "details": {
+    "landArea": "10 perches",
+    "propertyType": "Residential",
+    "surveyNumber": "SUR-2024-789"
+  },
+  "blockchainInfo": {
+    "network": "Polygon Mainnet",
+    "contractAddress": "0xabcd...efgh",
+    "lastUpdate": "2024-08-12"
+  }
+}

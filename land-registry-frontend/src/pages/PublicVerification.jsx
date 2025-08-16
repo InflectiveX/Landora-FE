@@ -163,204 +163,201 @@ export default function PublicVerification() {
 
         {/* Search Results */}
   {searchResult && searchResult !== null && (
-          <Paper sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-              <VerifiedIcon sx={{ mr: 2, color: 'success.main' }} />
-              <Typography variant="h5" color="success.main">
-                Property Found & Verified
-              </Typography>
-              <Chip
-                label={searchResult.status.toUpperCase()}
-                color={getStatusColor(searchResult.status)}
-                sx={{ ml: 2 }}
-              />
-            </Box>
+    <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 2 }}>
+      <Paper sx={{ p: 3, maxWidth: 1100, width: '100%', bgcolor: 'background.default', boxShadow: '0 4px 24px rgba(21,101,192,0.08)', borderRadius: 5, mx: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, justifyContent: 'center' }}>
+          <VerifiedIcon sx={{ mr: 2, color: 'success.main' }} />
+          <Typography variant="h5" color="success.main">
+            Property Found & Verified
+          </Typography>
+          <Chip
+            label={searchResult.status.toUpperCase()}
+            color={getStatusColor(searchResult.status)}
+            sx={{ ml: 2 }}
+          />
+        </Box>
 
-            <Grid container spacing={3}>
-              {/* Property Information */}
-              <Grid item xs={12} md={8}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-                      <LocationIcon sx={{ mr: 1, color: 'primary.main' }} />
-                      Property Information
-                    </Typography>
-                    <Divider sx={{ mb: 2 }} />
-                    
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6}>
-                        <List dense>
-                          <ListItem>
-                            <ListItemText 
-                              primary="Property Title" 
-                              secondary={searchResult.title} 
-                            />
-                          </ListItem>
-                          <ListItem>
-                            <ListItemText 
-                              primary="Plot Number" 
-                              secondary={searchResult.plotNumber} 
-                            />
-                          </ListItem>
-                          <ListItem>
-                            <ListItemText 
-                              primary="Survey Number" 
-                              secondary={searchResult.details.surveyNumber} 
-                            />
-                          </ListItem>
-                        </List>
-                      </Grid>
-                      <Grid item xs={12} md={6}>
-                        <List dense>
-                          <ListItem>
-                            <ListItemText 
-                              primary="Property Type" 
-                              secondary={searchResult.details.propertyType} 
-                            />
-                          </ListItem>
-                          <ListItem>
-                            <ListItemText 
-                              primary="Land Area" 
-                              secondary={searchResult.details.landArea} 
-                            />
-                          </ListItem>
-                          <ListItem>
-                            <ListItemText 
-                              primary="District" 
-                              secondary={searchResult.location.district} 
-                            />
-                          </ListItem>
-                        </List>
-                      </Grid>
-                    </Grid>
-
-                    <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>
-                      Address
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {searchResult.location.address}
-                    </Typography>
-                  </CardContent>
-                </Card>
-
-                {/* Owner Information */}
-                <Card sx={{ mt: 2 }}>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-                      <PersonIcon sx={{ mr: 1, color: 'primary.main' }} />
-                      Owner Information
-                    </Typography>
-                    <Divider sx={{ mb: 2 }} />
-                    
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6}>
-                        <Typography variant="subtitle2">Registered Owner</Typography>
-                        <Typography variant="body1">{searchResult.owner.name}</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={6}>
-                        <Typography variant="subtitle2">NIC Number</Typography>
-                        <Typography variant="body1">{searchResult.owner.nic}</Typography>
-                      </Grid>
-                    </Grid>
-
-                    <Alert severity="info" sx={{ mt: 2 }}>
-                      Personal information is partially hidden for privacy protection
-                    </Alert>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              {/* Blockchain Verification */}
-              <Grid item xs={12} md={4}>
-                <Card sx={{ bgcolor: 'primary.light', color: 'primary.contrastText' }}>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-                      <SecurityIcon sx={{ mr: 1 }} />
-                      Blockchain Verification
-                    </Typography>
-                    <Divider sx={{ mb: 2, borderColor: 'primary.contrastText' }} />
-                    
+        {/* First Row: Property Info | Owner Info */}
+        <Grid container spacing={3} justifyContent="center" alignItems="stretch" sx={{ mb: 2, width: '100%' }}>
+          <Grid item xs={12} md={6} sx={{ display: 'flex' }}>
+            <Card sx={{ width: 500, borderRadius: 4, boxShadow: '0 2px 16px rgba(21,101,192,0.08)', bgcolor: 'background.paper', m: 'auto', display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <CardContent sx={{ p: 3, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                  <LocationIcon sx={{ mr: 1, color: 'primary.main' }} />
+                  Property Information
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6}>
                     <List dense>
                       <ListItem>
                         <ListItemText 
-                          primary="NFT Token ID" 
-                          secondary={searchResult.nftTokenId}
+                          primary="Property Title" 
+                          secondary={searchResult.title} 
                         />
                       </ListItem>
                       <ListItem>
                         <ListItemText 
-                          primary="Network" 
-                          secondary={searchResult.blockchainInfo.network}
+                          primary="Plot Number" 
+                          secondary={searchResult.plotNumber} 
                         />
                       </ListItem>
                       <ListItem>
                         <ListItemText 
-                          primary="Registration Date" 
-                          secondary={searchResult.registrationDate}
-                        />
-                      </ListItem>
-                      <ListItem>
-                        <ListItemText 
-                          primary="Last Verification" 
-                          secondary={searchResult.verificationDate}
+                          primary="Survey Number" 
+                          secondary={searchResult.details.surveyNumber} 
                         />
                       </ListItem>
                     </List>
-
-                    <Button
-                      fullWidth
-                      variant="contained"
-                      color="secondary"
-                      sx={{ mt: 2 }}
-                    >
-                      View on Blockchain
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                {/* Verification Status */}
-                <Card sx={{ mt: 2 }}>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      Verification Status
-                    </Typography>
-                    <Divider sx={{ mb: 2 }} />
-                    
+                  </Grid>
+                  <Grid item xs={12} md={6}>
                     <List dense>
                       <ListItem>
-                        <ListItemIcon>
-                          <VerifiedIcon color="success" />
-                        </ListItemIcon>
                         <ListItemText 
-                          primary="Government Verified"
-                          secondary="Authenticated by Land Registry"
+                          primary="Property Type" 
+                          secondary={searchResult.details.propertyType} 
                         />
                       </ListItem>
                       <ListItem>
-                        <ListItemIcon>
-                          <SecurityIcon color="success" />
-                        </ListItemIcon>
                         <ListItemText 
-                          primary="Blockchain Secured"
-                          secondary="Immutable record on blockchain"
+                          primary="Land Area" 
+                          secondary={searchResult.details.landArea} 
                         />
                       </ListItem>
                       <ListItem>
-                        <ListItemIcon>
-                          <DescriptionIcon color="success" />
-                        </ListItemIcon>
                         <ListItemText 
-                          primary="Documents Verified"
-                          secondary="All supporting docs validated"
+                          primary="District" 
+                          secondary={searchResult.location.district} 
                         />
                       </ListItem>
                     </List>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
-          </Paper>
-        )}
+                  </Grid>
+                </Grid>
+                <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>
+                  Address
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {searchResult.location.address}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={6} sx={{ display: 'flex' }}>
+            <Card sx={{ width: 500, borderRadius: 4, boxShadow: '0 2px 16px rgba(21,101,192,0.08)', bgcolor: 'background.paper', m: 'auto', display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <CardContent sx={{ p: 3, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                  <PersonIcon sx={{ mr: 1, color: 'primary.main' }} />
+                  Owner Information
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="subtitle2">Registered Owner</Typography>
+                    <Typography variant="body1">{searchResult.owner.name}</Typography>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="subtitle2">NIC Number</Typography>
+                    <Typography variant="body1">{searchResult.owner.nic}</Typography>
+                  </Grid>
+                </Grid>
+                <Alert severity="info" sx={{ mt: 2 }}>
+                  Personal information is partially hidden for privacy protection
+                </Alert>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+
+        {/* Second Row: Blockchain Certification | Verification Status */}
+        <Grid container spacing={3} justifyContent="center" alignItems="stretch" sx={{ width: '100%' }}>
+          <Grid item xs={12} md={6} sx={{ display: 'flex' }}>
+            <Card sx={{ width: 500, borderRadius: 4, boxShadow: '0 2px 16px rgba(21,101,192,0.08)', bgcolor: 'primary.light', color: 'primary.contrastText', m: 'auto', display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <CardContent sx={{ p: 3, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                  <SecurityIcon sx={{ mr: 1 }} />
+                  Blockchain Verification
+                </Typography>
+                <Divider sx={{ mb: 2, borderColor: 'primary.contrastText' }} />
+                <List dense>
+                  <ListItem>
+                    <ListItemText 
+                      primary="NFT Token ID" 
+                      secondary={searchResult.nftTokenId}
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText 
+                      primary="Network" 
+                      secondary={searchResult.blockchainInfo.network}
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText 
+                      primary="Registration Date" 
+                      secondary={searchResult.registrationDate}
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText 
+                      primary="Last Verification" 
+                      secondary={searchResult.verificationDate}
+                    />
+                  </ListItem>
+                </List>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  color="secondary"
+                  sx={{ mt: 2 }}
+                >
+                  View on Blockchain
+                </Button>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={6} sx={{ display: 'flex' }}>
+            <Card sx={{ width: 500, borderRadius: 4, boxShadow: '0 2px 16px rgba(21,101,192,0.08)', bgcolor: 'background.paper', m: 'auto', display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <CardContent sx={{ p: 3, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <Typography variant="h6" gutterBottom>
+                  Verification Status
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <List dense>
+                  <ListItem>
+                    <ListItemIcon>
+                      <VerifiedIcon color="success" />
+                    </ListItemIcon>
+                    <ListItemText 
+                      primary="Government Verified"
+                      secondary="Authenticated by Land Registry"
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemIcon>
+                      <SecurityIcon color="success" />
+                    </ListItemIcon>
+                    <ListItemText 
+                      primary="Blockchain Secured"
+                      secondary="Immutable record on blockchain"
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemIcon>
+                      <DescriptionIcon color="success" />
+                    </ListItemIcon>
+                    <ListItemText 
+                      primary="Documents Verified"
+                      secondary="All supporting docs validated"
+                    />
+                  </ListItem>
+                </List>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </Paper>
+    </Box>
+  )}
 
         {/* No Results */}
   {searchResult === null && !loading && (

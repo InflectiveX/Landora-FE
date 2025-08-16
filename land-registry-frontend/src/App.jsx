@@ -47,7 +47,6 @@ function App() {
           <Router>
             <Routes>
               <Route path="/login" element={<Login />} />
-              <Route path="/verify" element={<PublicVerification />} />
 
               {/* User Layout */}
               <Route path="/" element={<Layout />}>
@@ -91,6 +90,10 @@ function App() {
                       <PropertyTransfer />
                     </ProtectedRoute>
                   } 
+                />
+                <Route 
+                  path="/verify" 
+                  element={<PublicVerification />} 
                 />
               </Route>
 

@@ -1,28 +1,10 @@
+
 import React, { useState } from 'react';
 import {
-  Box,
-  Container,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  Card,
-  CardContent,
-  Grid,
-  Chip,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Divider,
-  Alert,
-  CircularProgress,
-  AppBar,
-  Toolbar,
+  Box, Container, Paper, Typography, TextField, Button, Card, CardContent, Grid, Chip, List, ListItem, ListItemText, ListItemIcon, Divider, Alert, CircularProgress
 } from '@mui/material';
 import {
   Search as SearchIcon,
-  AccountBalance as AccountBalanceIcon,
   Verified as VerifiedIcon,
   LocationOn as LocationIcon,
   Person as PersonIcon,
@@ -32,48 +14,56 @@ import {
 } from '@mui/icons-material';
 import { useForm } from 'react-hook-form';
 
-const PublicVerification = () => {
+// --- Mock Data & Helpers ---
+const mockProperty = {
+  id: 1,
+  title: 'Residential Plot - Colombo 07',
+  plotNumber: 'COL-07-2024-001',
+  status: 'verified',
+  registrationDate: '2024-08-10',
+  verificationDate: '2024-08-12',
+  nftTokenId: '0x1234...5678',
+  owner: {
+    name: 'John D***',
+    nic: '1990*****678',
+  },
+  location: {
+    address: 'No. 123, Galle Road, Colombo 07',
+    district: 'Colombo',
+    province: 'Western Province',
+  },
+  details: {
+    landArea: '10 perches',
+    propertyType: 'Residential',
+    surveyNumber: 'SUR-2024-789',
+  },
+  blockchainInfo: {
+    network: 'Polygon Mainnet',
+    contractAddress: '0xabcd...efgh',
+    lastUpdate: '2024-08-12',
+  }
+};
+
+function getStatusColor(status) {
+  switch (status) {
+    case 'verified': return 'success';
+    case 'pending': return 'warning';
+    case 'rejected': return 'error';
+    default: return 'default';
+  }
+}
+
+export default function PublicVerification() {
   const [searchResult, setSearchResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm();
 
-  // Mock search results
-  const mockProperty = {
-    id: 1,
-    title: 'Residential Plot - Colombo 07',
-    plotNumber: 'COL-07-2024-001',
-    status: 'verified',
-    registrationDate: '2024-08-10',
-    verificationDate: '2024-08-12',
-    nftTokenId: '0x1234...5678',
-    owner: {
-      name: 'John D***', // Partially hidden for privacy
-      nic: '1990*****678',
-    },
-    location: {
-      address: 'No. 123, Galle Road, Colombo 07',
-      district: 'Colombo',
-      province: 'Western Province',
-    },
-    details: {
-      landArea: '10 perches',
-      propertyType: 'Residential',
-      surveyNumber: 'SUR-2024-789',
-    },
-    blockchainInfo: {
-      network: 'Polygon Mainnet',
-      contractAddress: '0xabcd...efgh',
-      lastUpdate: '2024-08-12',
-    }
-  };
-
+  // --- Handlers ---
   const onSearch = async (data) => {
     setLoading(true);
     try {
-      // Mock API call
+      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Mock successful search
       if (data.searchQuery) {
         setSearchResult(mockProperty);
       } else {
@@ -86,33 +76,33 @@ const PublicVerification = () => {
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'verified': return 'success';
-      case 'pending': return 'warning';
-      case 'rejected': return 'error';
-      default: return 'default';
-    }
-  };
-
+  // --- Render ---
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-      {/* Header */}
-      <AppBar position="static">
-        <Toolbar>
-          <AccountBalanceIcon sx={{ mr: 2 }} />
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Sri Lankan Land Registry - Public Verification
-          </Typography>
-        </Toolbar>
-      </AppBar>
-
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Box sx={{
+      minHeight: '100vh',
+      height: '100vh',
+      bgcolor: 'background.default',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      overflow: 'hidden',
+    }}>
+      <Container maxWidth="md" sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', py: 0 }}>
         {/* Search Section */}
-        <Paper sx={{ p: 4, mb: 4 }}>
+        <Paper sx={{
+          p: { xs: 2, sm: 4 },
+          mb: 4,
+          borderRadius: 4,
+          boxShadow: '0 4px 24px rgba(21,101,192,0.10)',
+          background: 'rgba(255,255,255,0.98)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}>
           <Box sx={{ textAlign: 'center', mb: 4 }}>
             <SecurityIcon sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
-            <Typography variant="h4" gutterBottom color="primary">
+            <Typography variant="h4" gutterBottom color="primary" sx={{ fontWeight: 700 }}>
               Property Verification Portal
             </Typography>
             <Typography variant="body1" color="text.secondary">
@@ -120,9 +110,9 @@ const PublicVerification = () => {
             </Typography>
           </Box>
 
-          <Box component="form" onSubmit={handleSubmit(onSearch)}>
-            <Grid container spacing={2} alignItems="end">
-              <Grid item xs={12} md={8}>
+          <Box component="form" onSubmit={handleSubmit(onSearch)} sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+            <Grid container spacing={2} alignItems="center" justifyContent="center" sx={{ width: '100%', maxWidth: 700 }}>
+              <Grid item xs={12} md={7}>
                 <TextField
                   fullWidth
                   label="Search Property"
@@ -132,9 +122,10 @@ const PublicVerification = () => {
                   })}
                   error={!!errors.searchQuery}
                   helperText={errors.searchQuery?.message || 'Example: COL-07-2024-001 or 0x1234...5678'}
+                  sx={{ bgcolor: 'background.paper', borderRadius: 2 }}
                 />
               </Grid>
-              <Grid item xs={12} md={2}>
+              <Grid item xs={6} md={2}>
                 <Button
                   fullWidth
                   variant="contained"
@@ -142,16 +133,18 @@ const PublicVerification = () => {
                   type="submit"
                   disabled={loading}
                   startIcon={loading ? <CircularProgress size={20} /> : <SearchIcon />}
+                  sx={{ height: 56, fontWeight: 600, borderRadius: 2 }}
                 >
                   {loading ? 'Searching...' : 'Search'}
                 </Button>
               </Grid>
-              <Grid item xs={12} md={2}>
+              <Grid item xs={6} md={2}>
                 <Button
                   fullWidth
                   variant="outlined"
                   size="large"
                   startIcon={<QrCodeScannerIcon />}
+                  sx={{ height: 56, fontWeight: 600, borderRadius: 2 }}
                 >
                   Scan QR
                 </Button>
@@ -374,53 +367,56 @@ const PublicVerification = () => {
           </Paper>
         )}
 
-        {/* Information Cards */}
-        <Grid container spacing={3} sx={{ mt: 4 }}>
-          <Grid item xs={12} md={4}>
-            <Card>
-              <CardContent sx={{ textAlign: 'center' }}>
-                <SecurityIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                  Blockchain Security
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  All property records are secured on the blockchain, ensuring they cannot be tampered with or falsified.
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          
-          <Grid item xs={12} md={4}>
-            <Card>
-              <CardContent sx={{ textAlign: 'center' }}>
-                <VerifiedIcon sx={{ fontSize: 48, color: 'success.main', mb: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                  Government Verified
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Every property registration is verified by official government land registry officers.
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          
-          <Grid item xs={12} md={4}>
-            <Card>
-              <CardContent sx={{ textAlign: 'center' }}>
-                <SearchIcon sx={{ fontSize: 48, color: 'info.main', mb: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                  Public Access
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Anyone can verify property ownership and authenticity through this public portal.
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
+        {/* Information Block: 3 sections in one row, no outlines */}
+        <Box
+          sx={{
+            mt: 4,
+            mb: 2,
+            display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' },
+            alignItems: 'stretch',
+            justifyContent: 'center',
+            gap: { xs: 2, md: 4 },
+            bgcolor: 'background.paper',
+            borderRadius: 4,
+            boxShadow: '0 2px 12px rgba(21,101,192,0.06)',
+            p: { xs: 2, md: 3 },
+            width: '100%',
+            maxWidth: 900,
+            mx: 'auto',
+          }}
+        >
+          <Box sx={{ flex: 1, textAlign: 'center', px: { xs: 0, md: 2 } }}>
+            <SecurityIcon sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+              Blockchain Security
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              All property records are secured on the blockchain, ensuring they cannot be tampered with or falsified.
+            </Typography>
+          </Box>
+          <Box sx={{ flex: 1, textAlign: 'center', px: { xs: 0, md: 2 } }}>
+            <VerifiedIcon sx={{ fontSize: 48, color: 'success.main', mb: 1 }} />
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+              Government Verified
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Every property registration is verified by official government land registry officers.
+            </Typography>
+          </Box>
+          <Box sx={{ flex: 1, textAlign: 'center', px: { xs: 0, md: 2 } }}>
+            <SearchIcon sx={{ fontSize: 48, color: 'info.main', mb: 1 }} />
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+              Public Access
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Anyone can verify property ownership and authenticity through this public portal.
+            </Typography>
+          </Box>
+        </Box>
 
         {/* Footer */}
-        <Box sx={{ mt: 6, textAlign: 'center' }}>
+        <Box sx={{ mt: 2, textAlign: 'center', flexShrink: 0 }}>
           <Typography variant="body2" color="text.secondary">
             © 2024 Government of Sri Lanka - Department of Land Registry. All rights reserved.
           </Typography>
@@ -430,5 +426,5 @@ const PublicVerification = () => {
   );
 };
 
-export default PublicVerification;
+
                 

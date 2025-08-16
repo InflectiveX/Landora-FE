@@ -1,12 +1,54 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Landora Land Registry Frontend
 
-Currently, two official plugins are available:
+This is the frontend for the Landora Land Registry System, built with React, Vite, and Material-UI. It provides a modern, secure, and user-friendly interface for property registration, verification, transfer, and administration.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- **User Dashboard**: Citizens can register properties, view transaction history, and manage their profile.
+- **Property Registration**: Guided process for submitting new property details and documents.
+- **Verification Queue**: Admins can review and verify property submissions.
+- **Property Transfer**: Secure transfer of property ownership.
+- **Officer Management**: Admins can add, edit, and remove government officers from the system (see `/admin/officers`).
+- **Help & Support**: Comprehensive help center with FAQs, guides, and contact options.
+- **Authentication**: Secure login for citizens and officers.
+- **Modern UI**: Responsive design with Material-UI and custom themes.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Project Structure
+
+- `src/pages/` — Main pages (Dashboard, Login, LandRegistration, OfficerManagement, etc.)
+- `src/components/common/` — Shared layout and UI components
+- `src/theme/` — Theme customization
+- `public/` — Static assets
+
+## Officer Management
+
+Admins can manage government officers via the Officer Management page:
+
+- Navigate to **Admin Panel** → **Manage Officers**
+- Add, edit, or remove officers
+- Officers have name, email, department, and status fields
+
+## Getting Started
+
+1. Install dependencies:
+	```sh
+	npm install
+	```
+2. Start the development server:
+	```sh
+	npm run dev
+	```
+3. Visit [http://localhost:5173](http://localhost:5173) in your browser.
+
+## Tech Stack
+
+- React
+- Vite
+- Material-UI
+- React Router
+- React Hook Form
+- Notistack (notifications)
+
+---
+For more details, see the code in the `src/` directory.

@@ -23,6 +23,7 @@ import PublicVerification from './pages/PublicVerification';
 
 import AdminDashboard from './pages/AdminDashboard';
 import AdminPropertySearch from './pages/AdminPropertySearch';
+import OfficerManagement from './pages/OfficerManagement';
 import AllProperties from './pages/AllProperties';
 import Profile from './pages/Profile';
 import TransactionHistory from './pages/TransactionHistory';
@@ -150,6 +151,14 @@ function App() {
                   element={
                     <ProtectedRoute adminOnly={true}>
                       <AdminPropertySearch />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route 
+                  path="officers"
+                  element={
+                    <ProtectedRoute adminOnly={true}>
+                      <OfficerManagement />
                     </ProtectedRoute>
                   }
                 />

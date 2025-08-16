@@ -50,6 +50,7 @@ const AdminLayout = () => {
     { text: 'Admin Dashboard', icon: <AdminIcon />, path: '/admin' },
     { text: 'Verification Queue', icon: <VerifiedUserIcon />, path: '/admin/verification-queue' },
     { text: 'Property Search', icon: <DashboardIcon />, path: '/admin/property-search' },
+    { text: 'Manage Officers', icon: <PersonIcon />, path: '/admin/officers' },
   ];
 
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);

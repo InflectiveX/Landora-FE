@@ -93,16 +93,18 @@ const Dashboard = () => {
   };
 
   return (
-    <Box>
-      {/* Welcome Section */}
-      <Paper sx={{ p: 3, mb: 3, bgcolor: 'primary.main', color: 'white' }}>
-        <Typography variant="h4" gutterBottom>
-          Welcome back, {user.name}!
-        </Typography>
-        <Typography variant="body1" sx={{ opacity: 0.9 }}>
-          Manage your property registrations securely on the blockchain
-        </Typography>
-      </Paper>
+    <Box sx={{ bgcolor: 'transparent', minHeight: '100vh', p: { xs: 1, sm: 2, md: 3 } }}>
+      {/* Welcome Section - Full Width, No Blue Background */}
+      <Box sx={{ width: '100%', mb: 3 }}>
+        <Paper elevation={2} sx={{ width: '100%', p: { xs: 2, sm: 3 }, borderRadius: 2, boxShadow: 2 }}>
+          <Typography variant="h4" gutterBottom>
+            Welcome back, {user.name}!
+          </Typography>
+          <Typography variant="body1" sx={{ opacity: 0.9 }}>
+            Manage your property registrations securely on the blockchain
+          </Typography>
+        </Paper>
+      </Box>
 
       {/* Statistics Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>

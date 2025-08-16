@@ -340,40 +340,17 @@ const Login = () => {
               </Button>
 
               {tabValue === 0 && (
-                <>
-                  <Divider sx={{ my: 3 }}>
-                    <Typography variant="body2" color="text.secondary" fontWeight="500">
-                      OR
-                    </Typography>
-                  </Divider>
-
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    size="large"
-                    onClick={handleEnicLogin}
-                    startIcon={<HomeIcon />}
-                    sx={{ 
-                      py: 2,
-                      borderRadius: 3,
-                      borderWidth: 2,
-                      borderColor: alpha('#7209b7', 0.3),
-                      color: '#7209b7',
-                      fontSize: '1rem',
-                      fontWeight: 600,
-                      textTransform: 'none',
-                      transition: 'all 0.3s ease',
-                      '&:hover': {
-                        borderColor: '#7209b7',
-                        backgroundColor: alpha('#7209b7', 0.05),
-                        transform: 'translateY(-1px)',
-                        boxShadow: '0 4px 20px rgba(114, 9, 183, 0.2)',
-                      },
-                    }}
-                  >
-                    Login with Sri Lankan eNIC
-                  </Button>
-                </>
+                <Box sx={{ mt: 2, textAlign: 'center' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    New user?{' '}
+                    <span
+                      style={{ color: '#7209b7', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}
+                      onClick={() => navigate('/signup')}
+                    >
+                      Sign up here
+                    </span>
+                  </Typography>
+                </Box>
               )}
             </Box>
 

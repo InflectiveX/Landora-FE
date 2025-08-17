@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import pendingRegistrations from '../data/pendingRegistrations.json';
 import {
   Box,
   Paper,
@@ -49,45 +50,7 @@ const VerificationQueue = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const { enqueueSnackbar } = useSnackbar();
 
-  // Mock pending registrations
-  const pendingRegistrations = [
-    {
-      id: 1,
-      propertyTitle: 'Residential Plot - Galle',
-      plotNumber: 'GAL-2024-001',
-      submittedBy: 'Alice Johnson',
-      submissionDate: '2024-08-15',
-      status: 'pending',
-      priority: 'normal',
-      documents: ['Title Deed', 'Survey Plan', 'Tax Records'],
-      location: 'No. 45, Main Street, Galle',
-      landArea: '15 perches',
-    },
-    {
-      id: 2,
-      propertyTitle: 'Commercial Building - Kandy',
-      plotNumber: 'KAN-2024-002',
-      submittedBy: 'Bob Smith',
-      submissionDate: '2024-08-14',
-      status: 'under_review',
-      priority: 'high',
-      documents: ['Title Deed', 'Survey Plan', 'Building Permit'],
-      location: 'No. 78, Peradeniya Road, Kandy',
-      landArea: '25 perches',
-    },
-    {
-      id: 3,
-      propertyTitle: 'Agricultural Land - Matara',
-      plotNumber: 'MAT-2024-003',
-      submittedBy: 'Carol Brown',
-      submissionDate: '2024-08-13',
-      status: 'pending',
-      priority: 'normal',
-      documents: ['Title Deed', 'Survey Plan'],
-      location: 'Weligama Road, Matara',
-      landArea: '2 acres',
-    },
-  ];
+  // ...existing code...
 
   const getStatusColor = (status) => {
     switch (status) {

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import users from '../data/users.json';
 import { useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -61,26 +62,22 @@ const Login = () => {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      // Mock authentication - replace with actual API call
+      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock successful login
-      const mockUser = {
-        id: 1,
-        name: tabValue === 0 ? 'John Doe' : 'Admin User',
-        email: data.email,
-        role: tabValue === 0 ? 'citizen' : 'admin',
-      };
-      
-      localStorage.setItem('token', 'mock-jwt-token');
-      localStorage.setItem('user', JSON.stringify(mockUser));
-
-      enqueueSnackbar('Login successful!', { variant: 'success' });
-      // Redirect based on role
-      if (mockUser.role === 'admin') {
-        navigate('/admin', { replace: true });
+      // Find user from imported users.json
+      const role = tabValue === 0 ? 'citizen' : 'admin';
+      const user = users.find(u => u.email === data.email && u.password === data.password && u.role === role);
+      if (user) {
+        localStorage.setItem('token', 'mock-jwt-token');
+        localStorage.setItem('user', JSON.stringify(user));
+        enqueueSnackbar('Login successful!', { variant: 'success' });
+        if (user.role === 'admin') {
+          navigate('/admin', { replace: true });
+        } else {
+          navigate('/dashboard', { replace: true });
+        }
       } else {
-        navigate('/dashboard', { replace: true });
+        enqueueSnackbar('Invalid credentials or role.', { variant: 'error' });
       }
     } catch (error) {
       enqueueSnackbar('Login failed. Please try again.', { variant: 'error' });

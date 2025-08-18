@@ -1,0 +1,57 @@
+/* Modern global base styles */
+html {
+	box-sizing: border-box;
+	scroll-behavior: smooth;
+}
+*, *::before, *::after {
+	box-sizing: inherit;
+}
+body {
+	margin: 0;
+	font-family: 'Inter', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+	background: #f8f9fa;
+	color: #212529;
+	min-height: 100vh;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+	width: 10px;
+	background: #e9ecef;
+}
+::-webkit-scrollbar-thumb {
+	background: #b0bec5;
+	border-radius: 8px;
+	transition: background 0.3s;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: #90a4ae;
+}
+
+a {
+	color: #1565c0;
+	text-decoration: none;
+	transition: color 0.2s;
+}
+a:hover {
+	color: #0d47a1;
+	text-decoration: underline;
+}
+
+button, input, select, textarea {
+	font-family: inherit;
+	outline: none;
+	transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+/* Remove tap highlight on mobile */
+* {
+	-webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth transitions for interactive elements */
+.MuiButton-root, .MuiCard-root, .MuiPaper-root, .MuiTextField-root {
+	transition: box-shadow 0.3s, border-color 0.3s, background 0.3s;
+}

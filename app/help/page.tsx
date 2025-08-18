@@ -1,12 +1,12 @@
 'use client'
 
+import HelpSupport from '../../components/ui/HelpSupport';
 import { DashboardLayout } from '../../components/layout';
-import DashboardContent from '../../components/ui/DashboardContent';
 
-export default function Dashboard() {
+export default function HelpPage() {
   return (
     <DashboardLayout>
-      <DashboardContent />
+      <HelpSupport />
     </DashboardLayout>
   );
 }

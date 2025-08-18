@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState } from 'react';
-import pendingRegistrations from '../../data/pendingRegistrations.json';
 import {
   Box,
   Paper,
@@ -51,6 +50,46 @@ const VerificationQueue = () => {
   const [tabValue, setTabValue] = useState(0);
   const [filterStatus, setFilterStatus] = useState('all');
   const { enqueueSnackbar } = useSnackbar();
+
+  // Mock pending registrations data
+  const pendingRegistrations = [
+    {
+      id: 1,
+      propertyTitle: 'Residential Land - Kandy',
+      plotNumber: 'PLOT001',
+      location: 'Kandy, Central Province',
+      landArea: '2500 sq ft',
+      submittedBy: 'Jane Smith',
+      submissionDate: '2024-02-15',
+      status: 'pending',
+      priority: 'high',
+      documents: ['Title Deed', 'Survey Plan', 'Identity Document', 'Tax Records']
+    },
+    {
+      id: 2,
+      propertyTitle: 'Commercial Land - Galle',
+      plotNumber: 'PLOT002',
+      location: 'Galle, Southern Province',
+      landArea: '5000 sq ft',
+      submittedBy: 'Mike Johnson',
+      submissionDate: '2024-02-14',
+      status: 'under_review',
+      priority: 'normal',
+      documents: ['Title Deed', 'Survey Plan', 'Building Permit']
+    },
+    {
+      id: 3,
+      propertyTitle: 'Agricultural Land - Anuradhapura',
+      plotNumber: 'PLOT003',
+      location: 'Anuradhapura, North Central Province',
+      landArea: '2 acres',
+      submittedBy: 'Sarah Wilson',
+      submissionDate: '2024-02-13',
+      status: 'pending',
+      priority: 'low',
+      documents: ['Title Deed', 'Survey Plan', 'Agricultural Certificate']
+    }
+  ];
 
   // ...existing code...
 

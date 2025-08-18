@@ -28,6 +28,7 @@ import {
 import { useDropzone } from 'react-dropzone';
 
 const FileUpload = ({
+  onFileUpload,
   onFilesChange,
   acceptedTypes = {
     'application/pdf': ['.pdf'],
@@ -72,6 +73,7 @@ const FileUpload = ({
       const updatedFiles = [...files, ...newFiles].slice(0, maxFiles);
       setFiles(updatedFiles);
       onFilesChange?.(updatedFiles);
+      onFileUpload?.(updatedFiles);
 
       // Simulate upload process
       newFiles.forEach((fileObj) => {
@@ -134,6 +136,7 @@ const FileUpload = ({
     const updatedFiles = files.filter((f) => f.id !== fileId);
     setFiles(updatedFiles);
     onFilesChange?.(updatedFiles);
+    onFileUpload?.(updatedFiles);
   };
 
   const getFileIcon = (fileType) => {

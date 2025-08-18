@@ -1,12 +1,12 @@
 'use client'
 
+import AllProperties from '../../components/ui/AllProperties';
 import { DashboardLayout } from '../../components/layout';
-import DashboardContent from '../../components/ui/DashboardContent';
 
-export default function Dashboard() {
+export default function PropertiesPage() {
   return (
     <DashboardLayout>
-      <DashboardContent />
+      <AllProperties />
     </DashboardLayout>
   );
 }

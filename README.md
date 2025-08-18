@@ -1,4 +1,264 @@
-# Landora - Land Registry Frontend
+# Landora - Sri Lankan Land Registry System
+
+A modern blockchain-based land registry system built with Next.js, React, and Material-UI for the Government of Sri Lanka.
+
+![Landora Dashboard](./public/dashboard-preview.png)
+
+## 🌟 Features
+
+### Core Functionality
+- **Property Registration**: Complete property registration with blockchain integration
+- **Property Verification**: Public verification system for property authenticity
+- **Transaction History**: Comprehensive blockchain transaction tracking
+- **Document Management**: Secure document upload with IPFS storage
+- **User Management**: Role-based access control (Citizens, Administrators)
+
+### User Features
+- **Dashboard**: Personalized dashboard with property overview and statistics
+- **Property Management**: Register, view, and manage properties
+- **Public Verification**: Verify any property using Property ID or Transaction Hash
+- **Transaction Tracking**: Real-time blockchain transaction monitoring
+- **Profile Management**: Complete user profile and settings management
+- **Help & Support**: Comprehensive FAQ and contact support
+
+### Admin Features
+- **Verification Queue**: Review and approve property registrations
+- **User Management**: Manage citizens and verify accounts
+- **System Analytics**: View system statistics and reports
+- **Blockchain Monitoring**: Monitor blockchain network health
+
+### Technical Features
+- **Blockchain Integration**: Ethereum-based property registration
+- **IPFS Storage**: Decentralized document storage
+- **Responsive Design**: Mobile-first responsive interface
+- **Real-time Updates**: Live transaction and verification updates
+- **Secure Authentication**: JWT-based authentication system
+
+## 🛠 Technology Stack
+
+### Frontend
+- **Next.js 15** - React framework with SSR/SSG
+- **React 19** - UI library
+- **TypeScript** - Type-safe JavaScript
+- **Material-UI v7** - Modern React component library
+- **React Hook Form** - Form handling with validation
+- **TanStack Query** - Server state management
+- **Notistack** - Notification system
+- **React Dropzone** - File upload handling
+
+### Blockchain & Storage
+- **Ethers.js** - Ethereum blockchain interaction
+- **IPFS** - Decentralized file storage
+- **Web3 Integration** - Blockchain connectivity
+
+### Development Tools
+- **ESLint** - Code linting
+- **TypeScript** - Type checking
+- **Next.js API Routes** - Backend API development
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+- Git
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/Landora-FE.git
+   cd Landora-FE
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env.local
+   ```
+   
+   Configure the following environment variables:
+   ```env
+   NEXT_PUBLIC_API_URL=http://localhost:3000/api
+   NEXT_PUBLIC_BLOCKCHAIN_NETWORK=mumbai
+   NEXT_PUBLIC_IPFS_GATEWAY=https://ipfs.io/ipfs/
+   ```
+
+4. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open the application**
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## 📱 Usage
+
+### For Citizens
+
+1. **Registration**
+   - Sign up with your email and personal details
+   - Verify your account through email confirmation
+
+2. **Property Registration**
+   - Navigate to "Register Property"
+   - Fill in property details, owner information
+   - Upload required documents (Title Deed, Survey Plan, etc.)
+   - Submit for blockchain registration
+
+3. **Property Verification**
+   - Use the "Public Verification" tool
+   - Enter Property ID or Transaction Hash
+   - View complete property information and blockchain proof
+
+4. **Dashboard Management**
+   - View your properties and transactions
+   - Track verification status
+   - Manage your profile and settings
+
+### For Administrators
+
+1. **Admin Dashboard**
+   - Access comprehensive system overview
+   - Monitor system health and statistics
+
+2. **Verification Queue**
+   - Review pending property registrations
+   - Verify submitted documents
+   - Approve or reject registrations
+
+3. **User Management**
+   - Manage citizen accounts
+   - Handle verification requests
+   - Monitor system usage
+
+## 🏗 Project Structure
+
+```
+Landora-FE/
+├── app/                    # Next.js 13+ App Router
+│   ├── api/               # API routes
+│   ├── dashboard/         # Dashboard pages
+│   ├── login/             # Authentication pages
+│   └── ...
+├── components/            # React components
+│   ├── layout/           # Layout components
+│   └── ui/               # UI components
+├── lib/                  # Utility libraries
+├── styles/               # Global styles
+├── public/               # Static assets
+└── ...
+```
+
+## 🔧 API Endpoints
+
+### Authentication
+- `POST /api/auth/login` - User login
+- `POST /api/auth/register` - User registration
+
+### Properties
+- `GET /api/properties` - Get all properties
+- `POST /api/properties` - Register new property
+- `GET /api/properties/[id]` - Get property details
+
+### Transactions
+- `GET /api/transactions` - Get transaction history
+- `POST /api/transactions` - Create new transaction
+
+### Verification
+- `POST /api/verify` - Verify property by ID or hash
+
+## 🎨 Design System
+
+### Color Palette
+- **Primary**: #1F3A93 (Government Blue)
+- **Secondary**: #17A589 (Teal)
+- **Success**: #27AE60 (Green)
+- **Warning**: #F39C12 (Orange)
+- **Error**: #E74C3C (Red)
+
+### Typography
+- **Headings**: Roboto, Bold
+- **Body**: Roboto, Regular
+- **Code**: Monaco, Monospace
+
+## 🧪 Testing
+
+### Demo Accounts
+**Admin Account:**
+- Email: admin@demo.com
+- Password: password
+
+**Citizen Account:**
+- Email: user@demo.com  
+- Password: password
+
+### Sample Data
+**Property ID for Verification:** `PROP001`
+**Transaction Hash:** `0x1234567890abcdef1234567890abcdef12345678`
+
+## 🚢 Deployment
+
+### Build for Production
+```bash
+npm run build
+npm start
+```
+
+### Docker Deployment
+```bash
+docker build -t landora-frontend .
+docker run -p 3000:3000 landora-frontend
+```
+
+### Vercel Deployment
+```bash
+npm i -g vercel
+vercel --prod
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🏛 Government Compliance
+
+This system is designed to comply with:
+- Sri Lankan Land Registry Regulations
+- Data Protection Laws
+- Blockchain Technology Standards
+- Government Digital Service Guidelines
+
+## 📞 Support
+
+For support, please contact:
+- **Email**: support@landregistry.gov.lk
+- **Phone**: +94 11 123 4567
+- **Office**: Land Registry Department, Colombo 01
+
+## 🙏 Acknowledgments
+
+- Government of Sri Lanka - Land Registry Department
+- Open Source Community
+- Blockchain Technology Contributors
+- Material-UI Team
+- Next.js Team
+
+---
+
+**Built with ❤️ for Sri Lanka 🇱🇰** - Land Registry Frontend
 
 A modern land registry management system built with Next.js 15, Material-UI, and TypeScript. This application provides comprehensive land registration, verification, and management capabilities for both citizens and government officials.
 

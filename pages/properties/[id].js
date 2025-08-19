@@ -36,6 +36,12 @@ export default function PropertyDetails() {
     );
   }
 
+  const title = property.title || property.address || `${property.district || 'Property'}`;
+  const plotNumber = property.survey_number || property.plotNumber;
+  const landArea = property.land_area || property.landArea;
+  const ownerNIC = property.currentowner_nic || property.ownerNIC;
+  const registrationDate = property.registration_date || property.registrationDate;
+
   const statusColor = { verified: 'success', pending: 'warning', rejected: 'error', under_review: 'info' }[property.status] || 'default';
 
   return (
@@ -43,7 +49,7 @@ export default function PropertyDetails() {
       <Box sx={{ p: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
           <Box>
-            <Typography variant="h4" gutterBottom>{property.title || 'Property'}</Typography>
+            <Typography variant="h4" gutterBottom>{title}</Typography>
             <Chip label={(property.status || '').toUpperCase()} color={statusColor} />
           </Box>
           <Box sx={{ display: 'flex', gap: 1 }}>
@@ -60,7 +66,7 @@ export default function PropertyDetails() {
                   <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}><LocationIcon sx={{ mr: 1 }} />Location</Typography>
                   <Divider sx={{ mb: 2 }} />
                   <List dense>
-                    <ListItem><ListItemText primary="Plot Number" secondary={property.plotNumber} /></ListItem>
+                    <ListItem><ListItemText primary="Plot Number" secondary={plotNumber} /></ListItem>
                     <ListItem><ListItemText primary="District" secondary={property.district} /></ListItem>
                     <ListItem><ListItemText primary="Province" secondary={property.province} /></ListItem>
                     <ListItem><ListItemText primary="Address" secondary={property.address} /></ListItem>
@@ -92,10 +98,10 @@ export default function PropertyDetails() {
               <Typography variant="h6" gutterBottom>Details</Typography>
               <Divider sx={{ mb: 1 }} />
               <List dense>
-                <ListItem><ListItemText primary="Land Area" secondary={property.landArea} /></ListItem>
-                <ListItem><ListItemText primary="Type" secondary={property.propertyType} /></ListItem>
-                <ListItem><ListItemText primary="Owner NIC" secondary={property.ownerNIC} /></ListItem>
-                {property.registrationDate && <ListItem><ListItemText primary="Registered" secondary={new Date(property.registrationDate).toLocaleDateString()} /></ListItem>}
+                <ListItem><ListItemText primary="Land Area" secondary={landArea} /></ListItem>
+                <ListItem><ListItemText primary="Type" secondary={property.property_type || property.propertyType} /></ListItem>
+                <ListItem><ListItemText primary="Owner NIC" secondary={ownerNIC} /></ListItem>
+                {registrationDate && <ListItem><ListItemText primary="Registered" secondary={new Date(registrationDate).toLocaleDateString()} /></ListItem>}
               </List>
             </Paper>
           </Grid>

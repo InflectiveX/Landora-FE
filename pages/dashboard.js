@@ -38,6 +38,8 @@ export default function Dashboard() {
       }
     };
     run();
+    const intervalId = setInterval(run, 15 * 60 * 1000);
+    return () => clearInterval(intervalId);
   }, [getProperties, getTransactions]);
 
   if (!isAuthenticated) return (

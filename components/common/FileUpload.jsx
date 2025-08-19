@@ -281,6 +281,8 @@ const FileUpload = ({
                         )}
                       </Box>
                     }
+                    primaryTypographyProps={{ component: 'div' }}
+                    secondaryTypographyProps={{ component: 'div' }}
                   />
                   <ListItemSecondaryAction>
                     <IconButton

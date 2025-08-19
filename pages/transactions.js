@@ -34,15 +34,17 @@ export default function TransactionHistory() {
       }
     };
     run();
+    const intervalId = setInterval(run, 15 * 60 * 1000);
+    return () => clearInterval(intervalId);
   }, [getTransactions]);
 
   const getStatusColor = (status) => ({ completed: 'success', pending: 'warning', failed: 'error', processing: 'info' }[status] || 'default');
   const getTypeColor = (type) => ({ registration: 'primary', transfer: 'secondary', verification: 'info' }[type] || 'default');
 
   const filtered = transactions.filter((t) => {
-    const matchesSearch = (t.propertyTitle || '').toLowerCase().includes(searchTerm.toLowerCase()) || (t.transactionHash || '').toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = ((t.description || '').toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesStatus = filterStatus === 'all' || t.status === filterStatus;
-    const matchesType = filterType === 'all' || t.type === filterType;
+    const matchesType = filterType === 'all' || (t.property_type === filterType || t.type === filterType);
     return matchesSearch && matchesStatus && matchesType;
   });
 
@@ -81,11 +83,10 @@ export default function TransactionHistory() {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Property</TableCell>
+                <TableCell>Description</TableCell>
                 <TableCell>Type</TableCell>
                 <TableCell>Status</TableCell>
-                <TableCell>Date</TableCell>
-                <TableCell>Transaction Hash</TableCell>
+                <TableCell>Amount</TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -93,13 +94,11 @@ export default function TransactionHistory() {
               {pageRows.map((t, idx) => (
                 <TableRow key={t.id || idx} hover>
                   <TableCell>
-                    <Typography variant="subtitle2">{t.propertyTitle}</Typography>
-                    <Typography variant="body2" color="text.secondary">{t.plotNumber}</Typography>
+                    <Typography variant="subtitle2">{t.description || '-'}</Typography>
                   </TableCell>
-                  <TableCell><Chip label={(t.type || '').toUpperCase()} color={getTypeColor(t.type)} size="small" /></TableCell>
+                  <TableCell><Chip label={(t.property_type || t.type || '').toUpperCase()} color={getTypeColor(t.property_type || t.type)} size="small" /></TableCell>
                   <TableCell><Chip label={(t.status || '').toUpperCase()} color={getStatusColor(t.status)} size="small" /></TableCell>
-                  <TableCell>{t.date ? new Date(t.date).toLocaleDateString() : '-'}</TableCell>
-                  <TableCell><Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{(t.transactionHash || '').substring(0, 20)}...</Typography></TableCell>
+                  <TableCell>{t.amount || '-'}</TableCell>
                   <TableCell>
                     <IconButton color="primary" onClick={() => { setSelectedTransaction(t); setDialogOpen(true); }}><VisibilityIcon /></IconButton>
                   </TableCell>
@@ -119,34 +118,26 @@ export default function TransactionHistory() {
                 <Grid container spacing={3}>
                   <Grid xs={12} md={6}>
                     <Card><CardContent>
-                      <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}><AccountBalanceIcon sx={{ mr: 1, color: 'primary.main' }} />Property Information</Typography>
+                      <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}><AccountBalanceIcon sx={{ mr: 1, color: 'primary.main' }} />Overview</Typography>
                       <Divider sx={{ mb: 2 }} />
                       <List dense>
-                        <ListItem><ListItemText primary="Property Title" secondary={selectedTransaction.propertyTitle} /></ListItem>
-                        <ListItem><ListItemText primary="Plot Number" secondary={selectedTransaction.plotNumber} /></ListItem>
-                        <ListItem><ListItemText primary="Transaction Type" secondary={<Chip label={(selectedTransaction.type || '').toUpperCase()} color={getTypeColor(selectedTransaction.type)} size="small" />} /></ListItem>
+                        <ListItem><ListItemText primary="Type" secondary={<Chip label={(selectedTransaction.property_type || selectedTransaction.type || '').toUpperCase()} color={getTypeColor(selectedTransaction.property_type || selectedTransaction.type)} size="small" />} /></ListItem>
+                        <ListItem><ListItemText primary="Status" secondary={<Chip label={(selectedTransaction.status || '').toUpperCase()} color={getStatusColor(selectedTransaction.status)} size="small" />} /></ListItem>
+                        <ListItem><ListItemText primary="Amount" secondary={selectedTransaction.amount || '-'} /></ListItem>
+                        <ListItem><ListItemText primary="Description" secondary={selectedTransaction.description || '-'} /></ListItem>
                       </List>
                     </CardContent></Card>
                   </Grid>
                   <Grid xs={12} md={6}>
                     <Card><CardContent>
-                      <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}><SecurityIcon sx={{ mr: 1, color: 'primary.main' }} />Blockchain Information</Typography>
+                      <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}><SecurityIcon sx={{ mr: 1, color: 'primary.main' }} />IDs</Typography>
                       <Divider sx={{ mb: 2 }} />
                       <List dense>
-                        <ListItem><ListItemText primary="Transaction Hash" secondary={<Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{selectedTransaction.transactionHash}</Typography>} /></ListItem>
-                        <ListItem><ListItemText primary="Block Number" secondary={selectedTransaction.blockNumber} /></ListItem>
-                        <ListItem><ListItemText primary="Gas Used" secondary={`${selectedTransaction.gasUsed} wei`} /></ListItem>
-                      </List>
-                    </CardContent></Card>
-                  </Grid>
-                  <Grid xs={12}>
-                    <Card><CardContent>
-                      <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}><ScheduleIcon sx={{ mr: 1, color: 'primary.main' }} />Transaction Timeline</Typography>
-                      <Divider sx={{ mb: 2 }} />
-                      <List dense>
-                        {(selectedTransaction.timeline || []).map((e, i) => (
-                          <ListItem key={i}><ListItemText primary={e.action} secondary={`${e.timestamp} • ${e.description}`} /></ListItem>
-                        ))}
+                        <ListItem><ListItemText primary="Transaction ID" secondary={String(selectedTransaction.id)} /></ListItem>
+                        <ListItem><ListItemText primary="NFT ID" secondary={String(selectedTransaction.nft_id)} /></ListItem>
+                        <ListItem><ListItemText primary="Property ID" secondary={String(selectedTransaction.property_id)} /></ListItem>
+                        <ListItem><ListItemText primary="From User" secondary={String(selectedTransaction.from_user_id)} /></ListItem>
+                        <ListItem><ListItemText primary="To User" secondary={String(selectedTransaction.to_user_id)} /></ListItem>
                       </List>
                     </CardContent></Card>
                   </Grid>
@@ -154,7 +145,6 @@ export default function TransactionHistory() {
               </DialogContent>
               <DialogActions>
                 <Button onClick={() => setDialogOpen(false)}>Close</Button>
-                <Button variant="contained" onClick={() => window.open(`https://polygonscan.com/tx/${selectedTransaction.transactionHash}`, '_blank')}>View on Blockchain</Button>
               </DialogActions>
             </>
           )}

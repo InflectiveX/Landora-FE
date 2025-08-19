@@ -8,6 +8,18 @@ import { useSnackbar } from 'notistack';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '@/lib/api';
 
+// Lightweight JWT decoder (no external deps)
+const decodeJwt = (token) => {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+    return JSON.parse(jsonPayload);
+  } catch {
+    return null;
+  }
+};
+
 export default function Login() {
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
@@ -28,16 +40,33 @@ export default function Login() {
       else if (res && res.jwt) token = res.jwt;
       if (!token) throw new Error('No token returned from server');
 
-      // Try to fetch user info from protected endpoint
-      let userInfo = null;
-      try {
-        const protectedRes = await apiClient.auth.protected();
-        // Accept either object with user or just object representing user
-        userInfo = protectedRes?.user || protectedRes || null;
-      } catch {
-        // Fallback minimal user
-        userInfo = { name: data.email.split('@')[0], email: data.email, role: tabValue === 0 ? 'citizen' : 'officer' };
+      // Persist token first so protected call includes Authorization header
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('token', token);
       }
+
+      // Build user info from JWT claims
+      let userInfo = null;
+      const payload = decodeJwt(token);
+      if (payload) {
+        userInfo = {
+          id: payload.id ?? payload.sub ?? undefined,
+          name: payload.username ?? payload.name ?? data.email.split('@')[0],
+          email: payload.email ?? data.email,
+          role: payload.role ?? (tabValue === 0 ? 'citizen' : 'officer'),
+          status: payload.status ?? undefined,
+        };
+      } else {
+        // Fallback: try protected, then minimal
+        try {
+          const protectedRes = await apiClient.auth.protected();
+          userInfo = protectedRes?.user || protectedRes || { name: data.email.split('@')[0], email: data.email, role: tabValue === 0 ? 'citizen' : 'officer' };
+        } catch {
+          userInfo = { name: data.email.split('@')[0], email: data.email, role: tabValue === 0 ? 'citizen' : 'officer' };
+        }
+      }
+
+      // Finalize login
       login(userInfo, token);
       enqueueSnackbar('Logged in successfully', { variant: 'success' });
       router.push('/dashboard');

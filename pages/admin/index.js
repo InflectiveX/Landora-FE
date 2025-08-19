@@ -17,7 +17,10 @@ export default function AdminDashboard() {
     let mounted = true;
     (async () => {
       try {
-        const properties = await apiClient.property.getDetails().catch(() => []);
+        const properties = await apiClient.property.getDetails().catch((error) => {
+          console.error('Error fetching admin dashboard data:', error);
+          return [];
+        });
         const list = Array.isArray(properties) ? properties : [];
         const total = list.length;
         const verified = list.filter(p => (p.status || '').toLowerCase() === 'verified').length;
@@ -30,7 +33,8 @@ export default function AdminDashboard() {
           { title: 'Pending Verification', value: pending, change: '', changeType: 'increase', icon: <PendingIcon />, color: 'warning' },
           { title: 'Rejected Applications', value: rejected, change: '', changeType: 'decrease', icon: <CancelIcon />, color: 'error' },
         ]);
-      } catch {
+      } catch (error) {
+        console.error('Admin dashboard error:', error);
         if (!mounted) return;
       }
     })();

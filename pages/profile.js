@@ -61,19 +61,19 @@ export default function Profile() {
         <Paper elevation={3} sx={{ borderRadius: 2 }}>
           <Box sx={{ p: 3, borderBottom: 1, borderColor: 'divider' }}>
             <Grid container spacing={3} alignItems="center">
-              <Grid item>
+              <Grid>
                 <Avatar sx={{ width: 80, height: 80, bgcolor: 'primary.main', fontSize: '2rem' }}>
                   {userInfo.name.charAt(0)}
                 </Avatar>
               </Grid>
-              <Grid item xs>
+              <Grid xs>
                 <Typography variant="h4" gutterBottom>{userInfo.name}</Typography>
                 <Typography variant="body1" color="text.secondary">{userInfo.email}</Typography>
                 <Box sx={{ mt: 1 }}>
                   <Chip icon={<VerifiedIcon />} label="Verified Account" color="success" size="small" />
                 </Box>
               </Grid>
-              <Grid item>
+              <Grid>
                 <Button variant={editMode ? 'outlined' : 'contained'} startIcon={editMode ? <CancelIcon /> : <EditIcon />} onClick={() => setEditMode(!editMode)}>
                   {editMode ? 'Cancel' : 'Edit Profile'}
                 </Button>
@@ -93,24 +93,24 @@ export default function Profile() {
 
           <TabPanel value={activeTab} index={0}>
             <Grid container spacing={3}>
-              <Grid item xs={12} md={8}>
+              <Grid xs={12} md={8}>
                 <Card>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>Personal Information</Typography>
                     <Grid container spacing={2}>
-                      <Grid item xs={12} sm={6}>
+                      <Grid xs={12} sm={6}>
                         <TextField fullWidth label="Full Name" value={userInfo.name} disabled={!editMode} onChange={(e) => setUserInfo({ ...userInfo, name: e.target.value })} />
                       </Grid>
-                      <Grid item xs={12} sm={6}>
+                      <Grid xs={12} sm={6}>
                         <TextField fullWidth label="NIC Number" value={userInfo.nicNumber} disabled={!editMode} onChange={(e) => setUserInfo({ ...userInfo, nicNumber: e.target.value })} />
                       </Grid>
-                      <Grid item xs={12} sm={6}>
+                      <Grid xs={12} sm={6}>
                         <TextField fullWidth label="Email" value={userInfo.email} disabled={!editMode} onChange={(e) => setUserInfo({ ...userInfo, email: e.target.value })} />
                       </Grid>
-                      <Grid item xs={12} sm={6}>
+                      <Grid xs={12} sm={6}>
                         <TextField fullWidth label="Phone Number" value={userInfo.phone} disabled={!editMode} onChange={(e) => setUserInfo({ ...userInfo, phone: e.target.value })} />
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid xs={12}>
                         <TextField fullWidth label="Address" value={userInfo.address} disabled={!editMode} multiline rows={3} onChange={(e) => setUserInfo({ ...userInfo, address: e.target.value })} />
                       </Grid>
                     </Grid>
@@ -128,7 +128,7 @@ export default function Profile() {
 
           <TabPanel value={activeTab} index={1}>
             <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
+              <Grid xs={12} md={6}>
                 <Card>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>Password Settings</Typography>
@@ -136,7 +136,7 @@ export default function Profile() {
                   </CardContent>
                 </Card>
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid xs={12} md={6}>
                 <Card>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>Two-Factor Authentication</Typography>
@@ -199,9 +199,9 @@ export default function Profile() {
           <DialogTitle>Change Password</DialogTitle>
           <DialogContent>
             <Grid container spacing={2} sx={{ mt: 1 }}>
-              <Grid item xs={12}><TextField fullWidth type="password" label="Current Password" value={passwordData.currentPassword} onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })} /></Grid>
-              <Grid item xs={12}><TextField fullWidth type="password" label="New Password" value={passwordData.newPassword} onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })} /></Grid>
-              <Grid item xs={12}><TextField fullWidth type="password" label="Confirm New Password" value={passwordData.confirmPassword} onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })} /></Grid>
+              <Grid xs={12}><TextField fullWidth type="password" label="Current Password" value={passwordData.currentPassword} onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })} /></Grid>
+              <Grid xs={12}><TextField fullWidth type="password" label="New Password" value={passwordData.newPassword} onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })} /></Grid>
+              <Grid xs={12}><TextField fullWidth type="password" label="Confirm New Password" value={passwordData.confirmPassword} onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })} /></Grid>
             </Grid>
           </DialogContent>
           <DialogActions>

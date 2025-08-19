@@ -16,11 +16,15 @@ export const ThemeModeProvider = ({ children }) => {
 
   useEffect(() => {
     const saved = typeof window !== 'undefined' ? localStorage.getItem('landora-theme') : null;
-    if (saved === 'light' || saved === 'dark') setMode(saved);
+    if (saved === 'light' || saved === 'dark') {
+      setMode(saved);
+    }
   }, []);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') localStorage.setItem('landora-theme', mode);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('landora-theme', mode);
+    }
   }, [mode]);
 
   const toggleTheme = () => setMode((m) => (m === 'light' ? 'dark' : 'light'));

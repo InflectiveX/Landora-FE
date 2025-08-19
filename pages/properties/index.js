@@ -14,8 +14,13 @@ export default function AllProperties() {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const data = await getProperties().catch(() => []);
+        const data = await getProperties().catch((error) => {
+          console.error('Error fetching properties:', error);
+          return [];
+        });
         setProperties(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error('Properties page error:', error);
       } finally {
         setLoading(false);
       }

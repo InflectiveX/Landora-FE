@@ -130,21 +130,21 @@ export default function PublicVerification() {
               </Box>
 
               <Grid container spacing={4}>
-                <Grid item xs={12} md={8}>
+                <Grid xs={12} md={8}>
                   <Grid container spacing={3}>
-                    <Grid item xs={12}>
+                    <Grid xs={12}>
                       <Card elevation={0}><CardContent>
                         <Typography variant="h6" fontWeight={700} gutterBottom sx={{ display: 'flex', alignItems: 'center' }}><LocationIcon sx={{ mr: 1, color: 'primary.main' }} />Location Details</Typography>
                         <Divider sx={{ mb: 2 }} />
                         <Grid container spacing={2}>
-                          <Grid item xs={12} md={6}>
+                          <Grid xs={12} md={6}>
                             <List dense>
                               <ListItem><ListItemText primary="Address" secondary={searchResult.location.address} /></ListItem>
                               <ListItem><ListItemText primary="District" secondary={searchResult.location.district} /></ListItem>
                               <ListItem><ListItemText primary="Province" secondary={searchResult.location.province} /></ListItem>
                             </List>
                           </Grid>
-                          <Grid item xs={12} md={6}>
+                          <Grid xs={12} md={6}>
                             <List dense>
                               <ListItem><ListItemText primary="Coordinates" secondary={searchResult.location.coordinates} /></ListItem>
                               <ListItem><ListItemText primary="Land Area" secondary={searchResult.details.landArea} /></ListItem>
@@ -154,31 +154,31 @@ export default function PublicVerification() {
                         </Grid>
                       </CardContent></Card>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid xs={12}>
                       <Card elevation={0}><CardContent>
                         <Typography variant="h6" fontWeight={700} gutterBottom sx={{ display: 'flex', alignItems: 'center' }}><PersonIcon sx={{ mr: 1, color: 'primary.main' }} />Owner Information</Typography>
                         <Divider sx={{ mb: 2 }} />
                         <Alert severity="info" sx={{ mb: 2 }}>Owner info is partially hidden for privacy.</Alert>
                         <Grid container spacing={2}>
-                          <Grid item xs={12} md={4}><Typography variant="subtitle2" color="text.secondary">Full Name</Typography><Typography variant="body1" fontWeight={600}>{searchResult.owner.name.substring(0, 1)}*** {searchResult.owner.name.split(' ').pop()}</Typography></Grid>
-                          <Grid item xs={12} md={4}><Typography variant="subtitle2" color="text.secondary">NIC Number</Typography><Typography variant="body1" fontWeight={600}>{searchResult.owner.nic.substring(0, 3)}***{searchResult.owner.nic.substring(6)}</Typography></Grid>
-                          <Grid item xs={12} md={4}><Typography variant="subtitle2" color="text.secondary">Email</Typography><Typography variant="body1" fontWeight={600}>{searchResult.owner.email.substring(0, 2)}***@{searchResult.owner.email.split('@')[1]}</Typography></Grid>
+                          <Grid xs={12} md={4}><Typography variant="subtitle2" color="text.secondary">Full Name</Typography><Typography variant="body1" fontWeight={600}>{searchResult.owner.name.substring(0, 1)}*** {searchResult.owner.name.split(' ').pop()}</Typography></Grid>
+                          <Grid xs={12} md={4}><Typography variant="subtitle2" color="text.secondary">NIC Number</Typography><Typography variant="body1" fontWeight={600}>{searchResult.owner.nic.substring(0, 3)}***{searchResult.owner.nic.substring(6)}</Typography></Grid>
+                          <Grid xs={12} md={4}><Typography variant="subtitle2" color="text.secondary">Email</Typography><Typography variant="body1" fontWeight={600}>{searchResult.owner.email.substring(0, 2)}***@{searchResult.owner.email.split('@')[1]}</Typography></Grid>
                         </Grid>
                       </CardContent></Card>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid xs={12}>
                       <Card elevation={0} sx={{ bgcolor: 'success.light', color: 'success.contrastText' }}><CardContent>
                         <Typography variant="h6" fontWeight={700} gutterBottom sx={{ display: 'flex', alignItems: 'center' }}><AccountBalanceIcon sx={{ mr: 1 }} />Blockchain Certification</Typography>
                         <Typography variant="body2" sx={{ opacity: 0.9, mb: 2 }}>This property is certified on the blockchain.</Typography>
                         <Grid container spacing={2}>
-                          <Grid item xs={12} md={6}><Typography variant="subtitle2">NFT Token ID</Typography><Typography variant="body1" fontWeight={600} sx={{ fontFamily: 'monospace' }}>{searchResult.nftTokenId}</Typography></Grid>
-                          <Grid item xs={12} md={6}><Typography variant="subtitle2">Transaction Hash</Typography><Typography variant="body1" fontWeight={600} sx={{ fontFamily: 'monospace' }}>{searchResult.blockchainTxHash}</Typography></Grid>
+                          <Grid xs={12} md={6}><Typography variant="subtitle2">NFT Token ID</Typography><Typography variant="body1" fontWeight={600} sx={{ fontFamily: 'monospace' }}>{searchResult.nftTokenId}</Typography></Grid>
+                          <Grid xs={12} md={6}><Typography variant="subtitle2">Transaction Hash</Typography><Typography variant="body1" fontWeight={600} sx={{ fontFamily: 'monospace' }}>{searchResult.blockchainTxHash}</Typography></Grid>
                         </Grid>
                       </CardContent></Card>
                     </Grid>
                   </Grid>
                 </Grid>
-                <Grid item xs={12} md={4}>
+                <Grid xs={12} md={4}>
                   <Card elevation={0}><CardContent>
                     <Typography variant="h6" fontWeight={700} gutterBottom sx={{ display: 'flex', alignItems: 'center' }}><ScheduleIcon sx={{ mr: 1, color: 'primary.main' }} />Registration Timeline</Typography>
                     <Divider sx={{ mb: 2 }} />

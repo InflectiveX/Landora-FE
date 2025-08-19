@@ -46,8 +46,8 @@ export default function OfficerManagement() {
       <Box sx={{ p: 3 }}>
         <Typography variant="h4" gutterBottom>User Management</Typography>
         <Grid container spacing={2} sx={{ mb: 3 }}>
-          <Grid item xs={12} md={6}><TextField fullWidth placeholder="Search users..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} InputProps={{ startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }}/> }} /></Grid>
-          <Grid item xs={12} md={3}><FormControl fullWidth><InputLabel>Status</InputLabel><Select value={filterStatus} label="Status" onChange={(e) => setFilterStatus(e.target.value)}><MenuItem value="all">All</MenuItem><MenuItem value="active">Active</MenuItem><MenuItem value="blocked">Blocked</MenuItem><MenuItem value="pending">Pending</MenuItem></Select></FormControl></Grid>
+          <Grid xs={12} md={6}><TextField fullWidth placeholder="Search users..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} InputProps={{ startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }}/> }} /></Grid>
+          <Grid xs={12} md={3}><FormControl fullWidth><InputLabel>Status</InputLabel><Select value={filterStatus} label="Status" onChange={(e) => setFilterStatus(e.target.value)}><MenuItem value="all">All</MenuItem><MenuItem value="active">Active</MenuItem><MenuItem value="blocked">Blocked</MenuItem><MenuItem value="pending">Pending</MenuItem></Select></FormControl></Grid>
         </Grid>
         <Paper>
           <TableContainer>
@@ -82,7 +82,7 @@ export default function OfficerManagement() {
           <DialogContent>
             {selectedUser && (
               <Grid container spacing={2}>
-                <Grid item xs={12}><Typography variant="h6">{selectedUser.name}</Typography><Typography variant="body2" color="text.secondary">{selectedUser.email}</Typography></Grid>
+                <Grid xs={12}><Typography variant="h6">{selectedUser.name}</Typography><Typography variant="body2" color="text.secondary">{selectedUser.email}</Typography></Grid>
               </Grid>
             )}
           </DialogContent>

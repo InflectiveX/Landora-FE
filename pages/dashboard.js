@@ -20,11 +20,19 @@ export default function Dashboard() {
     const run = async () => {
       try {
         const [p, t] = await Promise.all([
-          getProperties().catch(() => []),
-          getTransactions().catch(() => []),
+          getProperties().catch((error) => {
+            console.error('Error fetching properties:', error);
+            return [];
+          }),
+          getTransactions().catch((error) => {
+            console.error('Error fetching transactions:', error);
+            return [];
+          }),
         ]);
         setProperties(Array.isArray(p) ? p : []);
         setTransactions(Array.isArray(t) ? t : []);
+      } catch (error) {
+        console.error('Dashboard error:', error);
       } finally {
         setLoading(false);
       }

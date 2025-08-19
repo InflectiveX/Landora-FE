@@ -22,8 +22,13 @@ export default function TransactionHistory() {
   useEffect(() => {
     const run = async () => {
       try {
-        const data = await getTransactions().catch(() => []);
+        const data = await getTransactions().catch((error) => {
+          console.error('Error fetching transactions:', error);
+          return [];
+        });
         setTransactions(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error('Transaction history error:', error);
       } finally {
         setLoading(false);
       }

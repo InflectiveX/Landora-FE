@@ -78,14 +78,14 @@ export default function LandRegistration() {
         <Box>
           <Typography variant="h6" gutterBottom>Property Information</Typography>
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6}><TextField fullWidth label="Property Title" {...register('propertyTitle', { required: 'Property title is required' })} error={!!errors.propertyTitle} helperText={errors.propertyTitle?.message} /></Grid>
-            <Grid item xs={12} md={6}><TextField fullWidth label="Survey/Plot Number" {...register('plotNumber', { required: 'Plot number is required' })} error={!!errors.plotNumber} helperText={errors.plotNumber?.message} /></Grid>
-            <Grid item xs={12}><TextField fullWidth label="Property Address" multiline rows={2} {...register('address', { required: 'Address is required' })} error={!!errors.address} helperText={errors.address?.message} /></Grid>
-            <Grid item xs={12} md={4}><TextField fullWidth label="District" {...register('district', { required: 'District is required' })} error={!!errors.district} helperText={errors.district?.message} /></Grid>
-            <Grid item xs={12} md={4}><TextField fullWidth label="Province" {...register('province', { required: 'Province is required' })} error={!!errors.province} helperText={errors.province?.message} /></Grid>
-            <Grid item xs={12} md={4}><TextField fullWidth label="Land Area (in perches)" type="number" {...register('landArea', { required: 'Land area is required' })} error={!!errors.landArea} helperText={errors.landArea?.message} /></Grid>
-            <Grid item xs={12} md={6}><TextField fullWidth select SelectProps={{ native: true }} {...register('propertyType', { required: 'Property type is required' })} error={!!errors.propertyType} helperText={errors.propertyType?.message}><option value="">Select Property Type</option><option value="residential">Residential</option><option value="commercial">Commercial</option><option value="agricultural">Agricultural</option><option value="industrial">Industrial</option></TextField></Grid>
-            <Grid item xs={12} md={6}><TextField fullWidth label="Current Owner's NIC" {...register('ownerNIC', { required: 'Owner NIC is required' })} error={!!errors.ownerNIC} helperText={errors.ownerNIC?.message} /></Grid>
+            <Grid xs={12} md={6}><TextField fullWidth label="Property Title" {...register('propertyTitle', { required: 'Property title is required' })} error={!!errors.propertyTitle} helperText={errors.propertyTitle?.message} /></Grid>
+            <Grid xs={12} md={6}><TextField fullWidth label="Survey/Plot Number" {...register('plotNumber', { required: 'Plot number is required' })} error={!!errors.plotNumber} helperText={errors.plotNumber?.message} /></Grid>
+            <Grid xs={12}><TextField fullWidth label="Property Address" multiline rows={2} {...register('address', { required: 'Address is required' })} error={!!errors.address} helperText={errors.address?.message} /></Grid>
+            <Grid xs={12} md={4}><TextField fullWidth label="District" {...register('district', { required: 'District is required' })} error={!!errors.district} helperText={errors.district?.message} /></Grid>
+            <Grid xs={12} md={4}><TextField fullWidth label="Province" {...register('province', { required: 'Province is required' })} error={!!errors.province} helperText={errors.province?.message} /></Grid>
+            <Grid xs={12} md={4}><TextField fullWidth label="Land Area (in perches)" type="number" {...register('landArea', { required: 'Land area is required' })} error={!!errors.landArea} helperText={errors.landArea?.message} /></Grid>
+            <Grid xs={12} md={6}><TextField fullWidth select SelectProps={{ native: true }} {...register('propertyType', { required: 'Property type is required' })} error={!!errors.propertyType} helperText={errors.propertyType?.message}><option value="">Select Property Type</option><option value="residential">Residential</option><option value="commercial">Commercial</option><option value="agricultural">Agricultural</option><option value="industrial">Industrial</option></TextField></Grid>
+            <Grid xs={12} md={6}><TextField fullWidth label="Current Owner's NIC" {...register('ownerNIC', { required: 'Owner NIC is required' })} error={!!errors.ownerNIC} helperText={errors.ownerNIC?.message} /></Grid>
           </Grid>
         </Box>
       );
@@ -97,7 +97,7 @@ export default function LandRegistration() {
           <Alert severity="info" sx={{ mb: 3, borderRadius: 2, fontSize: 16 }}>Please upload clear, high-resolution scans. Accepted: PDF, JPG, PNG (Max 10MB)</Alert>
           <Grid container spacing={3}>
             {requiredDocuments.map((doc) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={doc.id}>
+              <Grid xs={12} sm={6} md={4} lg={3} key={doc.id}>
                 <Card variant="outlined" sx={{ borderRadius: 3 }}>
                   <CardContent>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -118,7 +118,7 @@ export default function LandRegistration() {
       <Box>
         <Typography variant="h6" gutterBottom>Review & Submit</Typography>
         <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
+          <Grid xs={12} md={6}>
             <Card><CardContent>
               <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}><LocationIcon sx={{ mr: 1 }} />Property Details</Typography>
               <Divider sx={{ mb: 2 }} />
@@ -130,7 +130,7 @@ export default function LandRegistration() {
               </List>
             </CardContent></Card>
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid xs={12} md={6}>
             <Card><CardContent>
               <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}><DescriptionIcon sx={{ mr: 1 }} />Uploaded Documents</Typography>
               <Divider sx={{ mb: 2 }} />

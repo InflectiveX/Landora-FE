@@ -5,7 +5,7 @@ import { ThemeModeProvider } from '@/contexts/ThemeContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { Box, CircularProgress } from '@mui/material';
+import { Box, CircularProgress, CssBaseline } from '@mui/material';
 
 const queryClient = new QueryClient();
 
@@ -46,6 +46,7 @@ export default function App({ Component, pageProps }) {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeModeProvider>
+        <CssBaseline />
         <SnackbarProvider maxSnack={3} anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
           <AuthProvider>
             <RouterGuard>

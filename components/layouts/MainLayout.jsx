@@ -62,10 +62,34 @@ const MainLayout = ({ children }) => {
   );
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <AppBar position="fixed" elevation={0} sx={{ backdropFilter: 'blur(10px)', backgroundColor: 'rgba(255,255,255,0.7)', color: 'text.primary', borderBottom: '1px solid', borderColor: 'divider' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+      <AppBar 
+        position="fixed" 
+        elevation={0} 
+        sx={{ 
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          backdropFilter: 'blur(12px)',
+          backgroundColor: 'background.paper',
+          color: 'text.primary',
+          borderBottom: '1px solid',
+          borderColor: 'divider'
+        }}
+      >
         <Toolbar sx={{ minHeight: 72 }}>
-          <IconButton color="inherit" edge="start" onClick={() => setOpen((v) => !v)} sx={{ mr: 2 }}>
+          <IconButton 
+            color="inherit" 
+            edge="start" 
+            onClick={() => setOpen((v) => !v)} 
+            sx={{ mr: 2, display: { md: 'none' } }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <IconButton 
+            color="inherit" 
+            edge="start" 
+            onClick={() => setOpen((v) => !v)} 
+            sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
+          >
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
@@ -75,15 +99,26 @@ const MainLayout = ({ children }) => {
           <IconButton color="inherit" onClick={(e) => setAnchorEl(e.currentTarget)}>
             <Avatar sx={{ width: 32, height: 32 }}>{user?.name?.[0] || 'U'}</Avatar>
           </IconButton>
-          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} transformOrigin={{ vertical: 'top', horizontal: 'right' }}>
+          <Menu 
+            anchorEl={anchorEl} 
+            open={Boolean(anchorEl)} 
+            onClose={() => setAnchorEl(null)}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} 
+            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+          >
             <MenuItem onClick={() => { setAnchorEl(null); router.push('/profile'); }}>Profile</MenuItem>
             <Divider />
             <MenuItem onClick={() => { setAnchorEl(null); logout(); }}>Logout</MenuItem>
           </Menu>
         </Toolbar>
       </AppBar>
-      <Box component="nav" sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}>
+      <Box 
+        component="nav" 
+        sx={{ 
+          width: { md: drawerWidth }, 
+          flexShrink: { md: 0 }
+        }}
+      >
         <Drawer
           variant={isMobile ? 'temporary' : 'permanent'}
           open={open}
@@ -94,16 +129,28 @@ const MainLayout = ({ children }) => {
               boxSizing: 'border-box',
               width: drawerWidth,
               backdropFilter: 'blur(12px)',
-              backgroundColor: 'rgba(255,255,255,0.6)',
+              backgroundColor: 'background.paper',
               borderRight: '1px solid',
               borderColor: 'divider',
+              top: 0,
+              height: '100vh',
+              zIndex: (theme) => theme.zIndex.drawer,
             },
           }}
         >
+          <Toolbar />
           {drawer}
         </Drawer>
       </Box>
-      <Box component="main" sx={{ flexGrow: 1, width: { md: `calc(100% - ${drawerWidth}px)` } }}>
+      <Box 
+        component="main" 
+        sx={{ 
+          flexGrow: 1, 
+          width: { md: `calc(100% - ${drawerWidth}px)` },
+          minHeight: '100vh',
+          backgroundColor: 'background.default'
+        }}
+      >
         <Toolbar sx={{ minHeight: 72 }} />
         <Container maxWidth="xl" sx={{ py: 3 }}>
           {children}

@@ -1,11 +1,11 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Box, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Chip, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Grid, Card, CardContent, List, ListItem, ListItemText, ListItemIcon, Divider, TextField, Alert, Tabs, Tab } from '@mui/material';
+import { Box, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Chip, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Card, CardContent, List, ListItem, ListItemText, ListItemIcon, Divider, TextField, Alert, Tabs, Tab } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import { Visibility as VisibilityIcon, CheckCircle as CheckCircleIcon, Cancel as CancelIcon, Description as DescriptionIcon, Person as PersonIcon, LocationOn as LocationIcon, Schedule as ScheduleIcon, FilterList as FilterListIcon } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import MainLayout from '@/components/layouts/MainLayout';
 import apiClient from '@/lib/api';
-import Grid from '@mui/material/Grid';
 
 export default function VerificationQueue() {
   const [selectedProperty, setSelectedProperty] = useState(null);
@@ -34,7 +34,8 @@ export default function VerificationQueue() {
           landArea: p.landArea || p.area || '',
         }));
         if (mounted) setQueue(items);
-      } catch {
+      } catch (error) {
+        console.error('Error fetching verification queue:', error);
         if (mounted) setQueue([]);
       }
     })();

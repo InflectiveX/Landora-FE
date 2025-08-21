@@ -1,49 +1,38 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Container, Paper, Box, Typography, TextField, Button, Tab, Tabs, Alert, InputAdornment, IconButton, Fade, Zoom, CircularProgress, alpha } from '@mui/material';
-import { AccountBalance as AccountBalanceIcon, Visibility, VisibilityOff, Person as PersonIcon, Lock as LockIcon, AdminPanelSettings as GovernmentIcon } from '@mui/icons-material';
+import { Container, Paper, Box, Typography, TextField, Button, Alert, InputAdornment, IconButton, Fade, CircularProgress } from '@mui/material';
+import { AccountBalance as AccountBalanceIcon, Visibility, VisibilityOff, Person as PersonIcon, Lock as LockIcon } from '@mui/icons-material';
 import { useForm } from 'react-hook-form';
 import { useSnackbar } from 'notistack';
 import { apiClient } from '@/lib/api';
 
-const SignUp = () => {
+export default function SignUp() {
 	const router = useRouter();
 	const { enqueueSnackbar } = useSnackbar();
-	const [tabValue, setTabValue] = useState(0);
+	const [loading, setLoading] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-	const [loading, setLoading] = useState(false);
-
-	const { register, handleSubmit, formState: { errors }, watch, reset } = useForm();
+	const { register, handleSubmit, watch, formState: { errors } } = useForm();
 	const password = watch('password');
-
-	const handleTabChange = (event, newValue) => {
-		setTabValue(newValue);
-		reset();
-	};
 
 	const onSubmit = async (data) => {
 		setLoading(true);
 		try {
-			// API call to register user - align with backend Credentials { fullname, email, password, nic }
+			// API call to register user
 			const response = await apiClient.user.register({
-				fullname: data.fullName,
+				fullname: data.fullName, // Changed to match backend 'fullname'
 				email: data.email,
-				nic: data.nicNumber,
-				password: data.password
+				nic: data.nicNumber,     // Changed to match backend 'nic'
+				password: data.password,
+				role: 'citizen' // Only citizens can sign up through this page
 			});
 
-			enqueueSnackbar('Registration successful! Please check your email for verification.', { 
-				variant: 'success' 
-			});
-			
-			// Redirect to login
+			enqueueSnackbar('Account created successfully! Please check your email for activation instructions.', { variant: 'success' });
 			router.push('/login');
 		} catch (error) {
-			enqueueSnackbar(error.message || 'Registration failed. Please try again.', { 
-				variant: 'error' 
-			});
+			console.error('Registration error:', error);
+			enqueueSnackbar(error.message || 'Registration failed. Please try again.', { variant: 'error' });
 		} finally {
 			setLoading(false);
 		}
@@ -108,35 +97,21 @@ const SignUp = () => {
 
 						{/* Role Selection Tabs */}
 						<Box sx={{ mb: 4 }}>
-							<Tabs 
-								value={tabValue} 
-								onChange={handleTabChange} 
-								variant="fullWidth"
-								sx={{
-									'& .MuiTab-root': {
-										fontWeight: 600,
-										fontSize: '1rem',
-										py: 2
-									}
-								}}
-							>
-								<Tab 
-									icon={<PersonIcon />} 
-									label="Citizen" 
-									iconPosition="start"
-								/>
-								<Tab 
-									icon={<GovernmentIcon />} 
-									label="Government Officer" 
-									iconPosition="start"
-								/>
-							</Tabs>
+							<Box sx={{ textAlign: 'center', mb: 4 }}>
+								<Typography variant="h6" fontWeight="bold" gutterBottom>
+									Register as a Citizen
+								</Typography>
+								<Typography variant="body2" color="text.secondary">
+									Complete the form below to create your citizen account.
+								</Typography>
+							</Box>
 						</Box>
 
 						<Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ space: 3 }}>
 							<TextField
 								fullWidth
 								label="Full Name"
+								autoComplete="name"
 								{...register('fullName', { 
 									required: 'Full name is required',
 									minLength: { value: 2, message: 'Name must be at least 2 characters' }
@@ -157,6 +132,7 @@ const SignUp = () => {
 								fullWidth
 								label="Email Address"
 								type="email"
+								autoComplete="email"
 								{...register('email', { 
 									required: 'Email is required',
 									pattern: { 
@@ -172,6 +148,7 @@ const SignUp = () => {
 							<TextField
 								fullWidth
 								label="NIC Number"
+								autoComplete="off"
 								{...register('nicNumber', { 
 									required: 'NIC number is required',
 									pattern: { 
@@ -188,6 +165,7 @@ const SignUp = () => {
 								fullWidth
 								label="Password"
 								type={showPassword ? 'text' : 'password'}
+								autoComplete="new-password"
 								{...register('password', { 
 									required: 'Password is required',
 									minLength: { value: 8, message: 'Password must be at least 8 characters' },
@@ -222,6 +200,7 @@ const SignUp = () => {
 								fullWidth
 								label="Confirm Password"
 								type={showConfirmPassword ? 'text' : 'password'}
+								autoComplete="new-password"
 								{...register('confirmPassword', { 
 									required: 'Please confirm your password',
 									validate: value => value === password || 'Passwords do not match'
@@ -248,10 +227,9 @@ const SignUp = () => {
 								sx={{ mb: 4 }}
 							/>
 
-							<Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
+							<Alert severity="info" sx={{ mb: 3 }}>
 								<Typography variant="body2">
 									By creating an account, you agree to our Terms of Service and Privacy Policy.
-									{tabValue === 1 && ' Government officers will be verified by administrators.'}
 								</Typography>
 							</Alert>
 
@@ -259,34 +237,24 @@ const SignUp = () => {
 								type="submit"
 								fullWidth
 								variant="contained"
-								size="large"
 								disabled={loading}
-								startIcon={loading ? <CircularProgress size={20} /> : null}
-								sx={{ 
-									py: 1.5, 
-									fontSize: '1.1rem', 
-									fontWeight: 600,
-									borderRadius: 2,
-									background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
-									'&:hover': {
-										background: 'linear-gradient(45deg, #5a6fd8 30%, #6a4190 90%)',
-									},
-								}}
+								startIcon={loading ? <CircularProgress size={18} /> : null}
+								sx={{ py: 1.25, mb: 3 }}
 							>
 								{loading ? 'Creating Account...' : 'Create Account'}
 							</Button>
 
-							<Box sx={{ textAlign: 'center', mt: 3 }}>
-								<Typography variant="body2" color="text.secondary">
-									Already have an account?{' '}
-									<Button 
-										variant="text" 
-										onClick={() => router.push('/login')}
-										sx={{ fontWeight: 600, textTransform: 'none' }}
-									>
-										Sign In
-									</Button>
+							<Box sx={{ textAlign: 'center' }}>
+								<Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+									Already have an account?
 								</Typography>
+								<Button
+									variant="text"
+									onClick={() => router.push('/login')}
+									sx={{ textTransform: 'none' }}
+								>
+									Back to Login
+								</Button>
 							</Box>
 						</Box>
 					</Paper>
@@ -295,5 +263,3 @@ const SignUp = () => {
 		</Box>
 	);
 };
-
-export default SignUp;

@@ -1,8 +1,8 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { Container, Paper, Box, Typography, TextField, Button, Tab, Tabs, Alert, InputAdornment, IconButton, Fade, CircularProgress } from '@mui/material';
-import { AccountBalance as AccountBalanceIcon, Visibility, VisibilityOff, Person as PersonIcon, Lock as LockIcon, AdminPanelSettings as GovernmentIcon } from '@mui/icons-material';
+import { Container, Paper, Box, Typography, TextField, Button, Alert, InputAdornment, IconButton, Fade, CircularProgress } from '@mui/material';
+import { AccountBalance as AccountBalanceIcon, Visibility, VisibilityOff, Lock as LockIcon } from '@mui/icons-material';
 import { useForm } from 'react-hook-form';
 import { useSnackbar } from 'notistack';
 import { useAuth } from '@/contexts/AuthContext';
@@ -24,7 +24,6 @@ export default function Login() {
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
   const { login } = useAuth();
-  const [tabValue, setTabValue] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -53,16 +52,16 @@ export default function Login() {
           id: payload.id ?? payload.sub ?? undefined,
           name: payload.username ?? payload.name ?? data.email.split('@')[0],
           email: payload.email ?? data.email,
-          role: payload.role ?? (tabValue === 0 ? 'citizen' : 'officer'),
+          role: payload.role ?? 'citizen',
           status: payload.status ?? undefined,
         };
       } else {
         // Fallback: try protected, then minimal
         try {
           const protectedRes = await apiClient.auth.protected();
-          userInfo = protectedRes?.user || protectedRes || { name: data.email.split('@')[0], email: data.email, role: tabValue === 0 ? 'citizen' : 'officer' };
+          userInfo = protectedRes?.user || protectedRes || { name: data.email.split('@')[0], email: data.email, role: 'citizen' };
         } catch {
-          userInfo = { name: data.email.split('@')[0], email: data.email, role: tabValue === 0 ? 'citizen' : 'officer' };
+          userInfo = { name: data.email.split('@')[0], email: data.email, role: 'citizen' };
         }
       }
 
@@ -88,16 +87,12 @@ export default function Login() {
               <Typography variant="body2" color="text.secondary">Access your Land Registry account</Typography>
             </Box>
 
-            <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)} sx={{ mb: 2 }}>
-              <Tab icon={<PersonIcon />} label="Citizen" iconPosition="start" />
-              <Tab icon={<GovernmentIcon />} label="Officer" iconPosition="start" />
-            </Tabs>
-
             <Box component="form" onSubmit={handleSubmit(onSubmit)}>
               <TextField
                 fullWidth
                 label="Email"
                 type="email"
+                autoComplete="email"
                 {...register('email', { required: 'Email is required' })}
                 error={!!errors.email}
                 helperText={errors.email?.message}
@@ -107,6 +102,7 @@ export default function Login() {
                 fullWidth
                 label="Password"
                 type={showPassword ? 'text' : 'password'}
+                autoComplete="current-password"
                 {...register('password', { required: 'Password is required' })}
                 error={!!errors.password}
                 helperText={errors.password?.message}
@@ -124,12 +120,36 @@ export default function Login() {
                     </InputAdornment>
                   )
                 }}
-                sx={{ mb: 3 }}
+                sx={{ mb: 1 }}
               />
+
+              <Box sx={{ textAlign: 'right', mb: 3 }}>
+                <Button
+                  variant="text"
+                  size="small"
+                  onClick={() => router.push('/forgot')}
+                  sx={{ textTransform: 'none' }}
+                >
+                  Forgot Password?
+                </Button>
+              </Box>
 
               <Button type="submit" fullWidth variant="contained" disabled={loading} startIcon={loading ? <CircularProgress size={18} /> : null} sx={{ py: 1.25 }}>
                 {loading ? 'Signing in...' : 'Sign in'}
               </Button>
+
+              <Box sx={{ textAlign: 'center', mt: 3 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  Don't have an account?
+                </Typography>
+                <Button
+                  variant="text"
+                  onClick={() => router.push('/signup')}
+                  sx={{ textTransform: 'none' }}
+                >
+                  Sign up as Citizen
+                </Button>
+              </Box>
             </Box>
           </Paper>
         </Fade>

@@ -51,7 +51,6 @@ export default function LandRegistration() {
     console.log("clicked");
     setLoading(true);
     try {
-      // Map UI form fields to backend Property record fields
       const body = {
         address: data.address,
         district: data.district,
@@ -61,10 +60,24 @@ export default function LandRegistration() {
         survey_number: data.plotNumber,
         currentowner_nic: data.ownerNIC
       };
-      await registerProperty(body);
-      // After backend returns new land id, you can register documents as JSON like:
-      // await apiClient.document.register({ land_id: newLandId, name: file.name, doc_type: k, url: 'https://...' })
-      // Temporarily skip document.register to avoid 400 due to multipart mismatch
+      const res = await registerProperty(body);
+      const newLandId = (res && typeof res === 'object') ? res.id : undefined;
+
+      // Register documents as JSON if we have a new land id
+      if (newLandId) {
+        const keys = Object.keys(uploadedFiles);
+        for (const k of keys) {
+          const file = uploadedFiles[k];
+          if (!file) continue;
+          await apiClient.document.register({
+            land_id: newLandId,
+            name: file.name,
+            doc_type: k,
+            url: ''
+          });
+        }
+      }
+
       enqueueSnackbar('Registration submitted successfully!', { variant: 'success' });
       setActiveStep(0);
       setUploadedFiles({});

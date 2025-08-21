@@ -1,54 +1,40 @@
-
-# Landora Land Registry Frontend
-
-This is the frontend for the Landora Land Registry System, built with React, Vite, and Material-UI. It provides a modern, secure, and user-friendly interface for property registration, verification, transfer, and administration.
-
-## Features
-
-- **User Dashboard**: Citizens can register properties, view transaction history, and manage their profile.
-- **Property Registration**: Guided process for submitting new property details and documents.
-- **Verification Queue**: Admins can review and verify property submissions.
-- **Property Transfer**: Secure transfer of property ownership.
-- **Officer Management**: Admins can add, edit, and remove government officers from the system (see `/admin/officers`).
-- **Help & Support**: Comprehensive help center with FAQs, guides, and contact options.
-- **Authentication**: Secure login for citizens and officers.
-- **Modern UI**: Responsive design with Material-UI and custom themes.
-
-## Project Structure
-
-- `src/pages/` — Main pages (Dashboard, Login, LandRegistration, OfficerManagement, etc.)
-- `src/components/common/` — Shared layout and UI components
-- `src/theme/` — Theme customization
-- `public/` — Static assets
-
-## Officer Management
-
-Admins can manage government officers via the Officer Management page:
-
-- Navigate to **Admin Panel** → **Manage Officers**
-- Add, edit, or remove officers
-- Officers have name, email, department, and status fields
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
 
 ## Getting Started
 
-1. Install dependencies:
-	```sh
-	npm install
-	```
-2. Start the development server:
-	```sh
-	npm run dev
-	```
-3. Visit [http://localhost:5173](http://localhost:5173) in your browser.
+First, run the development server:
 
-## Tech Stack
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-- React
-- Vite
-- Material-UI
-- React Router
-- React Hook Form
-- Notistack (notifications)
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
----
-For more details, see the code in the `src/` directory.
+You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+
+[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+
+The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+
+This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.

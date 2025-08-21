@@ -36,7 +36,7 @@ export default function ResetPassword() {
 
     setLoading(true);
     try {
-      await apiClient.user.resetPassword(token, data.password);
+      await apiClient.auth.resetPassword(token, data.password);
       enqueueSnackbar('Password updated successfully! You can now log in with your new password', { variant: 'success' });
       router.push('/login');
     } catch (e) {

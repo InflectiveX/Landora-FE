@@ -130,7 +130,7 @@ export default function ForgotPassword() {
               variant="outlined"
               onClick={() => {
                 console.log("Test button clicked");
-                apiClient.user
+                apiClient.auth
                   .forgotPassword("test@example.com")
                   .then((res) => console.log("Test API success:", res))
                   .catch((err) => console.error("Test API error:", err));

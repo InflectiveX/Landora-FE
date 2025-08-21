@@ -21,6 +21,7 @@ export default function App({ Component, pageProps }) {
         "/forgot",
         "/_error",
         "/api",
+        "/reset",
       ];
       const isPublic = publicRoutes.some(
         (p) => router.pathname === p || router.pathname.startsWith(p + "/")

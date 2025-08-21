@@ -17,6 +17,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!isAuthenticated) return;
     const run = async () => {
       try {
         const [p, t] = await Promise.all([
@@ -40,7 +41,7 @@ export default function Dashboard() {
     run();
     const intervalId = setInterval(run, 15 * 60 * 1000);
     return () => clearInterval(intervalId);
-  }, [getProperties, getTransactions]);
+  }, [getProperties, getTransactions, isAuthenticated]);
 
   if (!isAuthenticated) return (
     <MainLayout>
@@ -98,14 +99,19 @@ export default function Dashboard() {
               <Typography variant="h6" gutterBottom>Recent Properties</Typography>
               <Divider sx={{ mb: 2 }} />
               <List>
-                {(properties || []).slice(0, 5).map((p) => (
-                  <ListItem key={p.id} secondaryAction={<Button onClick={() => router.push(`/properties/${p.id}`)}>View</Button>}>
-                    <ListItemText
-                      primary={p.title}
-                      secondary={`Plot: ${p.plotNumber} • Area: ${p.landArea}`}
-                    />
-                  </ListItem>
-                ))}
+                {(properties || []).slice(0, 5).map((p) => {
+                  const title = p.title || p.address || `${p.district || 'Property'}`;
+                  const plotNumber = p.survey_number || p.plotNumber;
+                  const landArea = p.land_area || p.landArea;
+                  return (
+                    <ListItem key={p.id} secondaryAction={<Button onClick={() => router.push(`/properties/${p.id}`)}>View</Button>}>
+                      <ListItemText
+                        primary={title}
+                        secondary={`Plot: ${plotNumber || '-'} • Area: ${landArea || '-'}`}
+                      />
+                    </ListItem>
+                  );
+                })}
                 {properties.length === 0 && (
                   <Box sx={{ p: 2, textAlign: 'center' }}>
                     <Typography variant="body2" color="text.secondary">No properties found.</Typography>
@@ -131,5 +137,3 @@ export default function Dashboard() {
     </MainLayout>
   );
 }
-
-

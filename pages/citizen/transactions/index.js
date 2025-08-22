@@ -42,7 +42,7 @@ import { useApi } from "@/lib/api";
 import CitizenLayout from "@/components/layouts/CitizenLayout";
 
 export default function TransactionHistory() {
-  const { getTransactions } = useApi();
+  const { getCurrentUserTransfers } = useApi();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -57,7 +57,7 @@ export default function TransactionHistory() {
   useEffect(() => {
     const run = async () => {
       try {
-        const data = await getTransactions().catch((error) => {
+        const data = await getCurrentUserTransfers().catch((error) => {
           console.error("Error fetching transactions:", error);
           return [];
         });
@@ -71,7 +71,7 @@ export default function TransactionHistory() {
     run();
     const intervalId = setInterval(run, 15 * 60 * 1000);
     return () => clearInterval(intervalId);
-  }, [getTransactions]);
+  }, [getCurrentUserTransfers]);
 
   const getStatusColor = (status) =>
     ({

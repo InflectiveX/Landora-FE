@@ -94,7 +94,9 @@ export default function PropertyTransfer() {
         setBuyerLookupError(null);
         const user = await apiClient.user.getByNIC(nic);
         if (mounted) {
-          console.log("Buyer user found:", user); // Debug log
+          setBuyerUser(user || null);
+          setValue("buyerId", user?.id || "");
+          setBuyerLookupError(user ? null : "Buyer not found");
         }
       } catch (err) {
         console.error("User lookup failed", err);
@@ -280,6 +282,16 @@ export default function PropertyTransfer() {
   const ownerConflict =
     buyerNIC && ownerNIC && String(buyerNIC).trim() === String(ownerNIC).trim();
 
+  // Required documents for the transfer step
+  const requiredDocs = ["saleAgreement", "affidavit", "consentLetters"];
+  const missingDocs = requiredDocs.filter((k) => {
+    const v = docs[k];
+    if (!v) return true;
+    if (Array.isArray(v)) return v.length === 0;
+    return false;
+  });
+  const docsMissing = missingDocs.length > 0;
+
   return (
     <CitizenLayout>
       <Box>
@@ -319,7 +331,11 @@ export default function PropertyTransfer() {
                 <Button
                   variant="contained"
                   onClick={handleNext}
-                  disabled={activeStep === 0 && (buyerInvalid || ownerConflict)}
+                  // For step 0, ensure form fields are valid. For step 1, ensure required documents uploaded.
+                  disabled={
+                    (activeStep === 0 && (buyerInvalid || ownerConflict || !isValid)) ||
+                    (activeStep === 1 && docsMissing)
+                  }
                 >
                   Next
                 </Button>

@@ -20,41 +20,70 @@ import {
   Divider,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import {
-  Menu as MenuIcon,
-  Dashboard as DashboardIcon,
-  AddBox as AddBoxIcon,
-  Description as DescriptionIcon,
-  AccountBalance as AccountBalanceIcon,
-  Search as SearchIcon,
-  Person as PersonIcon,
-  Help as HelpIcon,
-  VerifiedUser as VerifiedUserIcon,
-} from "@mui/icons-material";
+
 import ThemeToggle from "@/components/ui/ThemeToggle";
 
 const drawerWidth = 280;
 
-const baseMenuItems = [
-  { text: "Dashboard", icon: <DashboardIcon />, path: "officer/dashboard" },
+import {
+  Menu as MenuIcon,
+  Dashboard as DashboardIcon,
+  AddLocationAlt as AddLocationAltIcon,
+  Description as DescriptionIcon,
+  FactCheck as FactCheckIcon,
+  AccountBalance as AccountBalanceIcon,
+  ListAlt as ListAltIcon,
+  BarChart as BarChartIcon,
+  Help as HelpIcon,
+  VerifiedUser as VerifiedUserIcon,
+  Search as SearchIcon,
+  Person as PersonIcon,
+  ExpandMore as ExpandMoreIcon,
+} from "@mui/icons-material";
+
+const officerMenuItems = [
+  { text: "Dashboard", icon: <DashboardIcon />, path: "/officer/dashboard" },
   {
-    text: "Register Property",
-    icon: <AddBoxIcon />,
-    path: "officer/land-registration",
-  },
-  {
-    text: "All Properties",
+    text: "Properties",
     icon: <DescriptionIcon />,
-    path: "officer/properties",
+    path: "/officer/properties",
+    subItems: [
+      {
+        text: "All Properties",
+        icon: <ListAltIcon />,
+        path: "/officer/properties",
+      },
+      {
+        text: "Verify a Property",
+        icon: <VerifiedUserIcon />,
+        path: "/officer/properties/verify",
+      },
+    ],
   },
   {
-    text: "Transaction History",
-    icon: <AccountBalanceIcon />,
-    path: "officer/transactions",
+    text: "Verification Queue",
+    icon: <FactCheckIcon />,
+    path: "/officer/verification-queue",
+    subItems: [
+      {
+        text: "Register Queue",
+        icon: <ListAltIcon />,
+        path: "/officer/verification-queue/register",
+      },
+      {
+        text: "Transfer Queue",
+        icon: <ListAltIcon />,
+        path: "/officer/verification-queue/transfer",
+      },
+    ],
   },
-  { text: "Profile", icon: <PersonIcon />, path: "officer/profile" },
-  { text: "Help & Support", icon: <HelpIcon />, path: "officer/help" },
-  { text: "Public Verification", icon: <SearchIcon />, path: "officer/verify" },
+  {
+    text: "Transactions",
+    icon: <AccountBalanceIcon />,
+    path: "/officer/transactions",
+  },
+  { text: "Reports", icon: <BarChartIcon />, path: "/officer/reports" },
+  { text: "Help & Support", icon: <HelpIcon />, path: "/officer/help" },
 ];
 
 const OfficerLayout = ({ children }) => {
@@ -85,19 +114,56 @@ const OfficerLayout = ({ children }) => {
   ];
   const isAdminUser = !!user && user.role === "admin";
 
-  // Officer-only nav
+  // Officer sidebar nav with sub-items for Verification Queue
+  const [openSubMenu, setOpenSubMenu] = useState(null);
   const drawer = (
     <Box sx={{ height: "100%" }}>
       <List>
-        {baseMenuItems.map((item) => (
-          <ListItemButton
-            key={item.text}
-            onClick={() => router.push(`/${item.path}`)}
-          >
-            <ListItemIcon>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.text} />
-          </ListItemButton>
-        ))}
+        {officerMenuItems.map((item) =>
+          item.subItems ? (
+            <>
+              <ListItemButton
+                key={item.text}
+                onClick={() =>
+                  setOpenSubMenu(openSubMenu === item.text ? null : item.text)
+                }
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} />
+                <ExpandMoreIcon
+                  sx={{
+                    transform:
+                      openSubMenu === item.text
+                        ? "rotate(180deg)"
+                        : "rotate(0deg)",
+                    transition: "0.2s",
+                  }}
+                />
+              </ListItemButton>
+              {openSubMenu === item.text && (
+                <List component="div" disablePadding sx={{ pl: 4 }}>
+                  {item.subItems.map((sub) => (
+                    <ListItemButton
+                      key={sub.text}
+                      onClick={() => router.push(sub.path)}
+                    >
+                      <ListItemIcon>{sub.icon}</ListItemIcon>
+                      <ListItemText primary={sub.text} />
+                    </ListItemButton>
+                  ))}
+                </List>
+              )}
+            </>
+          ) : (
+            <ListItemButton
+              key={item.text}
+              onClick={() => router.push(item.path)}
+            >
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItemButton>
+          )
+        )}
       </List>
     </Box>
   );

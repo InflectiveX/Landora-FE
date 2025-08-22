@@ -175,7 +175,28 @@ export default function PropertyDetails() {
                           key={i}
                           secondaryAction={
                             <Box sx={{ display: "flex", gap: 1 }}>
-                              <IconButton onClick={() => setDocDialog(d)}>
+                              <IconButton
+                                onClick={() => {
+                                  const docUrl = d.url || d.path || null;
+                                  // If it's a PDF, open the dedicated viewer in a new tab to avoid embed issues
+                                  if (
+                                    docUrl &&
+                                    String(docUrl)
+                                      .toLowerCase()
+                                      .endsWith(".pdf")
+                                  ) {
+                                    window.open(
+                                      `/pdf-viewer?url=${encodeURIComponent(
+                                        docUrl
+                                      )}`,
+                                      "_blank"
+                                    );
+                                    return;
+                                  }
+                                  // otherwise open the dialog with details
+                                  setDocDialog(d);
+                                }}
+                              >
                                 <DescriptionIcon />
                               </IconButton>
                               <IconButton>
@@ -249,6 +270,15 @@ export default function PropertyDetails() {
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setDocDialog(null)}>Close</Button>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                const url = docDialog?.url || docDialog?.path;
+                if (url) window.open(url, "_blank", "noopener");
+              }}
+            >
+              Open
+            </Button>
             <Button variant="contained" startIcon={<DownloadIcon />}>
               Download
             </Button>

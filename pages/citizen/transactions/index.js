@@ -412,10 +412,38 @@ export default function TransactionHistory() {
                                 />
                                 <Button
                                   size="small"
-                                  component="a"
-                                  href={d.url || d.path || `#`}
-                                  target="_blank"
-                                  rel="noreferrer"
+                                  onClick={() => {
+                                    const docUrl = d.url || d.path || "";
+                                    try {
+                                      const lower = (
+                                        docUrl || ""
+                                      ).toLowerCase();
+                                      if (
+                                        lower.endsWith(".pdf") ||
+                                        lower.includes("/pdf/")
+                                      ) {
+                                        // open in lightweight in-app pdf viewer
+                                        window.open(
+                                          `/pdf-viewer?url=${encodeURIComponent(
+                                            docUrl
+                                          )}`,
+                                          "_blank"
+                                        );
+                                      } else {
+                                        window.open(
+                                          docUrl || "",
+                                          "_blank",
+                                          "noopener"
+                                        );
+                                      }
+                                    } catch (e) {
+                                      window.open(
+                                        docUrl || "",
+                                        "_blank",
+                                        "noopener"
+                                      );
+                                    }
+                                  }}
                                 >
                                   View
                                 </Button>

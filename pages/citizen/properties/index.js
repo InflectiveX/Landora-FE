@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { Box, List, ListItemText, Chip, Typography, Paper, CircularProgress, ListItemButton } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { useApi } from '@/lib/api';
-import MainLayout from '@/components/layouts/MainLayout';
+import CitizenLayout from '@/components/layouts/CitizenLayout';
 
 export default function AllProperties() {
   const router = useRouter();
@@ -35,16 +35,16 @@ export default function AllProperties() {
 
   if (loading) {
     return (
-      <MainLayout>
+      <CitizenLayout>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
           <CircularProgress />
         </Box>
-      </MainLayout>
+      </CitizenLayout>
     );
   }
 
   return (
-    <MainLayout>
+    <CitizenLayout>
       <Box>
         <Typography variant="h4" gutterBottom>All Properties</Typography>
         <Paper sx={{ mt: 2 }}>
@@ -74,7 +74,7 @@ export default function AllProperties() {
           {properties.length === 0 && (<Box sx={{ p: 4, textAlign: 'center' }}><Typography variant="body1" color="text.secondary">No properties found.</Typography></Box>)}
         </Paper>
       </Box>
-    </MainLayout>
+    </CitizenLayout>
   );
 }
 

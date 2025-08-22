@@ -17,14 +17,14 @@ import CitizenLayout from "@/components/layouts/CitizenLayout";
 
 export default function AllProperties() {
   const router = useRouter();
-  const { getProperties } = useApi();
+  const { getCurrentUserLands } = useApi();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const data = await getProperties().catch((error) => {
+        const data = await getCurrentUserLands().catch((error) => {
           console.error("Error fetching properties:", error);
           return [];
         });
@@ -38,7 +38,7 @@ export default function AllProperties() {
     fetchProperties();
     const intervalId = setInterval(fetchProperties, 15 * 60 * 1000);
     return () => clearInterval(intervalId);
-  }, [getProperties]);
+  }, [getCurrentUserLands]);
 
   const statusColors = {
     verified: "success",
@@ -82,7 +82,7 @@ export default function AllProperties() {
               return (
                 <ListItemButton
                   key={p.id || idx}
-                  onClick={() => router.push(`./properties/${p.id}`)}
+                  onClick={() => router.push(`/citizen/properties/${p.id}`)}
                   divider={idx < properties.length - 1}
                 >
                   <ListItemText

@@ -1,6 +1,0 @@
-[
-  { "id": "transferDeed", "name": "Transfer Deed", "required": true },
-  { "id": "buyerNIC", "name": "Buyer NIC Copy", "required": true },
-  { "id": "paymentProof", "name": "Payment Proof", "required": true },
-  { "id": "legalClearance", "name": "Legal Clearance Certificate", "required": false }
-]

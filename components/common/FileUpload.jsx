@@ -39,6 +39,8 @@ const FileUpload = ({
   required = false,
   label = "Upload Documents",
   description = "Drag and drop files here, or click to select files",
+  // Optional: folder to place uploaded files into (Cloudinary unsigned upload folder)
+  folder,
 }) => {
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
@@ -98,6 +100,14 @@ const FileUpload = ({
     const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
     const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
+    // Helpful debug: warn if cloud vars missing (client-side)
+    if (typeof window !== "undefined" && (!CLOUD_NAME || !UPLOAD_PRESET)) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        "Cloudinary client upload disabled: set NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME and NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET in your env"
+      );
+    }
+
     if (CLOUD_NAME && UPLOAD_PRESET) {
       // Upload using XHR so we can track progress
       const uploadWithXhr = () =>
@@ -113,11 +123,13 @@ const FileUpload = ({
                 ...prev,
                 [fileObj.id]: progress,
               }));
-              setFiles((prevFiles) =>
-                prevFiles.map((f) =>
+              setFiles((prevFiles) => {
+                const next = prevFiles.map((f) =>
                   f.id === fileObj.id ? { ...f, progress } : f
-                )
-              );
+                );
+                onFilesChange?.(next);
+                return next;
+              });
             }
           };
 
@@ -125,8 +137,8 @@ const FileUpload = ({
             try {
               const res = JSON.parse(xhr.responseText);
               if (xhr.status >= 200 && xhr.status < 300) {
-                setFiles((prevFiles) =>
-                  prevFiles.map((f) =>
+                setFiles((prevFiles) => {
+                  const next = prevFiles.map((f) =>
                     f.id === fileObj.id
                       ? {
                           ...f,
@@ -137,45 +149,55 @@ const FileUpload = ({
                             res.original_filename || f.file.name,
                         }
                       : f
-                  )
-                );
+                  );
+                  onFilesChange?.(next);
+                  return next;
+                });
                 resolve(res);
               } else {
                 const err = res?.error || xhr.responseText || "Upload failed";
-                setFiles((prevFiles) =>
-                  prevFiles.map((f) =>
+                setFiles((prevFiles) => {
+                  const next = prevFiles.map((f) =>
                     f.id === fileObj.id
                       ? { ...f, status: "error", error: err }
                       : f
-                  )
-                );
+                  );
+                  onFilesChange?.(next);
+                  return next;
+                });
                 reject(new Error(err));
               }
             } catch (err) {
-              setFiles((prevFiles) =>
-                prevFiles.map((f) =>
+              setFiles((prevFiles) => {
+                const next = prevFiles.map((f) =>
                   f.id === fileObj.id
                     ? { ...f, status: "error", error: err.message }
                     : f
-                )
-              );
+                );
+                onFilesChange?.(next);
+                return next;
+              });
               reject(err);
             }
           };
 
           xhr.onerror = () => {
             const err = "Network error during upload";
-            setFiles((prevFiles) =>
-              prevFiles.map((f) =>
+            setFiles((prevFiles) => {
+              const next = prevFiles.map((f) =>
                 f.id === fileObj.id ? { ...f, status: "error", error: err } : f
-              )
-            );
+              );
+              onFilesChange?.(next);
+              return next;
+            });
             reject(new Error(err));
           };
 
           const fd = new FormData();
           fd.append("file", fileObj.file);
           fd.append("upload_preset", UPLOAD_PRESET);
+          // If caller provided a folder prop, include it so Cloudinary will place uploads there
+          if (folder) fd.append("folder", folder);
           xhr.send(fd);
         });
 
@@ -197,27 +219,35 @@ const FileUpload = ({
         // eslint-disable-next-line no-await-in-loop
         await new Promise((resolve) => setTimeout(resolve, 200));
         setUploadProgress((prev) => ({ ...prev, [fileObj.id]: progress }));
-        setFiles((prevFiles) =>
-          prevFiles.map((f) => (f.id === fileObj.id ? { ...f, progress } : f))
-        );
+        setFiles((prevFiles) => {
+          const next = prevFiles.map((f) =>
+            f.id === fileObj.id ? { ...f, progress } : f
+          );
+          onFilesChange?.(next);
+          return next;
+        });
       }
 
       const mockIpfsHash = `Qm${Math.random().toString(36).substr(2, 44)}`;
-      setFiles((prevFiles) =>
-        prevFiles.map((f) =>
+      setFiles((prevFiles) => {
+        const next = prevFiles.map((f) =>
           f.id === fileObj.id
             ? { ...f, status: "completed", ipfsHash: mockIpfsHash }
             : f
-        )
-      );
+        );
+        onFilesChange?.(next);
+        return next;
+      });
     } catch (error) {
-      setFiles((prevFiles) =>
-        prevFiles.map((f) =>
+      setFiles((prevFiles) => {
+        const next = prevFiles.map((f) =>
           f.id === fileObj.id
             ? { ...f, status: "error", error: error.message }
             : f
-        )
-      );
+        );
+        onFilesChange?.(next);
+        return next;
+      });
     } finally {
       setUploading(false);
     }

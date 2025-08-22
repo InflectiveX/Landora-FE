@@ -138,8 +138,14 @@ export default function PropertyTransfer() {
   const handleNext = () => setActiveStep((prev) => prev + 1);
   const handleBack = () => setActiveStep((prev) => prev - 1);
 
-  const onFilesChange = (files, key) =>
+  const onFilesChange = (files, key) => {
     // FileUpload passes an array of file objects; we store either single object or array
+    // Debug: print files so we can see secure_url / ipfsHash provided by FileUpload
+    try {
+      console.debug("onFilesChange - key:", key, "files:", files);
+    } catch (e) {
+      /* ignore */
+    }
     setDocs((prev) => {
       if (!files) return { ...prev, [key]: null };
       // if multiple allowed, keep the array
@@ -147,6 +153,7 @@ export default function PropertyTransfer() {
       // otherwise store the single file object
       return { ...prev, [key]: files[0] };
     });
+  };
 
   const onSubmit = async (data) => {
     console.log("onSubmit triggered with data:", data); // Debug log
@@ -202,14 +209,25 @@ export default function PropertyTransfer() {
         for (const fileObj of items) {
           try {
             let resp = null;
+            // Debug: inspect fileObj metadata (Cloudinary res or IPFS hash)
+            try {
+              console.debug("document upload fileObj for key:", key, fileObj);
+            } catch (e) {
+              /* ignore */
+            }
             // If FileUpload already uploaded to Cloudinary and returned metadata
             if (fileObj?.secure_url || fileObj?.public_id) {
-              // Build backend document record
+              // Build backend document record (Cloudinary upload metadata available)
               const docRecord = {
                 land_id: Number(id),
                 name: fileObj.original_filename || fileObj.file?.name || "",
                 doc_type: key,
-                url: fileObj.secure_url || "",
+                // prefer secure_url; if missing but ipfsHash exists, use IPFS gateway URL
+                url:
+                  fileObj.secure_url ||
+                  (fileObj.ipfsHash
+                    ? `https://ipfs.io/ipfs/${fileObj.ipfsHash}`
+                    : ""),
               };
               if (fileObj.ipfsHash) docRecord.ipfs_hash = fileObj.ipfsHash;
               console.log(
@@ -221,11 +239,15 @@ export default function PropertyTransfer() {
               // Many backends expect JSON — convert file to base64 and send JSON payload
               try {
                 const base64 = await readFileAsBase64(fileObj.file);
+                // If the frontend has an IPFS hash for the file, register a gateway URL
+                const derivedUrl = fileObj.ipfsHash
+                  ? `https://ipfs.io/ipfs/${fileObj.ipfsHash}`
+                  : "";
                 const docRecord = {
                   land_id: Number(id),
                   name: fileObj.file.name || "",
                   doc_type: key,
-                  url: "",
+                  url: derivedUrl,
                   file_base64: base64,
                 };
                 if (fileObj.ipfsHash) docRecord.ipfs_hash = fileObj.ipfsHash;
@@ -341,7 +363,9 @@ export default function PropertyTransfer() {
           />
         );
       case 1:
-        return <DocumentsStep onFilesChange={onFilesChange} />;
+        // Pass a dynamic folder based on transfer/property id so uploads are grouped in Cloudinary
+        const folder = id ? `transfers/${id}` : undefined;
+        return <DocumentsStep onFilesChange={onFilesChange} folder={folder} />;
       case 2:
         return <VerificationStep />;
       case 3:

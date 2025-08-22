@@ -6,6 +6,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Box, CircularProgress, CssBaseline } from "@mui/material";
+import { useSnackbar } from "notistack";
+import { setEnqueueSnackbar } from "@/lib/snackbar";
 
 const queryClient = new QueryClient();
 
@@ -70,13 +72,25 @@ export default function App({ Component, pageProps }) {
           maxSnack={3}
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
         >
+          {/* Link notistack enqueue function to lib/snackbar for non-React callers */}
+          <InnerSnackbarBridge />
           <AuthProvider>
             <RouterGuard>
-              <Component {...pageProps} />
+                <Component {...pageProps} />
             </RouterGuard>
           </AuthProvider>
         </SnackbarProvider>
       </ThemeModeProvider>
     </QueryClientProvider>
   );
+}
+
+function InnerSnackbarBridge() {
+  // This component exists solely to call useSnackbar at the root and expose
+  // the enqueueSnackbar function to other modules via setEnqueueSnackbar.
+  const { enqueueSnackbar } = useSnackbar();
+  useEffect(() => {
+    setEnqueueSnackbar((msg, opts) => enqueueSnackbar(msg, opts));
+  }, [enqueueSnackbar]);
+  return null;
 }

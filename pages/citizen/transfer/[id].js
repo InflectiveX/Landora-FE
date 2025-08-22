@@ -18,7 +18,11 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import CitizenLayout from "@/components/layouts/CitizenLayout";
-import FileUpload from "@/components/common/FileUpload";
+// Step components
+import BuyerInfo from "./components/BuyerInfo";
+import DocumentsStep from "./components/DocumentsStep";
+import VerificationStep from "./components/VerificationStep";
+import SummaryStep from "./components/SummaryStep";
 import apiClient from "@/lib/api";
 import { useSnackbar } from "notistack";
 import { useForm } from "react-hook-form";
@@ -43,6 +47,7 @@ export default function PropertyTransfer() {
       : null;
 
   const [activeStep, setActiveStep] = useState(0);
+  // docs will store file objects returned by FileUpload (single object or array)
   const [docs, setDocs] = useState({});
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -61,11 +66,52 @@ export default function PropertyTransfer() {
     handleSubmit,
     formState: { errors, isValid },
     watch,
+    setValue,
     trigger,
   } = useForm({
     resolver: yupResolver(schema),
     mode: "onChange",
   });
+
+  // Keep track of resolved buyer user id and details
+  const [buyerUser, setBuyerUser] = useState(null);
+  const [buyerLookupLoading, setBuyerLookupLoading] = useState(false);
+  const [buyerLookupError, setBuyerLookupError] = useState(null);
+
+  // Watch NIC changes and resolve user (debounced)
+  const buyerNIC = watch("buyerNIC");
+  useEffect(() => {
+    const nic = buyerNIC;
+    if (!nic || nic.length < 5) {
+      setBuyerUser(null);
+      setValue("buyerId", "");
+      return;
+    }
+    let mounted = true;
+    const timer = setTimeout(async () => {
+      try {
+        setBuyerLookupLoading(true);
+        setBuyerLookupError(null);
+        const user = await apiClient.user.getByNIC(nic);
+        if (mounted) {
+          console.log("Buyer user found:", user); // Debug log
+        }
+      } catch (err) {
+        console.error("User lookup failed", err);
+        if (mounted) {
+          setBuyerUser(null);
+          setValue("buyerId", "");
+          setBuyerLookupError("Lookup failed");
+        }
+      } finally {
+        if (mounted) setBuyerLookupLoading(false);
+      }
+    }, 500);
+    return () => {
+      mounted = false;
+      clearTimeout(timer);
+    };
+  }, [buyerNIC, setValue]);
 
   // Fetch NFT & Property details
   useEffect(() => {
@@ -91,7 +137,14 @@ export default function PropertyTransfer() {
   const handleBack = () => setActiveStep((prev) => prev - 1);
 
   const onFilesChange = (files, key) =>
-    setDocs((prev) => ({ ...prev, [key]: files && files[0]?.file }));
+    // FileUpload passes an array of file objects; we store either single object or array
+    setDocs((prev) => {
+      if (!files) return { ...prev, [key]: null };
+      // if multiple allowed, keep the array
+      if (files.length > 1) return { ...prev, [key]: files };
+      // otherwise store the single file object
+      return { ...prev, [key]: files[0] };
+    });
 
   const onSubmit = async (data) => {
     console.log("onSubmit triggered with data:", data); // Debug log
@@ -108,15 +161,29 @@ export default function PropertyTransfer() {
       console.log("Submitting transfer with body:", body); // Debug log
       await apiClient.transfer.register(body);
 
-      // Upload documents
-      for (const [key, file] of Object.entries(docs)) {
-        if (!file) continue;
-        const fd = new FormData();
-        fd.append("file", file);
-        fd.append("documentType", key);
-        fd.append("transferFor", String(id));
-        console.log(`Uploading document: ${key}`); // Debug log
-        await apiClient.document.register(fd);
+      // Upload documents: if FileUpload uploaded to Cloudinary it will include secure_url/public_id
+      for (const [key, fileObj] of Object.entries(docs)) {
+        if (!fileObj) continue;
+        // If FileUpload stored the raw file under fileObj.file, and may have secure_url/public_id
+        if (fileObj.secure_url || fileObj.public_id) {
+          // send metadata to API so backend can persist the document record
+          const body = {
+            documentType: key,
+            transferFor: String(id),
+            url: fileObj.secure_url,
+            public_id: fileObj.public_id,
+            original_filename: fileObj.original_filename || fileObj.file?.name,
+          };
+          console.log(`Sending document metadata for: ${key}`, body);
+          await apiClient.document.register(body);
+        } else if (fileObj.file) {
+          const fd = new FormData();
+          fd.append("file", fileObj.file);
+          fd.append("documentType", key);
+          fd.append("transferFor", String(id));
+          console.log(`Uploading document file for: ${key}`); // Debug log
+          await apiClient.document.register(fd);
+        }
       }
 
       enqueueSnackbar("Transfer submitted successfully!", {
@@ -138,177 +205,80 @@ export default function PropertyTransfer() {
   const handleOpenConfirm = async () => {
     const isValidForm = await trigger(); // Trigger validation
     console.log("Form is valid:", isValidForm); // Debug log
-    if (isValidForm) {
-      setConfirmOpen(true);
-    } else {
+    if (!isValidForm) {
       enqueueSnackbar("Please fill all required fields correctly.", {
         variant: "error",
       });
+      return;
     }
+
+    // Ensure required documents are present
+    const requiredDocs = ["saleAgreement", "affidavit", "consentLetters"];
+    const missing = requiredDocs.filter((k) => {
+      const v = docs[k];
+      if (!v) return true;
+      // if array, must have at least one
+      if (Array.isArray(v)) return v.length === 0;
+      return false;
+    });
+
+    if (missing.length > 0) {
+      enqueueSnackbar(
+        `Please upload required documents: ${missing.join(", ")}`,
+        { variant: "error" }
+      );
+      return;
+    }
+    // Ensure buyer info was resolved
+    if (!buyerUser) {
+      enqueueSnackbar("Buyer not found. Please enter a valid Buyer NIC.", {
+        variant: "error",
+      });
+      return;
+    }
+
+    setConfirmOpen(true);
   };
 
-  // Render Step
+  // Render Step using separate components
   const renderStep = () => {
     switch (activeStep) {
       case 0:
         return (
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="NFT Token ID"
-                value={nftDetails?.token_id || ""}
-                InputProps={{ readOnly: true }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Property Address"
-                value={propertyDetails?.address || ""}
-                InputProps={{ readOnly: true }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Owner Name"
-                value={propertyDetails?.owner_name || ""}
-                InputProps={{ readOnly: true }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="District"
-                value={propertyDetails?.district || ""}
-                InputProps={{ readOnly: true }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Province"
-                value={propertyDetails?.province || ""}
-                InputProps={{ readOnly: true }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Land Area"
-                value={propertyDetails?.land_area || ""}
-                InputProps={{ readOnly: true }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Buyer NIC"
-                {...register("buyerNIC")}
-                error={!!errors.buyerNIC}
-                helperText={errors.buyerNIC?.message}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Description"
-                multiline
-                rows={3}
-                {...register("description")}
-                error={!!errors.description}
-                helperText={errors.description?.message}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Amount"
-                {...register("amount")}
-                error={!!errors.amount}
-                helperText={errors.amount?.message}
-              />
-            </Grid>
-          </Grid>
+          <BuyerInfo
+            nftDetails={nftDetails}
+            propertyDetails={propertyDetails}
+            register={register}
+            errors={errors}
+            watch={watch}
+            buyerUser={buyerUser}
+            buyerLookupLoading={buyerLookupLoading}
+            buyerLookupError={buyerLookupError}
+          />
         );
       case 1:
-        return (
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-              <FileUpload
-                label="Sale Agreement"
-                onFilesChange={(f) => onFilesChange(f, "saleAgreement")}
-                maxFiles={1}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <FileUpload
-                label="Affidavit"
-                onFilesChange={(f) => onFilesChange(f, "affidavit")}
-                maxFiles={1}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <FileUpload
-                label="Consent Letters"
-                onFilesChange={(f) => onFilesChange(f, "consentLetters")}
-                maxFiles={2}
-              />
-            </Grid>
-          </Grid>
-        );
+        return <DocumentsStep onFilesChange={onFilesChange} />;
       case 2:
-        return (
-          <Box>
-            <Typography variant="body1">
-              Please verify the buyer NIC, description, amount, and uploaded
-              documents are correct. You may be required to visit the land
-              registry office for in-person verification.
-            </Typography>
-          </Box>
-        );
+        return <VerificationStep />;
       case 3:
         return (
-          <Box>
-            <Typography variant="subtitle1" gutterBottom>
-              Summary
-            </Typography>
-            <Typography variant="body2">
-              NFT Token ID: {nftDetails?.token_id}
-            </Typography>
-            <Typography variant="body2">
-              Property Address: {propertyDetails?.address}
-            </Typography>
-            <Typography variant="body2">
-              Owner Name: {propertyDetails?.owner_name}
-            </Typography>
-            <Typography variant="body2">
-              District: {propertyDetails?.district}
-            </Typography>
-            <Typography variant="body2">
-              Province: {propertyDetails?.province}
-            </Typography>
-            <Typography variant="body2">
-              Land Area: {propertyDetails?.land_area}
-            </Typography>
-            <Typography variant="body2">
-              Buyer NIC: {watch("buyerNIC")}
-            </Typography>
-            <Typography variant="body2">
-              Description: {watch("description")}
-            </Typography>
-            <Typography variant="body2">Amount: {watch("amount")}</Typography>
-            <Typography variant="body2" sx={{ mt: 1 }}>
-              Documents: {Object.keys(docs).filter((k) => docs[k]).length}{" "}
-              attached
-            </Typography>
-          </Box>
+          <SummaryStep
+            nftDetails={nftDetails}
+            propertyDetails={propertyDetails}
+            docs={docs}
+            watch={watch}
+          />
         );
       default:
         return null;
     }
   };
+
+  // Derived validation for step navigation
+  const ownerNIC = propertyDetails?.owner_nic;
+  const buyerInvalid = !!(buyerLookupError || !buyerUser);
+  const ownerConflict =
+    buyerNIC && ownerNIC && String(buyerNIC).trim() === String(ownerNIC).trim();
 
   return (
     <CitizenLayout>
@@ -346,7 +316,11 @@ export default function PropertyTransfer() {
                   {loading ? "Submitting..." : "Submit Transfer"}
                 </Button>
               ) : (
-                <Button variant="contained" onClick={handleNext}>
+                <Button
+                  variant="contained"
+                  onClick={handleNext}
+                  disabled={activeStep === 0 && (buyerInvalid || ownerConflict)}
+                >
                   Next
                 </Button>
               )}

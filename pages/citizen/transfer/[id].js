@@ -152,41 +152,123 @@ export default function PropertyTransfer() {
     console.log("onSubmit triggered with data:", data); // Debug log
     setLoading(true);
     try {
+      // prefer explicit buyerId from the form, fall back to resolved buyerUser.id
+      const toUserId = Number(data.buyerId) || Number(buyerUser?.id);
+      if (!toUserId) {
+        enqueueSnackbar(
+          "Buyer ID missing. Please ensure the Buyer NIC resolves to a user.",
+          {
+            variant: "error",
+          }
+        );
+        setLoading(false);
+        return;
+      }
+
       const body = {
         nft_id: parseInt(id),
         property_id: parseInt(propertyDetails?.id),
-        to_user_id: parseInt(data.buyerNIC),
+        to_user_id: parseInt(toUserId),
         description: data.description,
         property_type: "transfer",
         amount: data.amount,
       };
       console.log("Submitting transfer with body:", body); // Debug log
-      await apiClient.transfer.register(body);
 
-      // Upload documents: if FileUpload uploaded to Cloudinary it will include secure_url/public_id
-      for (const [key, fileObj] of Object.entries(docs)) {
-        if (!fileObj) continue;
-        // If FileUpload stored the raw file under fileObj.file, and may have secure_url/public_id
-        if (fileObj.secure_url || fileObj.public_id) {
-          // send metadata to API so backend can persist the document record
-          const body = {
-            documentType: key,
-            transferFor: String(id),
-            url: fileObj.secure_url,
-            public_id: fileObj.public_id,
-            original_filename: fileObj.original_filename || fileObj.file?.name,
+      // helper to convert File -> base64 string for JSON uploads
+      const readFileAsBase64 = (file) =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const result = reader.result;
+            if (typeof result === "string") {
+              const idx = result.indexOf("base64,");
+              const base64 = idx >= 0 ? result.substring(idx + 7) : result;
+              resolve(base64);
+            } else {
+              reject(new Error("Failed to read file as base64"));
+            }
           };
-          console.log(`Sending document metadata for: ${key}`, body);
-          await apiClient.document.register(body);
-        } else if (fileObj.file) {
-          const fd = new FormData();
-          fd.append("file", fileObj.file);
-          fd.append("documentType", key);
-          fd.append("transferFor", String(id));
-          console.log(`Uploading document file for: ${key}`); // Debug log
-          await apiClient.document.register(fd);
+          reader.onerror = (err) => reject(err);
+          reader.readAsDataURL(file);
+        });
+
+      // 1) Upload / register all documents first. Abort on first failure.
+      const uploadedDocs = []; // store { key, resp }
+      for (const [key, stored] of Object.entries(docs)) {
+        if (!stored) continue;
+
+        const items = Array.isArray(stored) ? stored : [stored];
+        for (const fileObj of items) {
+          try {
+            let resp = null;
+            // If FileUpload already uploaded to Cloudinary and returned metadata
+            if (fileObj?.secure_url || fileObj?.public_id) {
+              // Build backend document record
+              const docRecord = {
+                land_id: Number(id),
+                name: fileObj.original_filename || fileObj.file?.name || "",
+                doc_type: key,
+                url: fileObj.secure_url || "",
+              };
+              if (fileObj.ipfsHash) docRecord.ipfs_hash = fileObj.ipfsHash;
+              console.log(
+                `Registering document metadata for: ${key}`,
+                docRecord
+              );
+              resp = await apiClient.document.register(docRecord);
+            } else if (fileObj?.file) {
+              // Many backends expect JSON — convert file to base64 and send JSON payload
+              try {
+                const base64 = await readFileAsBase64(fileObj.file);
+                const docRecord = {
+                  land_id: Number(id),
+                  name: fileObj.file.name || "",
+                  doc_type: key,
+                  url: "",
+                  file_base64: base64,
+                };
+                if (fileObj.ipfsHash) docRecord.ipfs_hash = fileObj.ipfsHash;
+                console.log(
+                  `Uploading document file (base64 JSON) for: ${key}`
+                );
+                resp = await apiClient.document.register(docRecord);
+              } catch (readErr) {
+                console.error("Failed to read file for upload", readErr);
+                throw readErr;
+              }
+            } else {
+              console.warn("Unknown file object shape for", key, fileObj);
+              continue;
+            }
+            uploadedDocs.push({ key, resp });
+          } catch (docErr) {
+            console.error("Document upload failed for", key, docErr);
+            enqueueSnackbar(`Failed to upload document: ${key}`, {
+              variant: "error",
+            });
+            throw docErr;
+          }
         }
       }
+
+      // 2) Register transfer and include uploaded document references when possible
+      // Attempt to extract document ids from uploaded responses
+      const documentIds = uploadedDocs
+        .map((d) => d.resp)
+        .map((r) => r?.id || r?.document_id || r?._id || r?.data?.id)
+        .filter(Boolean);
+
+      const transferBody = {
+        ...body,
+      };
+      if (uploadedDocs.length > 0) {
+        transferBody.documents = uploadedDocs.map((d) => d.resp);
+        if (documentIds.length > 0) transferBody.document_ids = documentIds;
+      }
+
+      console.log("Registering transfer with body:", transferBody);
+      const transferResp = await apiClient.transfer.register(transferBody);
 
       enqueueSnackbar("Transfer submitted successfully!", {
         variant: "success",
@@ -333,7 +415,8 @@ export default function PropertyTransfer() {
                   onClick={handleNext}
                   // For step 0, ensure form fields are valid. For step 1, ensure required documents uploaded.
                   disabled={
-                    (activeStep === 0 && (buyerInvalid || ownerConflict || !isValid)) ||
+                    (activeStep === 0 &&
+                      (buyerInvalid || ownerConflict || !isValid)) ||
                     (activeStep === 1 && docsMissing)
                   }
                 >

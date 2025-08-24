@@ -259,11 +259,13 @@ export default function PropertyTransfer() {
               };
 
               console.debug(
-                "Registering document metadata for:",
+                "Registering transfer document metadata for:",
                 key,
                 docRecord
               );
-              const resp = await apiClient.document.register(docRecord);
+              // Prefer transfer-specific register endpoint if available
+              // Use transfer-specific document endpoint
+              const resp = await apiClient.document.registerTransfer(docRecord);
               uploadedDocs.push({ key, resp, publicUrl });
             } catch (err) {
               console.error("Server-side upload failed", err);

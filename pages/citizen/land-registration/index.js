@@ -107,12 +107,14 @@ export default function LandRegistration() {
         for (const k of keys) {
           const file = uploadedFiles[k];
           if (!file) continue;
-          await apiClient.document.register({
+          const docPayload = {
             land_id: newLandId,
             name: file.name,
             doc_type: k,
             url: "",
-          });
+          };
+          // Use register-specific document endpoint
+          await apiClient.document.registerRegister(docPayload);
         }
       }
 

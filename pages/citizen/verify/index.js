@@ -87,7 +87,14 @@ export default function PublicVerification() {
       let documents = [];
       let nft = null;
       try {
-        documents = await apiClient.document.getByLandId(found.id);
+        // Prefer transfer documents, then register documents, then legacy helper
+        if (apiClient.document.getTransferByLandId) {
+          documents = await apiClient.document.getTransferByLandId(found.id);
+        } else if (apiClient.document.getRegisterByLandId) {
+          documents = await apiClient.document.getRegisterByLandId(found.id);
+        } else {
+          documents = await apiClient.document.getByLandId(found.id);
+        }
       } catch {}
       try {
         nft = await apiClient.nft.getByLandId(found.id);

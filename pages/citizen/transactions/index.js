@@ -268,7 +268,7 @@ export default function TransactionHistory() {
                         }
                         try {
                           setDocsLoading(true);
-                          const docs = await getDocumentsByLandId(propId).catch(
+                          const docs = await getTransferByLandId(propId).catch(
                             (e) => {
                               console.error("fetch docs error", e);
                               return [];

@@ -40,7 +40,7 @@ export default function App({ Component, pageProps }) {
           return;
         }
         if (isAdminRoute && (!user || user.role !== "admin")) {
-          router.replace("/dashboard");
+          router.replace("officer/dashboard");
           return;
         }
       } finally {
@@ -76,7 +76,7 @@ export default function App({ Component, pageProps }) {
           <InnerSnackbarBridge />
           <AuthProvider>
             <RouterGuard>
-                <Component {...pageProps} />
+              <Component {...pageProps} />
             </RouterGuard>
           </AuthProvider>
         </SnackbarProvider>

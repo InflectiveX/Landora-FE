@@ -147,6 +147,7 @@ const FileUpload = ({
                           public_id: res.public_id,
                           original_filename:
                             res.original_filename || f.file.name,
+                          uploaded_at: new Date().toISOString(),
                         }
                       : f
                   );
@@ -232,7 +233,14 @@ const FileUpload = ({
       setFiles((prevFiles) => {
         const next = prevFiles.map((f) =>
           f.id === fileObj.id
-            ? { ...f, status: "completed", ipfsHash: mockIpfsHash }
+            ? {
+                ...f,
+                status: "completed",
+                ipfsHash: mockIpfsHash,
+                uploaded_at: new Date().toISOString(),
+                // Derive a mock viewable url for fallback mode so parent can register
+                secure_url: `https://ipfs.io/ipfs/${mockIpfsHash}`,
+              }
             : f
         );
         onFilesChange?.(next);

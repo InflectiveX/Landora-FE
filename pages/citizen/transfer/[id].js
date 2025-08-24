@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Box,
   Paper,
@@ -138,21 +138,94 @@ export default function PropertyTransfer() {
   const handleNext = () => setActiveStep((prev) => prev + 1);
   const handleBack = () => setActiveStep((prev) => prev - 1);
 
+  // Keep track of which frontend-uploaded files we've already asked backend to register
+  const registeredFileIdsRef = useRef(new Set());
+
   const onFilesChange = (files, key) => {
     // FileUpload passes an array of file objects; we store either single object or array
-    // Debug: print files so we can see secure_url / ipfsHash provided by FileUpload
     try {
       console.debug("onFilesChange - key:", key, "files:", files);
     } catch (e) {
       /* ignore */
     }
+
+    // Update local docs state immediately with the file objects from FileUpload
     setDocs((prev) => {
       if (!files) return { ...prev, [key]: null };
-      // if multiple allowed, keep the array
       if (files.length > 1) return { ...prev, [key]: files };
-      // otherwise store the single file object
       return { ...prev, [key]: files[0] };
     });
+
+    // If any file is already uploaded to Cloudinary (secure_url present), register it with backend.
+    // Use a ref to avoid duplicate registrations for the same Cloudinary public_id / secure_url.
+    (async () => {
+      if (!files) return;
+      const items = Array.isArray(files) ? files : [files];
+      for (const fileObj of items) {
+        // only register completed Cloudinary uploads
+        const keyForDedup =
+          fileObj?.public_id || fileObj?.secure_url || fileObj?.id;
+        if (!fileObj) continue;
+        if (registeredFileIdsRef.current.has(keyForDedup)) continue;
+        if (fileObj.status !== "completed") continue;
+        // require a viewable url (Cloudinary secure_url) for backend registration
+        const viewableUrl = fileObj.secure_url || fileObj.url;
+        if (!viewableUrl) continue;
+
+        // mark as registering to prevent duplicates
+        registeredFileIdsRef.current.add(keyForDedup);
+
+        try {
+          const docRecord = {
+            land_id: Number(id),
+            name: fileObj.original_filename || fileObj.file?.name || "",
+            doc_type: key,
+            ipfs_hash: fileObj.ipfsHash || null,
+            url: viewableUrl,
+            uploaded_at: new Date().toISOString(),
+          };
+
+          console.debug(
+            "Registering uploaded document with backend:",
+            docRecord
+          );
+          const resp = await apiClient.document.register(docRecord);
+
+          // Replace the file object in docs with the backend response so subsequent submit uses registered docs
+          setDocs((prev) => {
+            const current = prev[key];
+            if (!current) return { ...prev, [key]: resp };
+
+            if (Array.isArray(current)) {
+              const nextArr = current.map((c) =>
+                // match by generated id (from FileUpload) or by Cloudinary public_id / secure_url
+                c?.id === fileObj.id ||
+                c?.public_id === fileObj.public_id ||
+                c?.secure_url === fileObj.secure_url
+                  ? resp
+                  : c
+              );
+              return { ...prev, [key]: nextArr };
+            }
+
+            // single item
+            // If the current item appears to be the same file object, replace it
+            const isSame =
+              current?.id === fileObj.id ||
+              current?.public_id === fileObj.public_id ||
+              current?.secure_url === fileObj.secure_url ||
+              current?.file?.name === fileObj.file?.name;
+            if (isSame) return { ...prev, [key]: resp };
+            // otherwise leave unchanged
+            return prev;
+          });
+        } catch (regErr) {
+          console.error("Failed to register uploaded document:", regErr);
+          // allow retry later by removing dedup key so user can re-trigger registration
+          registeredFileIdsRef.current.delete(keyForDedup);
+        }
+      }
+    })();
   };
 
   const onSubmit = async (data) => {

@@ -134,7 +134,9 @@ export default function BuyerInfo({
               <TextField
                 fullWidth
                 label="Owner NIC"
-                value={propertyDetails?.owner_nic}
+                value={
+                  propertyDetails?.owner_nic || propertyDetails?.ownerNIC || ""
+                }
                 InputProps={{ readOnly: true }}
                 {...inputProps}
               />

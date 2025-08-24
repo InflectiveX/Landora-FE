@@ -24,6 +24,7 @@ import DocumentsStep from "./components/DocumentsStep";
 import VerificationStep from "./components/VerificationStep";
 import SummaryStep from "./components/SummaryStep";
 import apiClient from "@/lib/api";
+import { supabase } from "@/lib/supabaseClient";
 import { useSnackbar } from "notistack";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -156,76 +157,7 @@ export default function PropertyTransfer() {
       return { ...prev, [key]: files[0] };
     });
 
-    // If any file is already uploaded to Cloudinary (secure_url present), register it with backend.
-    // Use a ref to avoid duplicate registrations for the same Cloudinary public_id / secure_url.
-    (async () => {
-      if (!files) return;
-      const items = Array.isArray(files) ? files : [files];
-      for (const fileObj of items) {
-        // only register completed Cloudinary uploads
-        const keyForDedup =
-          fileObj?.public_id || fileObj?.secure_url || fileObj?.id;
-        if (!fileObj) continue;
-        if (registeredFileIdsRef.current.has(keyForDedup)) continue;
-        if (fileObj.status !== "completed") continue;
-        // require a viewable url (Cloudinary secure_url) for backend registration
-        const viewableUrl = fileObj.secure_url || fileObj.url;
-        if (!viewableUrl) continue;
-
-        // mark as registering to prevent duplicates
-        registeredFileIdsRef.current.add(keyForDedup);
-
-        try {
-          const docRecord = {
-            land_id: Number(id),
-            name: fileObj.original_filename || fileObj.file?.name || "",
-            doc_type: key,
-            ipfs_hash: fileObj.ipfsHash || null,
-            url: viewableUrl,
-            uploaded_at: new Date().toISOString(),
-          };
-
-          console.debug(
-            "Registering uploaded document with backend:",
-            docRecord
-          );
-          const resp = await apiClient.document.register(docRecord);
-
-          // Replace the file object in docs with the backend response so subsequent submit uses registered docs
-          setDocs((prev) => {
-            const current = prev[key];
-            if (!current) return { ...prev, [key]: resp };
-
-            if (Array.isArray(current)) {
-              const nextArr = current.map((c) =>
-                // match by generated id (from FileUpload) or by Cloudinary public_id / secure_url
-                c?.id === fileObj.id ||
-                c?.public_id === fileObj.public_id ||
-                c?.secure_url === fileObj.secure_url
-                  ? resp
-                  : c
-              );
-              return { ...prev, [key]: nextArr };
-            }
-
-            // single item
-            // If the current item appears to be the same file object, replace it
-            const isSame =
-              current?.id === fileObj.id ||
-              current?.public_id === fileObj.public_id ||
-              current?.secure_url === fileObj.secure_url ||
-              current?.file?.name === fileObj.file?.name;
-            if (isSame) return { ...prev, [key]: resp };
-            // otherwise leave unchanged
-            return prev;
-          });
-        } catch (regErr) {
-          console.error("Failed to register uploaded document:", regErr);
-          // allow retry later by removing dedup key so user can re-trigger registration
-          registeredFileIdsRef.current.delete(keyForDedup);
-        }
-      }
-    })();
+    // All uploads are deferred until final submit. onFilesChange only stages files.
   };
 
   const onSubmit = async (data) => {
@@ -273,70 +205,70 @@ export default function PropertyTransfer() {
           reader.readAsDataURL(file);
         });
 
-      // 1) Upload / register all documents first. Abort on first failure.
+      // 1) Upload all staged files to Supabase storage, then register them with backend
       const uploadedDocs = []; // store { key, resp }
+      const bucket = "Landora";
       for (const [key, stored] of Object.entries(docs)) {
         if (!stored) continue;
 
         const items = Array.isArray(stored) ? stored : [stored];
         for (const fileObj of items) {
           try {
-            let resp = null;
-            // Debug: inspect fileObj metadata (Cloudinary res or IPFS hash)
-            try {
-              console.debug("document upload fileObj for key:", key, fileObj);
-            } catch (e) {
-              /* ignore */
-            }
-            // If FileUpload already uploaded to Cloudinary and returned metadata
-            if (fileObj?.secure_url || fileObj?.public_id) {
-              // Build backend document record (Cloudinary upload metadata available)
-              const docRecord = {
-                land_id: Number(id),
-                name: fileObj.original_filename || fileObj.file?.name || "",
-                doc_type: key,
-                // prefer secure_url; if missing but ipfsHash exists, use IPFS gateway URL
-                url:
-                  fileObj.secure_url ||
-                  (fileObj.ipfsHash
-                    ? `https://ipfs.io/ipfs/${fileObj.ipfsHash}`
-                    : ""),
-              };
-              if (fileObj.ipfsHash) docRecord.ipfs_hash = fileObj.ipfsHash;
-              console.log(
-                `Registering document metadata for: ${key}`,
-                docRecord
-              );
-              resp = await apiClient.document.register(docRecord);
-            } else if (fileObj?.file) {
-              // Many backends expect JSON — convert file to base64 and send JSON payload
-              try {
-                const base64 = await readFileAsBase64(fileObj.file);
-                // If the frontend has an IPFS hash for the file, register a gateway URL
-                const derivedUrl = fileObj.ipfsHash
-                  ? `https://ipfs.io/ipfs/${fileObj.ipfsHash}`
-                  : "";
-                const docRecord = {
-                  land_id: Number(id),
-                  name: fileObj.file.name || "",
-                  doc_type: key,
-                  url: derivedUrl,
-                  file_base64: base64,
-                };
-                if (fileObj.ipfsHash) docRecord.ipfs_hash = fileObj.ipfsHash;
-                console.log(
-                  `Uploading document file (base64 JSON) for: ${key}`
-                );
-                resp = await apiClient.document.register(docRecord);
-              } catch (readErr) {
-                console.error("Failed to read file for upload", readErr);
-                throw readErr;
-              }
-            } else {
-              console.warn("Unknown file object shape for", key, fileObj);
+            if (!fileObj?.file) {
+              console.warn("Skipping non-file object for", key, fileObj);
               continue;
             }
-            uploadedDocs.push({ key, resp });
+
+            const file = fileObj.file;
+            // build a unique path: transfers/{id}/{timestamp}_{random}_{filename}
+            const timestamp = Date.now();
+            const safeName = file.name.replace(/[^a-zA-Z0-9_.-]/g, "_");
+            const path = `transfers/${id}/${timestamp}_${Math.random()
+              .toString(36)
+              .substr(2, 6)}_${safeName}`;
+
+            // upload to server-side API which uses the Supabase service role key
+            const base64 = await readFileAsBase64(file);
+            const contentType = file.type || "application/octet-stream";
+            try {
+              const uploadResp = await fetch("/api/storage-upload", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  bucket,
+                  path,
+                  base64,
+                  contentType,
+                }),
+              });
+              const uploadJson = await uploadResp.json();
+              if (!uploadResp.ok) {
+                console.error("Server upload failed", uploadJson);
+                throw new Error(uploadJson.error || "Upload failed");
+              }
+
+              const publicUrl = uploadJson.publicUrl || null;
+
+              const docRecord = {
+                land_id: Number(id),
+                name: file.name || fileObj.original_filename || "",
+                doc_type: key,
+                url: publicUrl,
+                // storage_path: path,
+                uploaded_at: new Date().toISOString(),
+              };
+
+              console.debug(
+                "Registering document metadata for:",
+                key,
+                docRecord
+              );
+              const resp = await apiClient.document.register(docRecord);
+              uploadedDocs.push({ key, resp, publicUrl });
+            } catch (err) {
+              console.error("Server-side upload failed", err);
+              throw err;
+            }
           } catch (docErr) {
             console.error("Document upload failed for", key, docErr);
             enqueueSnackbar(`Failed to upload document: ${key}`, {
@@ -358,7 +290,11 @@ export default function PropertyTransfer() {
         ...body,
       };
       if (uploadedDocs.length > 0) {
+        // include both backend doc records and public URLs for convenience
         transferBody.documents = uploadedDocs.map((d) => d.resp);
+        transferBody.document_urls = uploadedDocs
+          .map((d) => d.publicUrl)
+          .filter(Boolean);
         if (documentIds.length > 0) transferBody.document_ids = documentIds;
       }
 

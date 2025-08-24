@@ -14,6 +14,7 @@
     "@hookform/resolvers": "^5.2.1",
     "@mui/icons-material": "^7.3.1",
     "@mui/material": "^7.3.1",
+    "@supabase/supabase-js": "^2.56.0",
     "@tanstack/react-query": "^5.85.3",
     "cloudinary": "^2.7.0",
     "ethers": "^6.15.0",

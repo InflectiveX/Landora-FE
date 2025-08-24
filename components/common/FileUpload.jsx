@@ -39,17 +39,16 @@ const FileUpload = ({
   required = false,
   label = "Upload Documents",
   description = "Drag and drop files here, or click to select files",
-  // Optional: folder to place uploaded files into (Cloudinary unsigned upload folder)
-  folder,
+  folder, // Cloudinary folder
 }) => {
   const [files, setFiles] = useState([]);
-  const [uploading, setUploading] = useState(false);
+  const [uploadingCount, setUploadingCount] = useState(0);
   const [uploadProgress, setUploadProgress] = useState({});
   const [errors, setErrors] = useState([]);
 
   const onDrop = useCallback(
     (acceptedFiles, rejectedFiles) => {
-      // Handle rejected files
+      // Handle errors
       if (rejectedFiles.length > 0) {
         const newErrors = rejectedFiles.map((file) => {
           if (file.file.size > maxSize) {
@@ -64,207 +63,49 @@ const FileUpload = ({
         setErrors([]);
       }
 
-      // Process accepted files
+      // Map accepted files and stage locally only. Do NOT auto-upload to any remote.
       const newFiles = acceptedFiles.map((file) => ({
         file,
         id: Math.random().toString(36).substr(2, 9),
-        status: "pending",
+        status: "staged", // staged until final submit
         progress: 0,
-        ipfsHash: null,
+        // these fields are reserved for later when uploaded to storage
+        url: null,
+        public_id: null,
+        original_filename: file.name,
+        storage_key: null,
         error: null,
       }));
 
-      const updatedFiles = [...files, ...newFiles].slice(0, maxFiles);
-      setFiles(updatedFiles);
-      onFilesChange?.(updatedFiles);
-
-      // Simulate upload process
-      newFiles.forEach((fileObj) => {
-        uploadFile(fileObj);
+      // Add to state safely and notify parent with staged file objects
+      setFiles((prev) => {
+        const updated = [...prev, ...newFiles].slice(0, maxFiles);
+        // send a simplified array to parent: either single or array depending on use
+        onFilesChange?.(updated);
+        return updated;
       });
     },
-    [files, maxFiles, maxSize, onFilesChange]
+    [maxFiles, maxSize, onFilesChange]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: acceptedTypes,
     maxFiles: maxFiles - files.length,
-    disabled: uploading || files.length >= maxFiles,
+    disabled: uploadingCount > 0 || files.length >= maxFiles,
   });
 
-  const uploadFile = async (fileObj) => {
-    setUploading(true);
-
-    // Use Cloudinary when NEXT_PUBLIC vars are available, otherwise fall back to simulated upload
-    const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-    const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-
-    // Helpful debug: warn if cloud vars missing (client-side)
-    if (typeof window !== "undefined" && (!CLOUD_NAME || !UPLOAD_PRESET)) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        "Cloudinary client upload disabled: set NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME and NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET in your env"
-      );
-    }
-
-    if (CLOUD_NAME && UPLOAD_PRESET) {
-      // Upload using XHR so we can track progress
-      const uploadWithXhr = () =>
-        new Promise((resolve, reject) => {
-          const xhr = new XMLHttpRequest();
-          const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`;
-          xhr.open("POST", url);
-
-          xhr.upload.onprogress = (e) => {
-            if (e.lengthComputable) {
-              const progress = Math.round((e.loaded / e.total) * 100);
-              setUploadProgress((prev) => ({
-                ...prev,
-                [fileObj.id]: progress,
-              }));
-              setFiles((prevFiles) => {
-                const next = prevFiles.map((f) =>
-                  f.id === fileObj.id ? { ...f, progress } : f
-                );
-                onFilesChange?.(next);
-                return next;
-              });
-            }
-          };
-
-          xhr.onload = () => {
-            try {
-              const res = JSON.parse(xhr.responseText);
-              if (xhr.status >= 200 && xhr.status < 300) {
-                setFiles((prevFiles) => {
-                  const next = prevFiles.map((f) =>
-                    f.id === fileObj.id
-                      ? {
-                          ...f,
-                          status: "completed",
-                          secure_url: res.secure_url,
-                          public_id: res.public_id,
-                          original_filename:
-                            res.original_filename || f.file.name,
-                          uploaded_at: new Date().toISOString(),
-                        }
-                      : f
-                  );
-                  onFilesChange?.(next);
-                  return next;
-                });
-                resolve(res);
-              } else {
-                const err = res?.error || xhr.responseText || "Upload failed";
-                setFiles((prevFiles) => {
-                  const next = prevFiles.map((f) =>
-                    f.id === fileObj.id
-                      ? { ...f, status: "error", error: err }
-                      : f
-                  );
-                  onFilesChange?.(next);
-                  return next;
-                });
-                reject(new Error(err));
-              }
-            } catch (err) {
-              setFiles((prevFiles) => {
-                const next = prevFiles.map((f) =>
-                  f.id === fileObj.id
-                    ? { ...f, status: "error", error: err.message }
-                    : f
-                );
-                onFilesChange?.(next);
-                return next;
-              });
-              reject(err);
-            }
-          };
-
-          xhr.onerror = () => {
-            const err = "Network error during upload";
-            setFiles((prevFiles) => {
-              const next = prevFiles.map((f) =>
-                f.id === fileObj.id ? { ...f, status: "error", error: err } : f
-              );
-              onFilesChange?.(next);
-              return next;
-            });
-            reject(new Error(err));
-          };
-
-          const fd = new FormData();
-          fd.append("file", fileObj.file);
-          fd.append("upload_preset", UPLOAD_PRESET);
-          // If caller provided a folder prop, include it so Cloudinary will place uploads there
-          if (folder) fd.append("folder", folder);
-          xhr.send(fd);
-        });
-
-      try {
-        await uploadWithXhr();
-      } catch (error) {
-        // already handled in XHR callbacks
-      } finally {
-        setUploading(false);
-      }
-
-      return;
-    }
-
-    // Fallback: simulate upload (keeps previous behavior for local/dev)
-    try {
-      for (let progress = 0; progress <= 100; progress += 10) {
-        // small delay to show progress
-        // eslint-disable-next-line no-await-in-loop
-        await new Promise((resolve) => setTimeout(resolve, 200));
-        setUploadProgress((prev) => ({ ...prev, [fileObj.id]: progress }));
-        setFiles((prevFiles) => {
-          const next = prevFiles.map((f) =>
-            f.id === fileObj.id ? { ...f, progress } : f
-          );
-          onFilesChange?.(next);
-          return next;
-        });
-      }
-
-      const mockIpfsHash = `Qm${Math.random().toString(36).substr(2, 44)}`;
-      setFiles((prevFiles) => {
-        const next = prevFiles.map((f) =>
-          f.id === fileObj.id
-            ? {
-                ...f,
-                status: "completed",
-                ipfsHash: mockIpfsHash,
-                uploaded_at: new Date().toISOString(),
-                // Derive a mock viewable url for fallback mode so parent can register
-                secure_url: `https://ipfs.io/ipfs/${mockIpfsHash}`,
-              }
-            : f
-        );
-        onFilesChange?.(next);
-        return next;
-      });
-    } catch (error) {
-      setFiles((prevFiles) => {
-        const next = prevFiles.map((f) =>
-          f.id === fileObj.id
-            ? { ...f, status: "error", error: error.message }
-            : f
-        );
-        onFilesChange?.(next);
-        return next;
-      });
-    } finally {
-      setUploading(false);
-    }
-  };
+  // All uploads are now deferred until form submission. This component only
+  // stages files locally and notifies the parent via onFilesChange with the
+  // staged file objects. Uploading to Supabase storage will be handled by the
+  // submit handler in the transfer page.
 
   const removeFile = (fileId) => {
-    const updatedFiles = files.filter((f) => f.id !== fileId);
-    setFiles(updatedFiles);
-    onFilesChange?.(updatedFiles);
+    setFiles((prev) => {
+      const updated = prev.filter((f) => f.id !== fileId);
+      onFilesChange?.(updated);
+      return updated;
+    });
   };
 
   const getFileIcon = (fileType) => {
@@ -290,7 +131,6 @@ const FileUpload = ({
         {label} {required && <span style={{ color: "red" }}>*</span>}
       </Typography>
 
-      {/* Upload Area */}
       <Paper
         {...getRootProps()}
         sx={{
@@ -300,13 +140,6 @@ const FileUpload = ({
           borderColor: isDragActive ? "primary.main" : "grey.300",
           backgroundColor: isDragActive ? "action.hover" : "background.paper",
           cursor: files.length >= maxFiles ? "not-allowed" : "pointer",
-          opacity: files.length >= maxFiles ? 0.5 : 1,
-          transition: "all 0.3s ease",
-          "&:hover": {
-            borderColor: files.length >= maxFiles ? "grey.300" : "primary.main",
-            backgroundColor:
-              files.length >= maxFiles ? "background.paper" : "action.hover",
-          },
         }}
       >
         <input {...getInputProps()} />
@@ -315,7 +148,6 @@ const FileUpload = ({
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            textAlign: "center",
           }}
         >
           <UploadIcon sx={{ fontSize: 48, color: "primary.main", mb: 2 }} />
@@ -326,10 +158,10 @@ const FileUpload = ({
             Supported formats: PDF, PNG, JPG, JPEG
           </Typography>
           <Typography variant="body2" color="textSecondary">
-            Maximum file size: {maxSize / 1024 / 1024}MB
+            Max size: {maxSize / 1024 / 1024}MB
           </Typography>
           <Typography variant="body2" color="textSecondary">
-            Maximum files: {maxFiles} ({maxFiles - files.length} remaining)
+            Max files: {maxFiles} ({maxFiles - files.length} remaining)
           </Typography>
           {!isDragActive && (
             <Button
@@ -343,19 +175,16 @@ const FileUpload = ({
         </Box>
       </Paper>
 
-      {/* Error Messages */}
       {errors.length > 0 && (
         <Alert severity="error" sx={{ mt: 2 }}>
-          <Typography variant="subtitle2">Upload Errors:</Typography>
-          {errors.map((error, index) => (
-            <Typography key={index} variant="body2">
-              • {error}
+          {errors.map((e, i) => (
+            <Typography key={i} variant="body2">
+              • {e}
             </Typography>
           ))}
         </Alert>
       )}
 
-      {/* File List */}
       {files.length > 0 && (
         <Card sx={{ mt: 2 }}>
           <CardContent>
@@ -372,7 +201,7 @@ const FileUpload = ({
                         sx={{ display: "flex", alignItems: "center", gap: 1 }}
                       >
                         <Typography variant="body2" noWrap>
-                          {fileObj.file.name}
+                          {fileObj.original_filename || fileObj.file.name}
                         </Typography>
                         <Chip
                           size="small"
@@ -393,6 +222,22 @@ const FileUpload = ({
                         <Typography variant="caption" color="textSecondary">
                           Size: {(fileObj.file.size / 1024).toFixed(1)} KB
                         </Typography>
+                        {fileObj.secure_url && (
+                          <Typography
+                            variant="caption"
+                            display="block"
+                            color="primary.main"
+                            sx={{
+                              textDecoration: "underline",
+                              cursor: "pointer",
+                            }}
+                            onClick={() =>
+                              window.open(fileObj.secure_url, "_blank")
+                            }
+                          >
+                            View File
+                          </Typography>
+                        )}
                         {fileObj.ipfsHash && (
                           <Typography
                             variant="caption"
@@ -427,7 +272,7 @@ const FileUpload = ({
                     <IconButton
                       edge="end"
                       onClick={() => removeFile(fileObj.id)}
-                      disabled={uploading}
+                      disabled={uploadingCount > 0}
                     >
                       <DeleteIcon />
                     </IconButton>

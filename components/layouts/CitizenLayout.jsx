@@ -4,8 +4,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   Box,
   Container,
-  AppBar,
-  Toolbar,
   Typography,
   IconButton,
   Drawer,
@@ -14,12 +12,12 @@ import {
   ListItemIcon,
   ListItemText,
   useMediaQuery,
-  Avatar,
   Menu,
   MenuItem,
   Divider,
+  useTheme,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+import { alpha } from "@mui/material/styles";
 import {
   Menu as MenuIcon,
   Dashboard as DashboardIcon,
@@ -30,8 +28,19 @@ import {
   Person as PersonIcon,
   Help as HelpIcon,
   VerifiedUser as VerifiedUserIcon,
+  Logout as LogoutIcon,
 } from "@mui/icons-material";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import {
+  ModernAppBar,
+  ModernToolbar,
+  BrandLogo,
+  ActionButtons,
+  ModernIconButton,
+  ModernAvatar,
+  ModernBadge,
+  FloatingActionBar,
+} from "@/components/ui/ModernNavigation";
 
 const drawerWidth = 280;
 
@@ -85,93 +94,273 @@ const CitizenLayout = ({ children }) => {
   ];
   const isAdminUser = !!user && user.role === "admin";
 
-  // Citizen-only nav
+  // Check if current route is active
+  const isActiveRoute = (path) => {
+    return (
+      router.pathname === `/${path}` || router.pathname.startsWith(`/${path}/`)
+    );
+  };
+
+  // Enhanced Drawer with modern styling
   const drawer = (
-    <Box sx={{ height: "100%" }}>
-      <List>
-        {baseMenuItems.map((item) => (
-          <ListItemButton
-            key={item.text}
-            onClick={() => router.push(`/${item.path}`)}
+    <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      {/* Sidebar Header */}
+      <Box
+        sx={{
+          p: 3,
+          borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+          background: `linear-gradient(135deg, ${alpha(
+            theme.palette.primary.main,
+            0.05
+          )} 0%, ${alpha(theme.palette.secondary.main, 0.05)} 100%)`,
+        }}
+      >
+        <BrandLogo onClick={() => router.push("/citizen/dashboard")}>
+          <AccountBalanceIcon
+            className="brand-icon"
+            sx={{
+              color: theme.palette.primary.main,
+              fontSize: 32,
+            }}
+          />
+          <Typography
+            className="brand-text"
+            sx={{
+              color: theme.palette.text.primary,
+              fontWeight: 700,
+              fontSize: "1.25rem",
+            }}
           >
-            <ListItemIcon>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.text} />
-          </ListItemButton>
-        ))}
-      </List>
+            Landora
+          </Typography>
+        </BrandLogo>
+      </Box>
+
+      {/* Navigation Menu */}
+      <Box sx={{ flex: 1, py: 2 }}>
+        <List>
+          {baseMenuItems.map((item) => (
+            <ListItemButton
+              key={item.text}
+              onClick={() => router.push(`/${item.path}`)}
+              selected={isActiveRoute(item.path)}
+              sx={{
+                mx: 1,
+                borderRadius: theme.shape.borderRadius,
+                mb: 0.5,
+                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                position: "relative",
+                overflow: "hidden",
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "3px",
+                  height: "100%",
+                  backgroundColor: theme.palette.primary.main,
+                  transform: "scaleY(0)",
+                  transition: "transform 0.3s ease",
+                  transformOrigin: "center",
+                },
+                "&:hover": {
+                  backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                  transform: "translateX(8px)",
+                  "& .MuiListItemIcon-root": {
+                    color: theme.palette.primary.main,
+                    transform: "scale(1.1)",
+                  },
+                  "&::before": {
+                    transform: "scaleY(1)",
+                  },
+                },
+                "&.Mui-selected": {
+                  backgroundColor: alpha(theme.palette.primary.main, 0.12),
+                  color: theme.palette.primary.main,
+                  "&::before": {
+                    transform: "scaleY(1)",
+                  },
+                  "& .MuiListItemIcon-root": {
+                    color: theme.palette.primary.main,
+                  },
+                },
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 40,
+                  color: isActiveRoute(item.path)
+                    ? theme.palette.primary.main
+                    : theme.palette.mode === "light"
+                    ? theme.palette.text.secondary
+                    : theme.palette.text.primary,
+                  transition: "color 0.3s ease",
+                }}
+              >
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText
+                primary={item.text}
+                primaryTypographyProps={{
+                  fontSize: "0.875rem",
+                  fontWeight: isActiveRoute(item.path) ? 600 : 500,
+                }}
+              />
+            </ListItemButton>
+          ))}
+        </List>
+      </Box>
+
+      {/* Sidebar Footer */}
+      <Box
+        sx={{
+          p: 2,
+          borderTop: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
+          backgroundColor:
+            theme.palette.mode === "light"
+              ? alpha(theme.palette.background.default, 0.5)
+              : alpha(theme.palette.background.paper, 0.3),
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, p: 1 }}>
+          <ModernAvatar
+            src={user?.avatar}
+            sx={{ width: 36, height: 36 }}
+            status={user?.status || "online"}
+          >
+            {user?.name?.[0] || "U"}
+          </ModernAvatar>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography variant="body2" fontWeight={600} noWrap>
+              {user?.name || "User"}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" noWrap>
+              {user?.role || "Citizen"}
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
     </Box>
   );
 
   return (
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
-      <AppBar
+      {/* Modern App Bar */}
+      <ModernAppBar
         position="fixed"
-        elevation={0}
+        variant="glass"
         sx={{
           zIndex: (theme) => theme.zIndex.drawer + 1,
-          backdropFilter: "blur(12px)",
-          backgroundColor: "background.paper",
-          color: "text.primary",
-          borderBottom: "1px solid",
-          borderColor: "divider",
+          backgroundColor:
+            theme.palette.mode === "light"
+              ? "rgba(255, 255, 255, 0.95)"
+              : "rgba(20, 21, 24, 0.95)",
+          backdropFilter: "blur(20px)",
+          borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
         }}
       >
-        <Toolbar sx={{ minHeight: 72 }}>
-          <IconButton
-            color="inherit"
+        <ModernToolbar>
+          <ModernIconButton
+            variant="glass"
             edge="start"
             onClick={() => setOpen((v) => !v)}
-            sx={{ mr: 2, display: { md: "none" } }}
+            sx={{ mr: 2 }}
           >
             <MenuIcon />
-          </IconButton>
-          <IconButton
-            color="inherit"
-            edge="start"
-            onClick={() => setOpen((v) => !v)}
-            sx={{ mr: 2, display: { xs: "none", md: "flex" } }}
+          </ModernIconButton>
+
+          <Typography
+            variant="h6"
+            sx={{
+              flexGrow: 1,
+              background: `linear-gradient(135deg, ${theme.palette.text.primary}, ${theme.palette.primary.main})`,
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              fontWeight: 600,
+            }}
           >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Land Registry System
           </Typography>
-          <ThemeToggle />
-          <IconButton
-            color="inherit"
-            onClick={(e) => setAnchorEl(e.currentTarget)}
-          >
-            <Avatar sx={{ width: 32, height: 32 }}>
+
+          <ActionButtons>
+            <ThemeToggle />
+
+            <ModernBadge badgeContent={3} color="error">
+              <ModernIconButton variant="glass">
+                <VerifiedUserIcon />
+              </ModernIconButton>
+            </ModernBadge>
+
+            <ModernAvatar
+              src={user?.avatar}
+              onClick={(e) => setAnchorEl(e.currentTarget)}
+              status={user?.status || "online"}
+              sx={{ cursor: "pointer" }}
+            >
               {user?.name?.[0] || "U"}
-            </Avatar>
-          </IconButton>
+            </ModernAvatar>
+          </ActionButtons>
+
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={() => setAnchorEl(null)}
             anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
             transformOrigin={{ vertical: "top", horizontal: "right" }}
+            PaperProps={{
+              sx: {
+                mt: 1,
+                backgroundColor: alpha(theme.palette.background.paper, 0.9),
+                backdropFilter: "blur(20px)",
+                border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
+                borderRadius: 2,
+                minWidth: 200,
+              },
+            }}
           >
             <MenuItem
               onClick={() => {
                 setAnchorEl(null);
-                router.push("/profile");
+                router.push("/citizen/profile");
+              }}
+              sx={{
+                gap: 1.5,
+                py: 1.5,
+                borderRadius: theme.shape.borderRadius,
+                mx: 1,
+                mb: 0.5,
               }}
             >
+              <PersonIcon fontSize="small" />
               Profile
             </MenuItem>
-            <Divider />
+            <Divider sx={{ mx: 1 }} />
             <MenuItem
               onClick={() => {
                 setAnchorEl(null);
                 logout();
               }}
+              sx={{
+                gap: 1.5,
+                py: 1.5,
+                borderRadius: theme.shape.borderRadius,
+                mx: 1,
+                mt: 0.5,
+                color: theme.palette.error.main,
+                "&:hover": {
+                  backgroundColor: alpha(theme.palette.error.main, 0.08),
+                },
+              }}
             >
+              <LogoutIcon fontSize="small" />
               Logout
             </MenuItem>
           </Menu>
-        </Toolbar>
-      </AppBar>
+        </ModernToolbar>
+      </ModernAppBar>
+
+      {/* Navigation Drawer */}
       <Box
         component="nav"
         sx={{
@@ -188,34 +377,54 @@ const CitizenLayout = ({ children }) => {
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,
-              backdropFilter: "blur(12px)",
-              backgroundColor: "background.paper",
-              borderRight: "1px solid",
-              borderColor: "divider",
+              backgroundColor:
+                theme.palette.mode === "light"
+                  ? "rgba(255, 255, 255, 0.95)"
+                  : "rgba(20, 21, 24, 0.95)",
+              backdropFilter: "blur(20px)",
+              borderRight: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
               top: 0,
               height: "100vh",
               zIndex: (theme) => theme.zIndex.drawer,
             },
           }}
         >
-          <Toolbar />
+          <ModernToolbar /> {/* Spacer for app bar */}
           {drawer}
         </Drawer>
       </Box>
+
+      {/* Main Content */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           width: { md: `calc(100% - ${drawerWidth}px)` },
           minHeight: "100vh",
-          backgroundColor: "background.default",
+          backgroundColor: "transparent",
         }}
       >
-        <Toolbar sx={{ minHeight: 72 }} />
-        <Container maxWidth="xl" sx={{ py: 3 }}>
+        <ModernToolbar /> {/* Spacer for app bar */}
+        <Container maxWidth="xl" sx={{ py: 4 }}>
           {children}
         </Container>
       </Box>
+
+      {/* Floating Action Bar for Mobile */}
+      <FloatingActionBar>
+        <ModernIconButton variant="glass" size="small">
+          <DashboardIcon />
+        </ModernIconButton>
+        <ModernIconButton variant="glass" size="small">
+          <AddBoxIcon />
+        </ModernIconButton>
+        <ModernIconButton variant="glass" size="small">
+          <DescriptionIcon />
+        </ModernIconButton>
+        <ModernIconButton variant="glass" size="small">
+          <PersonIcon />
+        </ModernIconButton>
+      </FloatingActionBar>
     </Box>
   );
 };

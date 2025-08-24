@@ -1,5 +1,16 @@
 import { createClient } from "@supabase/supabase-js";
 
+// Increase the Next.js API body parser limit to allow larger base64 payloads.
+// The default is 1mb which causes the client to receive a plain-text 413
+// response ("Body exceeded 1mb limit") that can't be parsed as JSON.
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "10mb",
+    },
+  },
+};
+
 // This API route accepts POST JSON: { bucket, path, base64, contentType }
 // It uses the Supabase service role key (must be set in env: SUPABASE_SERVICE_ROLE_KEY)
 export default async function handler(req, res) {

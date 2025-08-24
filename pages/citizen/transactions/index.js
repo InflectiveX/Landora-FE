@@ -42,7 +42,7 @@ import { useApi } from "@/lib/api";
 import CitizenLayout from "@/components/layouts/CitizenLayout";
 
 export default function TransactionHistory() {
-  const { getCurrentUserTransfers, getDocumentsByLandId } = useApi();
+  const { getCurrentUserTransfers, getTransferByLandId } = useApi();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);

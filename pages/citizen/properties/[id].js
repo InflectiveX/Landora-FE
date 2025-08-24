@@ -27,28 +27,123 @@ import {
   Download as DownloadIcon,
   SwapHoriz as SwapHorizIcon,
 } from "@mui/icons-material";
+import DocumentsList from "./components/DocumentsList";
 import CitizenLayout from "@/components/layouts/CitizenLayout";
 import { useApi } from "@/lib/api";
 
 export default function PropertyDetails() {
   const router = useRouter();
   const { id } = router.query;
-  const { getProperties } = useApi();
+  const {
+    getProperties,
+    getPropertyById,
+    getDocumentsByLandId,
+    getTransferByLandId,
+    getRegisterByLandId,
+  } = useApi();
   const [property, setProperty] = useState(null);
+  const [documents, setDocuments] = useState([]);
+  const [transferDocuments, setTransferDocuments] = useState([]);
+  const [registerDocuments, setRegisterDocuments] = useState([]);
+  const [docsLoading, setDocsLoading] = useState(false);
   const [docDialog, setDocDialog] = useState(null);
 
   useEffect(() => {
     if (!id) return;
     const load = async () => {
       try {
-        const list = await getProperties();
-        const found =
-          (list || []).find((p) => String(p.id) === String(id)) || null;
-        setProperty(found);
-      } catch {}
+        // Prefer fetching the single property by id so we get nested documents and
+        // any related fields the backend returns for a single resource.
+        const found = await getPropertyById(id);
+        setProperty(found || null);
+
+        // fetch documents separately (like transactions page)
+        try {
+          setDocsLoading(true);
+          // Fetch transfer and register documents in parallel and keep them separate.
+          const tCall =
+            typeof getTransferByLandId === "function"
+              ? getTransferByLandId(id)
+              : Promise.resolve([]);
+          const rCall =
+            typeof getRegisterByLandId === "function"
+              ? getRegisterByLandId(id)
+              : Promise.resolve([]);
+
+          const [tRes, rRes] = await Promise.allSettled([tCall, rCall]);
+
+          const toArray = (value) => {
+            if (!value) return [];
+            if (Array.isArray(value)) return value;
+            if (
+              value &&
+              typeof value === "object" &&
+              Array.isArray(value.documents)
+            )
+              return value.documents;
+            return [];
+          };
+
+          const rawTransfer =
+            tRes.status === "fulfilled" ? toArray(tRes.value) : [];
+          const rawRegister =
+            rRes.status === "fulfilled" ? toArray(rRes.value) : [];
+
+          // If the property record included documents, append them to a sensible place.
+          // By default, append to registerDocuments (backend often stores register files on the property)
+          const propDocs = Array.isArray(found?.documents)
+            ? found.documents
+            : [];
+
+          const dedupe = (arr) => {
+            const seen = new Set();
+            const out = [];
+            for (const d of arr) {
+              const key =
+                (d && d.id && String(d.id)) ||
+                d?.url ||
+                d?.path ||
+                d?.name ||
+                JSON.stringify(d);
+              if (!key) continue;
+              if (!seen.has(key)) {
+                seen.add(key);
+                out.push(d);
+              }
+            }
+            return out;
+          };
+
+          const transferList = dedupe(rawTransfer);
+          const registerList = dedupe([...rawRegister, ...propDocs]);
+
+          setTransferDocuments(transferList);
+          setRegisterDocuments(registerList);
+
+          // Keep combined documents around for any existing UI that relies on a single list
+          setDocuments([...transferList, ...registerList]);
+        } catch (e) {
+          setTransferDocuments([]);
+          setRegisterDocuments([]);
+          setDocuments([]);
+        } finally {
+          setDocsLoading(false);
+        }
+      } catch (e) {
+        // fallback: try full list
+        try {
+          const list = await getProperties();
+          const found =
+            (list || []).find((p) => String(p.id) === String(id)) || null;
+          setProperty(found);
+          setDocuments((found && found.documents) || []);
+        } catch (err) {
+          setProperty(null);
+        }
+      }
     };
     load();
-  }, [id, getProperties]);
+  }, [id, getProperties, getPropertyById, getDocumentsByLandId]);
 
   if (!property) {
     return (
@@ -59,7 +154,6 @@ export default function PropertyDetails() {
       </CitizenLayout>
     );
   }
-
   const title =
     property.title || property.address || `${property.district || "Property"}`;
   const plotNumber = property.survey_number || property.plotNumber;
@@ -158,62 +252,50 @@ export default function PropertyDetails() {
                 </Card>
               </Grid>
               <Grid xs={12}>
-                <Card>
-                  <CardContent>
-                    <Typography
-                      variant="h6"
-                      gutterBottom
-                      sx={{ display: "flex", alignItems: "center" }}
-                    >
-                      <DescriptionIcon sx={{ mr: 1 }} />
-                      Documents
-                    </Typography>
-                    <Divider sx={{ mb: 2 }} />
-                    <List dense>
-                      {(property.documents || []).map((d, i) => (
-                        <ListItem
-                          key={i}
-                          secondaryAction={
-                            <Box sx={{ display: "flex", gap: 1 }}>
-                              <IconButton
-                                onClick={() => {
-                                  const docUrl = d.url || d.path || null;
-                                  // If it's a PDF, open the dedicated viewer in a new tab to avoid embed issues
-                                  if (
-                                    docUrl &&
-                                    String(docUrl)
-                                      .toLowerCase()
-                                      .endsWith(".pdf")
-                                  ) {
-                                    window.open(
-                                      `/pdf-viewer?url=${encodeURIComponent(
-                                        docUrl
-                                      )}`,
-                                      "_blank"
-                                    );
-                                    return;
-                                  }
-                                  // otherwise open the dialog with details
-                                  setDocDialog(d);
-                                }}
-                              >
-                                <DescriptionIcon />
-                              </IconButton>
-                              <IconButton>
-                                <DownloadIcon />
-                              </IconButton>
-                            </Box>
-                          }
-                        >
-                          <ListItemText
-                            primary={d.name || `Document ${i + 1}`}
-                            secondary={d.type || "File"}
-                          />
-                        </ListItem>
-                      ))}
-                    </List>
-                  </CardContent>
-                </Card>
+                {/* Documents split into Transfer and Register groups.
+                    Use the separate lists we fetched earlier so items don't fall
+                    into "Other Documents" just because they lack a `group` field. */}
+
+                <DocumentsList
+                  title="Transfer Documents"
+                  documents={transferDocuments}
+                  onOpen={(d) => setDocDialog(d)}
+                />
+
+                <Box sx={{ height: 16 }} />
+
+                <DocumentsList
+                  title="Register Documents"
+                  documents={registerDocuments}
+                  onOpen={(d) => setDocDialog(d)}
+                />
+
+                {/* Compute other documents as those not present in transfer/register lists */}
+                {(() => {
+                  const getKey = (d) =>
+                    (d && d.id && String(d.id)) ||
+                    d?.url ||
+                    d?.path ||
+                    d?.name ||
+                    JSON.stringify(d);
+                  const tKeys = new Set((transferDocuments || []).map(getKey));
+                  const rKeys = new Set((registerDocuments || []).map(getKey));
+                  const otherDocs = (documents || []).filter((d) => {
+                    const k = getKey(d);
+                    return k && !tKeys.has(k) && !rKeys.has(k);
+                  });
+
+                  return otherDocs.length > 0 ? (
+                    <>
+                      <Box sx={{ height: 16 }} />
+                      <DocumentsList
+                        title="Other Documents"
+                        documents={otherDocs}
+                        onOpen={(d) => setDocDialog(d)}
+                      />
+                    </>
+                  ) : null;
+                })()}
               </Grid>
             </Grid>
           </Grid>

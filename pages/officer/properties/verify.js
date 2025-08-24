@@ -289,16 +289,15 @@ export default function VerifyPropertyPage() {
                         >
                           Search Results ({searchResults.length})
                         </Typography>
-                        <Grid container spacing={3}>
+                        <Grid container spacing={3} sx={{ alignItems: "stretch" }}>
                           {searchResults.map((property) => (
-                            <Grid item xs={12} sm={6} lg={4} key={property.id}>
+                            <Grid item xs={12} sm={6} lg={4} key={property.id} sx={{ display: "flex" }}>
                               <ModernCard
                                 variant="glass"
                                 interactive
                                 sx={{
-                                  height: "100%",
-                                  minHeight: 380,
-                                  maxHeight: 380,
+                                  height: 380,
+                                  width: "100%",
                                   display: "flex",
                                   flexDirection: "column",
                                   cursor: "pointer",
@@ -333,14 +332,15 @@ export default function VerifyPropertyPage() {
                                     flex: 1,
                                     display: "flex",
                                     flexDirection: "column",
-                                    justifyContent: "space-between",
-                                    position: "relative",
+                                    height: "100%",
+                                    p: 2,
+                                    pt: 1,
                                   }}
                                 >
                                   {/* Main Content */}
-                                  <Box sx={{ flex: 1 }}>
+                                  <Box sx={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
                                     {/* Property Title */}
-                                    <Box sx={{ mb: 2, mt: 3 }}>
+                                    <Box sx={{ mb: 2, mt: 3, minHeight: 64 }}>
                                       <Typography
                                         variant="h6"
                                         fontWeight={600}
@@ -350,6 +350,7 @@ export default function VerifyPropertyPage() {
                                           textOverflow: "ellipsis",
                                           whiteSpace: "nowrap",
                                           lineHeight: 1.2,
+                                          height: 24,
                                         }}
                                       >
                                         {property.landName ||
@@ -360,8 +361,7 @@ export default function VerifyPropertyPage() {
                                           display: "flex",
                                           alignItems: "center",
                                           gap: 0.5,
-                                          mb: 1,
-                                          minHeight: 24,
+                                          height: 24,
                                         }}
                                       >
                                         <LocationIcon
@@ -386,11 +386,18 @@ export default function VerifyPropertyPage() {
                                     </Box>
 
                                     {/* Property Details */}
-                                    <Box sx={{ mb: 2 }}>
+                                    <Box sx={{ mb: 2, height: 80 }}>
                                       <Typography
                                         variant="body2"
                                         color="text.secondary"
-                                        sx={{ mb: 1 }}
+                                        sx={{
+                                          mb: 1,
+                                          overflow: "hidden",
+                                          textOverflow: "ellipsis",
+                                          whiteSpace: "nowrap",
+                                          height: 20,
+                                          lineHeight: "20px",
+                                        }}
                                       >
                                         <strong>Owner:</strong>{" "}
                                         {property.ownerName || "N/A"}
@@ -398,7 +405,14 @@ export default function VerifyPropertyPage() {
                                       <Typography
                                         variant="body2"
                                         color="text.secondary"
-                                        sx={{ mb: 1 }}
+                                        sx={{
+                                          mb: 1,
+                                          overflow: "hidden",
+                                          textOverflow: "ellipsis",
+                                          whiteSpace: "nowrap",
+                                          height: 20,
+                                          lineHeight: "20px",
+                                        }}
                                       >
                                         <strong>Area:</strong>{" "}
                                         {property.area || "N/A"}
@@ -406,6 +420,13 @@ export default function VerifyPropertyPage() {
                                       <Typography
                                         variant="body2"
                                         color="text.secondary"
+                                        sx={{
+                                          overflow: "hidden",
+                                          textOverflow: "ellipsis",
+                                          whiteSpace: "nowrap",
+                                          height: 20,
+                                          lineHeight: "20px",
+                                        }}
                                       >
                                         <strong>Type:</strong>{" "}
                                         {property.landType || "N/A"}
@@ -419,10 +440,12 @@ export default function VerifyPropertyPage() {
                                       display: "flex",
                                       justifyContent: "flex-end",
                                       pt: 2,
+                                      height: 48,
                                       borderTop: `1px solid ${alpha(
                                         theme.palette.divider,
                                         0.1
                                       )}`,
+                                      flexShrink: 0,
                                     }}
                                   >
                                     <ModernButton

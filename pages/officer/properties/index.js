@@ -109,9 +109,8 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
         variant="glass"
         interactive
         sx={{
-          height: "100%",
-          minHeight: 380,
-          maxHeight: 380,
+          height: 300,
+          width: 300,
           display: "flex",
           flexDirection: "column",
           position: "relative",
@@ -203,13 +202,22 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
             flex: 1,
             display: "flex",
             flexDirection: "column",
-            justifyContent: "space-between",
+            height: "100%",
+            p: 2,
+            pt: 1,
           }}
         >
           {/* Main Content */}
-          <Box sx={{ flex: 1 }}>
+          <Box
+            sx={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              overflow: "hidden",
+            }}
+          >
             {/* Property Title & Location */}
-            <Box sx={{ mb: 2, mt: 3 }}>
+            <Box sx={{ mb: 2, mt: 3, minHeight: 64 }}>
               <Typography
                 variant="h6"
                 fontWeight={600}
@@ -219,6 +227,7 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
                   lineHeight: 1.2,
+                  height: 24,
                 }}
               >
                 {property.landName ||
@@ -230,8 +239,7 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
                   display: "flex",
                   alignItems: "center",
                   gap: 0.5,
-                  mb: 1,
-                  minHeight: 24,
+                  height: 24,
                 }}
               >
                 <LocationIcon sx={{ fontSize: 16, color: "text.secondary" }} />
@@ -258,7 +266,7 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
                 display: "flex",
                 justifyContent: "space-between",
                 mb: 2,
-                minHeight: 60,
+                height: 60,
               }}
             >
               <Box sx={{ flex: 1, mr: 1 }}>
@@ -272,6 +280,8 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
+                    height: 20,
+                    lineHeight: "20px",
                   }}
                 >
                   {property.area || property.size || "N/A"}
@@ -289,6 +299,8 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
+                    height: 20,
+                    lineHeight: "20px",
                   }}
                 >
                   {property.landType || property.type || "N/A"}
@@ -297,7 +309,7 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
             </Box>
 
             {/* Owner Information */}
-            <Box sx={{ mb: 2, minHeight: 40 }}>
+            <Box sx={{ mb: 2, height: 40 }}>
               <Typography variant="caption" color="text.secondary">
                 Owner
               </Typography>
@@ -308,6 +320,8 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
+                  height: 20,
+                  lineHeight: "20px",
                 }}
               >
                 {property.ownerName || property.owner || "N/A"}
@@ -322,8 +336,9 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
               alignItems: "center",
               justifyContent: "space-between",
               pt: 2,
-              minHeight: 48,
+              height: 32,
               borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+              flexShrink: 0,
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
@@ -520,9 +535,16 @@ export default function PropertiesPage() {
             ))}
           </Grid>
         ) : (
-          <Grid container spacing={3}>
+          <Grid container spacing={3} sx={{ alignItems: "stretch" }}>
             {filteredProperties.map((property, index) => (
-              <Grid item xs={12} sm={6} lg={4} key={property.id}>
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                lg={4}
+                key={property.id}
+                sx={{ display: "flex" }}
+              >
                 <PropertyCard
                   property={property}
                   index={index}

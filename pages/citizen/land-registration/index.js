@@ -26,7 +26,9 @@ import {
   CheckCircle as CheckCircleIcon,
   LocationOn as LocationIcon,
 } from "@mui/icons-material";
-import FileUpload from "@/components/common/FileUpload";
+import PropertyInfo from "./components/PropertyInfo";
+import DocumentsStep from "./components/DocumentsStep";
+import ReviewStep from "./components/ReviewStep";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -107,12 +109,14 @@ export default function LandRegistration() {
         for (const k of keys) {
           const file = uploadedFiles[k];
           if (!file) continue;
-          await apiClient.document.register({
+          const docPayload = {
             land_id: newLandId,
             name: file.name,
             doc_type: k,
             url: "",
-          });
+          };
+          // Use register-specific document endpoint
+          await apiClient.document.registerRegister(docPayload);
         }
       }
 
@@ -132,259 +136,27 @@ export default function LandRegistration() {
 
   const renderStep = () => {
     if (activeStep === 0) {
-      return (
-        <Box>
-          <Typography variant="h6" gutterBottom>
-            Property Information
-          </Typography>
-          <Grid container spacing={3}>
-            <Grid xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Property Title"
-                {...register("propertyTitle", {
-                  required: "Property title is required",
-                })}
-                error={!!errors.propertyTitle}
-                helperText={errors.propertyTitle?.message}
-              />
-            </Grid>
-            <Grid xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Survey/Plot Number"
-                {...register("plotNumber", {
-                  required: "Plot number is required",
-                })}
-                error={!!errors.plotNumber}
-                helperText={errors.plotNumber?.message}
-              />
-            </Grid>
-            <Grid xs={12}>
-              <TextField
-                fullWidth
-                label="Property Address"
-                multiline
-                rows={2}
-                {...register("address", { required: "Address is required" })}
-                error={!!errors.address}
-                helperText={errors.address?.message}
-              />
-            </Grid>
-            <Grid xs={12} md={4}>
-              <TextField
-                fullWidth
-                label="District"
-                {...register("district", { required: "District is required" })}
-                error={!!errors.district}
-                helperText={errors.district?.message}
-              />
-            </Grid>
-            <Grid xs={12} md={4}>
-              <TextField
-                fullWidth
-                label="Province"
-                {...register("province", { required: "Province is required" })}
-                error={!!errors.province}
-                helperText={errors.province?.message}
-              />
-            </Grid>
-            <Grid xs={12} md={4}>
-              <TextField
-                fullWidth
-                label="Land Area (in perches)"
-                type="number"
-                {...register("landArea", { required: "Land area is required" })}
-                error={!!errors.landArea}
-                helperText={errors.landArea?.message}
-              />
-            </Grid>
-            <Grid xs={12} md={6}>
-              <TextField
-                fullWidth
-                select
-                SelectProps={{ native: true }}
-                {...register("propertyType", {
-                  required: "Property type is required",
-                })}
-                error={!!errors.propertyType}
-                helperText={errors.propertyType?.message}
-              >
-                <option value="">Select Property Type</option>
-                <option value="residential">Residential</option>
-                <option value="commercial">Commercial</option>
-                <option value="agricultural">Agricultural</option>
-                <option value="industrial">Industrial</option>
-              </TextField>
-            </Grid>
-            <Grid xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Current Owner's NIC"
-                {...register("ownerNIC", { required: "Owner NIC is required" })}
-                error={!!errors.ownerNIC}
-                helperText={errors.ownerNIC?.message}
-              />
-            </Grid>
-          </Grid>
-        </Box>
-      );
+      return <PropertyInfo register={register} errors={errors} />;
     }
     if (activeStep === 1) {
       return (
-        <Box>
-          <Typography
-            variant="h6"
-            gutterBottom
-            sx={{ mb: 2, fontWeight: 600, color: "primary.main" }}
-          >
-            Document Upload
-          </Typography>
-          <Alert severity="info" sx={{ mb: 3, borderRadius: 2, fontSize: 16 }}>
-            Please upload clear, high-resolution scans. Accepted: PDF, JPG, PNG
-            (Max 10MB)
-          </Alert>
-          <Grid container spacing={3}>
-            {requiredDocuments.map((doc) => (
-              <Grid xs={12} sm={6} md={4} lg={3} key={doc.id}>
-                <Card variant="outlined" sx={{ borderRadius: 3 }}>
-                  <CardContent>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                      <DescriptionIcon
-                        sx={{ color: "primary.main", fontSize: 32 }}
-                      />
-                      <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
-                        {doc.name}
-                        {doc.required && (
-                          <Chip
-                            label="Required"
-                            size="small"
-                            color="error"
-                            sx={{ ml: 1 }}
-                          />
-                        )}
-                      </Typography>
-                    </Box>
-                    <FileUpload
-                      onFilesChange={(files) => handleFileUpload(files, doc.id)}
-                      acceptedTypes={{
-                        "application/pdf": [".pdf"],
-                        "image/*": [".png", ".jpg", ".jpeg"],
-                      }}
-                      maxFiles={1}
-                      maxSize={10 * 1024 * 1024}
-                      required={doc.required}
-                      label={null}
-                      description={`Upload file for ${doc.name}`}
-                    />
-                    {uploadedFiles[doc.id] && (
-                      <Typography
-                        variant="body2"
-                        color="success.main"
-                        sx={{ mt: 1 }}
-                      >
-                        ✓ {uploadedFiles[doc.id].name}
-                      </Typography>
-                    )}
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
+        <DocumentsStep
+          requiredDocuments={requiredDocuments}
+          handleFileUpload={handleFileUpload}
+          uploadedFiles={uploadedFiles}
+        />
       );
     }
     return (
-      <Box>
-        <Typography variant="h6" gutterBottom>
-          Review & Submit
-        </Typography>
-        <Grid container spacing={3}>
-          <Grid xs={12} md={6}>
-            <Card>
-              <CardContent>
-                <Typography
-                  variant="h6"
-                  gutterBottom
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
-                  <LocationIcon sx={{ mr: 1 }} />
-                  Property Details
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
-                <List dense>
-                  <ListItem>
-                    <ListItemText
-                      primary="Property Title"
-                      secondary={watch("propertyTitle")}
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText
-                      primary="Plot Number"
-                      secondary={watch("plotNumber")}
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText
-                      primary="Address"
-                      secondary={watch("address")}
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText
-                      primary="Land Area"
-                      secondary={`${watch("landArea")} perches`}
-                    />
-                  </ListItem>
-                </List>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid xs={12} md={6}>
-            <Card>
-              <CardContent>
-                <Typography
-                  variant="h6"
-                  gutterBottom
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
-                  <DescriptionIcon sx={{ mr: 1 }} />
-                  Uploaded Documents
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
-                <List dense>
-                  {requiredDocuments.map((doc) => (
-                    <ListItem key={doc.id}>
-                      <ListItemIcon>
-                        {uploadedFiles[doc.id] ? (
-                          <CheckCircleIcon color="success" />
-                        ) : (
-                          <DescriptionIcon color="disabled" />
-                        )}
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={doc.name}
-                        secondary={
-                          uploadedFiles[doc.id]
-                            ? uploadedFiles[doc.id].name
-                            : "Not uploaded"
-                        }
-                      />
-                    </ListItem>
-                  ))}
-                </List>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-        <Alert severity="warning" sx={{ mt: 3 }}>
-          By submitting, you confirm information is accurate and documents are
-          authentic.
-        </Alert>
-      </Box>
+      <ReviewStep
+        requiredDocuments={requiredDocuments}
+        uploadedFiles={uploadedFiles}
+        watch={watch}
+      />
     );
   };
+
+  // render step content via components
 
   return (
     <CitizenLayout>

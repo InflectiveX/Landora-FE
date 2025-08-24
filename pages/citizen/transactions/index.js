@@ -42,7 +42,7 @@ import { useApi } from "@/lib/api";
 import CitizenLayout from "@/components/layouts/CitizenLayout";
 
 export default function TransactionHistory() {
-  const { getCurrentUserTransfers } = useApi();
+  const { getCurrentUserTransfers, getTransferByLandId } = useApi();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -52,6 +52,8 @@ export default function TransactionHistory() {
   const [filterType, setFilterType] = useState("all");
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [documents, setDocuments] = useState([]);
+  const [docsLoading, setDocsLoading] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
 
   useEffect(() => {
@@ -255,9 +257,30 @@ export default function TransactionHistory() {
                   <TableCell>
                     <IconButton
                       color="primary"
-                      onClick={() => {
+                      onClick={async () => {
                         setSelectedTransaction(t);
                         setDialogOpen(true);
+                        const propId =
+                          t.property_id || t.propertyId || t.land_id;
+                        if (!propId) {
+                          setDocuments([]);
+                          return;
+                        }
+                        try {
+                          setDocsLoading(true);
+                          const docs = await getTransferByLandId(propId).catch(
+                            (e) => {
+                              console.error("fetch docs error", e);
+                              return [];
+                            }
+                          );
+                          setDocuments(Array.isArray(docs) ? docs : []);
+                        } catch (e) {
+                          console.error(e);
+                          setDocuments([]);
+                        } finally {
+                          setDocsLoading(false);
+                        }
                       }}
                     >
                       <VisibilityIcon />
@@ -356,6 +379,82 @@ export default function TransactionHistory() {
                             />
                           </ListItem>
                         </List>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                  <Grid xs={12}>
+                    <Card>
+                      <CardContent>
+                        <Typography
+                          variant="h6"
+                          gutterBottom
+                          sx={{ display: "flex", alignItems: "center" }}
+                        >
+                          <ScheduleIcon sx={{ mr: 1, color: "primary.main" }} />
+                          Documents
+                        </Typography>
+                        <Divider sx={{ mb: 2 }} />
+                        {docsLoading ? (
+                          <Box
+                            sx={{ display: "flex", justifyContent: "center" }}
+                          >
+                            <CircularProgress size={24} />
+                          </Box>
+                        ) : documents && documents.length ? (
+                          <List>
+                            {documents.map((d) => (
+                              <ListItem key={d.id} disablePadding>
+                                <ListItemText
+                                  primary={
+                                    d.name || d.title || `Document ${d.id}`
+                                  }
+                                  secondary={d.description || d.type || ""}
+                                />
+                                <Button
+                                  size="small"
+                                  onClick={() => {
+                                    const docUrl = d.url || d.path || "";
+                                    try {
+                                      const lower = (
+                                        docUrl || ""
+                                      ).toLowerCase();
+                                      if (
+                                        lower.endsWith(".pdf") ||
+                                        lower.includes("/pdf/")
+                                      ) {
+                                        // open in lightweight in-app pdf viewer
+                                        window.open(
+                                          `/pdf-viewer?url=${encodeURIComponent(
+                                            docUrl
+                                          )}`,
+                                          "_blank"
+                                        );
+                                      } else {
+                                        window.open(
+                                          docUrl || "",
+                                          "_blank",
+                                          "noopener"
+                                        );
+                                      }
+                                    } catch (e) {
+                                      window.open(
+                                        docUrl || "",
+                                        "_blank",
+                                        "noopener"
+                                      );
+                                    }
+                                  }}
+                                >
+                                  View
+                                </Button>
+                              </ListItem>
+                            ))}
+                          </List>
+                        ) : (
+                          <Typography color="text.secondary">
+                            No documents found for this property.
+                          </Typography>
+                        )}
                       </CardContent>
                     </Card>
                   </Grid>

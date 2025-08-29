@@ -276,7 +276,7 @@ const RegisterCard = ({
 
 export default function RegisterQueue() {
   const theme = useTheme();
-  const { getProperties } = useApi();
+  const { getProperties, getRegisterByLandId } = useApi();
 
   const [loading, setLoading] = useState(true);
   const [registrations, setRegistrations] = useState([]);
@@ -286,6 +286,8 @@ export default function RegisterQueue() {
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [actionNotes, setActionNotes] = useState("");
+  const [documents, setDocuments] = useState([]);
+  const [docsLoading, setDocsLoading] = useState(false);
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
@@ -335,9 +337,29 @@ export default function RegisterQueue() {
     );
   });
 
-  const handleViewDetails = (registration) => {
+  const handleViewDetails = async (registration) => {
     setSelectedRegistration(registration);
     setDetailsDialogOpen(true);
+    setDocsLoading(true);
+    setDocuments([]);
+    try {
+      // Use getRegisterByLandId to fetch registration documents
+      const propId =
+        registration.property_id || registration.id || registration.land_id;
+      let docs = [];
+      if (propId && typeof getRegisterByLandId === "function") {
+        docs = await getRegisterByLandId(propId);
+      }
+      // Defensive: flatten if nested under .documents
+      if (docs && typeof docs === "object" && Array.isArray(docs.documents)) {
+        docs = docs.documents;
+      }
+      setDocuments(Array.isArray(docs) ? docs : []);
+    } catch (e) {
+      setDocuments([]);
+    } finally {
+      setDocsLoading(false);
+    }
   };
 
   const handleApprove = (registration) => {
@@ -533,36 +555,70 @@ export default function RegisterQueue() {
                   <Typography variant="subtitle1" fontWeight={600} gutterBottom>
                     Submitted Documents
                   </Typography>
-                  <List>
-                    <ListItem>
-                      <ListItemIcon>
-                        <DescriptionIcon color="primary" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary="Land Deed"
-                        secondary="Uploaded 2024-01-15"
-                      />
-                      <ListItemSecondaryAction>
-                        <IconButton size="small" color="primary">
-                          <VisibilityIcon />
-                        </IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                    <ListItem>
-                      <ListItemIcon>
-                        <DescriptionIcon color="primary" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary="Survey Plan"
-                        secondary="Uploaded 2024-01-18"
-                      />
-                      <ListItemSecondaryAction>
-                        <IconButton size="small" color="primary">
-                          <VisibilityIcon />
-                        </IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                  </List>
+                  {docsLoading ? (
+                    <Box
+                      sx={{ display: "flex", justifyContent: "center", py: 2 }}
+                    >
+                      <LoadingSpinner size={24} />
+                    </Box>
+                  ) : documents && documents.length ? (
+                    <List>
+                      {documents.map((doc) => (
+                        <ListItem key={doc.id} disablePadding>
+                          <ListItemIcon>
+                            <DescriptionIcon color="primary" />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              doc.name || doc.title || `Document ${doc.id}`
+                            }
+                            secondary={doc.description || doc.type || ""}
+                          />
+                          <ListItemSecondaryAction>
+                            <IconButton
+                              size="small"
+                              color="primary"
+                              onClick={() => {
+                                const docUrl = doc.url || doc.path || "";
+                                try {
+                                  const lower = (docUrl || "").toLowerCase();
+                                  if (
+                                    lower.endsWith(".pdf") ||
+                                    lower.includes("/pdf/")
+                                  ) {
+                                    window.open(
+                                      `/pdf-viewer?url=${encodeURIComponent(
+                                        docUrl
+                                      )}`,
+                                      "_blank"
+                                    );
+                                  } else {
+                                    window.open(
+                                      docUrl || "",
+                                      "_blank",
+                                      "noopener"
+                                    );
+                                  }
+                                } catch (e) {
+                                  window.open(
+                                    docUrl || "",
+                                    "_blank",
+                                    "noopener"
+                                  );
+                                }
+                              }}
+                            >
+                              <VisibilityIcon />
+                            </IconButton>
+                          </ListItemSecondaryAction>
+                        </ListItem>
+                      ))}
+                    </List>
+                  ) : (
+                    <Typography color="text.secondary">
+                      No documents found for this registration.
+                    </Typography>
+                  )}
                 </Box>
               </Box>
             )}

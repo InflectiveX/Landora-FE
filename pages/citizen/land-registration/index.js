@@ -109,11 +109,67 @@ export default function LandRegistration() {
         for (const k of keys) {
           const file = uploadedFiles[k];
           if (!file) continue;
+
+          // Upload file to storage and get public URL (like transfer flow)
+          let publicUrl = "";
+          try {
+            // build a unique path: register/{landId}/{timestamp}_{random}_{filename}
+            const timestamp = Date.now();
+            const safeName = file.name.replace(/[^a-zA-Z0-9_.-]/g, "_");
+            const path = `register/${newLandId}/${timestamp}_${Math.random()
+              .toString(36)
+              .substr(2, 6)}_${safeName}`;
+
+            // helper to convert File -> base64 string for JSON uploads
+            const readFileAsBase64 = (file) =>
+              new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                  const result = reader.result;
+                  if (typeof result === "string") {
+                    const idx = result.indexOf("base64,");
+                    const base64 =
+                      idx >= 0 ? result.substring(idx + 7) : result;
+                    resolve(base64);
+                  } else {
+                    reject(new Error("Failed to read file as base64"));
+                  }
+                };
+                reader.onerror = (err) => reject(err);
+                reader.readAsDataURL(file);
+              });
+
+            const base64 = await readFileAsBase64(file);
+            const contentType = file.type || "application/octet-stream";
+            const uploadResp = await fetch("/api/storage-upload", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                bucket: "Landora",
+                path,
+                base64,
+                contentType,
+              }),
+            });
+            const uploadJson = await uploadResp.json();
+            if (!uploadResp.ok) {
+              console.error("Server upload failed", uploadJson);
+              throw new Error(uploadJson.error || "Upload failed");
+            }
+            publicUrl = uploadJson.publicUrl || "";
+          } catch (err) {
+            console.error("Document upload failed for registration", k, err);
+            enqueueSnackbar(`Failed to upload document: ${k}`, {
+              variant: "error",
+            });
+            // Continue to register with empty url if upload fails
+          }
+
           const docPayload = {
             land_id: newLandId,
             name: file.name,
             doc_type: k,
-            url: "",
+            url: publicUrl,
           };
           // Use register-specific document endpoint
           await apiClient.document.registerRegister(docPayload);

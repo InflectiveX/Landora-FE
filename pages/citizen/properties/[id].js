@@ -72,6 +72,9 @@ export default function PropertyDetails() {
 
           const [tRes, rRes] = await Promise.allSettled([tCall, rCall]);
 
+          // Debug: log raw register response
+          console.log("[DEBUG] getRegisterByLandId response:", rRes);
+
           const toArray = (value) => {
             if (!value) return [];
             if (Array.isArray(value)) return value;
@@ -81,6 +84,15 @@ export default function PropertyDetails() {
               Array.isArray(value.documents)
             )
               return value.documents;
+            // Try to handle if value is an object with a single key containing an array
+            if (
+              value &&
+              typeof value === "object" &&
+              Object.values(value).length === 1 &&
+              Array.isArray(Object.values(value)[0])
+            ) {
+              return Object.values(value)[0];
+            }
             return [];
           };
 
@@ -119,6 +131,9 @@ export default function PropertyDetails() {
 
           setTransferDocuments(transferList);
           setRegisterDocuments(registerList);
+
+          // Debug: log registerDocuments after processing
+          console.log("[DEBUG] registerDocuments:", registerList);
 
           // Keep combined documents around for any existing UI that relies on a single list
           setDocuments([...transferList, ...registerList]);
@@ -269,33 +284,6 @@ export default function PropertyDetails() {
                   documents={registerDocuments}
                   onOpen={(d) => setDocDialog(d)}
                 />
-
-                {/* Compute other documents as those not present in transfer/register lists */}
-                {(() => {
-                  const getKey = (d) =>
-                    (d && d.id && String(d.id)) ||
-                    d?.url ||
-                    d?.path ||
-                    d?.name ||
-                    JSON.stringify(d);
-                  const tKeys = new Set((transferDocuments || []).map(getKey));
-                  const rKeys = new Set((registerDocuments || []).map(getKey));
-                  const otherDocs = (documents || []).filter((d) => {
-                    const k = getKey(d);
-                    return k && !tKeys.has(k) && !rKeys.has(k);
-                  });
-
-                  return otherDocs.length > 0 ? (
-                    <>
-                      <Box sx={{ height: 16 }} />
-                      <DocumentsList
-                        title="Other Documents"
-                        documents={otherDocs}
-                        onOpen={(d) => setDocDialog(d)}
-                      />
-                    </>
-                  ) : null;
-                })()}
               </Grid>
             </Grid>
           </Grid>

@@ -50,6 +50,20 @@ import { createStaggerAnimation, createHoverLift } from "@/lib/animations";
 import { useApi } from "@/lib/api";
 import OfficerLayout from "@/components/layouts/OfficerLayout";
 
+const getStatusColor = (status) => {
+  switch (status?.toLowerCase()) {
+    case "pending":
+    case "under_review":
+      return "warning";
+    case "approved":
+      return "success";
+    case "rejected":
+      return "error";
+    default:
+      return "default";
+  }
+};
+
 const TransferCard = ({
   transfer,
   index,
@@ -59,20 +73,6 @@ const TransferCard = ({
 }) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
-
-  const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case "pending":
-      case "under_review":
-        return "warning";
-      case "approved":
-        return "success";
-      case "rejected":
-        return "error";
-      default:
-        return "default";
-    }
-  };
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -279,7 +279,7 @@ const TransferCard = ({
 
 export default function TransferQueue() {
   const theme = useTheme();
-  const { getTransactions } = useApi();
+  const { getTransactions, getTransferByLandId } = useApi();
 
   const [loading, setLoading] = useState(true);
   const [transfers, setTransfers] = useState([]);
@@ -289,6 +289,8 @@ export default function TransferQueue() {
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [actionNotes, setActionNotes] = useState("");
+  const [documents, setDocuments] = useState([]);
+  const [docsLoading, setDocsLoading] = useState(false);
 
   // Load transfer data
   useEffect(() => {
@@ -324,9 +326,26 @@ export default function TransferQueue() {
     );
   });
 
-  const handleViewDetails = (transfer) => {
+  const handleViewDetails = async (transfer) => {
     setSelectedTransfer(transfer);
     setDetailsDialogOpen(true);
+    setDocsLoading(true);
+    setDocuments([]);
+    try {
+      const propId = transfer.property_id || transfer.id || transfer.land_id;
+      let docs = [];
+      if (propId && typeof getTransferByLandId === "function") {
+        docs = await getTransferByLandId(propId);
+      }
+      if (docs && typeof docs === "object" && Array.isArray(docs.documents)) {
+        docs = docs.documents;
+      }
+      setDocuments(Array.isArray(docs) ? docs : []);
+    } catch (e) {
+      setDocuments([]);
+    } finally {
+      setDocsLoading(false);
+    }
   };
 
   const handleApprove = (transfer) => {
@@ -528,50 +547,32 @@ export default function TransferQueue() {
                   <Typography variant="subtitle1" fontWeight={600} gutterBottom>
                     Submitted Documents
                   </Typography>
-                  <List>
-                    <ListItem>
-                      <ListItemIcon>
-                        <DescriptionIcon color="primary" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary="Transfer Agreement"
-                        secondary="Uploaded 2024-01-15"
-                      />
-                      <ListItemSecondaryAction>
-                        <IconButton size="small" color="primary">
-                          <VisibilityIcon />
-                        </IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                    <ListItem>
-                      <ListItemIcon>
-                        <DescriptionIcon color="primary" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary="Valuation Report"
-                        secondary="Uploaded 2024-01-18"
-                      />
-                      <ListItemSecondaryAction>
-                        <IconButton size="small" color="primary">
-                          <VisibilityIcon />
-                        </IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                    <ListItem>
-                      <ListItemIcon>
-                        <DescriptionIcon color="primary" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary="Payment Proof"
-                        secondary="Uploaded 2024-01-20"
-                      />
-                      <ListItemSecondaryAction>
-                        <IconButton size="small" color="primary">
-                          <VisibilityIcon />
-                        </IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                  </List>
+                  {docsLoading ? (
+                    <Typography variant="body2" color="text.secondary">Loading documents...</Typography>
+                  ) : documents.length === 0 ? (
+                    <Typography variant="body2" color="text.secondary">No documents found.</Typography>
+                  ) : (
+                    <List>
+                      {documents.map((doc, idx) => (
+                        <ListItem key={doc.id || idx}>
+                          <ListItemIcon>
+                            <DescriptionIcon color="primary" />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={doc.name || doc.filename || `Document #${idx + 1}`}
+                            secondary={doc.uploadedAt ? `Uploaded ${new Date(doc.uploadedAt).toLocaleDateString()}` : null}
+                          />
+                          {doc.url && (
+                            <ListItemSecondaryAction>
+                              <IconButton size="small" color="primary" component="a" href={doc.url} target="_blank" rel="noopener noreferrer">
+                                <VisibilityIcon />
+                              </IconButton>
+                            </ListItemSecondaryAction>
+                          )}
+                        </ListItem>
+                      ))}
+                    </List>
+                  )}
                 </Box>
               </Box>
             )}

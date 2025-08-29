@@ -284,7 +284,7 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
                     lineHeight: "20px",
                   }}
                 >
-                  {property.area || property.size || "N/A"}
+                  {property.land_area + " purchases" || "N/A"}
                 </Typography>
               </Box>
               <Box sx={{ flex: 1, textAlign: "right", ml: 1 }}>
@@ -303,7 +303,7 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
                     lineHeight: "20px",
                   }}
                 >
-                  {property.landType || property.type || "N/A"}
+                  {property.property_type || "N/A"}
                 </Typography>
               </Box>
             </Box>
@@ -324,7 +324,7 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
                   lineHeight: "20px",
                 }}
               >
-                {property.ownerName || property.owner || "N/A"}
+                {property.owner_name || "N/A"}
               </Typography>
             </Box>
           </Box>
@@ -344,7 +344,7 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
               <CalendarIcon sx={{ fontSize: 14, color: "text.secondary" }} />
               <Typography variant="caption" color="text.secondary">
-                {formatDate(property.registrationDate || property.createdAt)}
+                {formatDate(property.registration_date)}
               </Typography>
             </Box>
             <Typography variant="caption" color="text.secondary">

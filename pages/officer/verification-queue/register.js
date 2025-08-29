@@ -191,17 +191,30 @@ const RegisterCard = ({
           }}
         >
           {/* Property Title & Details */}
-          <Box sx={{ mb: 2, mt: 3 }}>
+          <Box sx={{ mb: 2, mt: 3, width: 200 }}>
             <Typography variant="h6" fontWeight={600} gutterBottom>
               {registration.landName || `Registration #${registration.id}`}
             </Typography>
 
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+              <Typography variant="body2" color="text.secondary">
+                Province : {registration.province || "N/A"}
+              </Typography>
+            </Box>
+
+            <Box
+              sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}
+            >
+              <Typography variant="body2" color="text.secondary">
+                District : {registration.district || "N/A"}
+              </Typography>
+            </Box>
             <Box
               sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}
             >
               <LocationIcon sx={{ fontSize: 16, color: "text.secondary" }} />
               <Typography variant="body2" color="text.secondary">
-                {registration.location || "Location not specified"}
+                Address : {registration.address || "N/A"}
               </Typography>
             </Box>
 
@@ -210,7 +223,7 @@ const RegisterCard = ({
             >
               <PersonIcon sx={{ fontSize: 16, color: "text.secondary" }} />
               <Typography variant="body2" color="text.secondary">
-                Owner: {registration.ownerName || "N/A"}
+                Owner: {registration.owner_name || "N/A"}
               </Typography>
             </Box>
           </Box>
@@ -222,7 +235,7 @@ const RegisterCard = ({
                 Area
               </Typography>
               <Typography variant="body2" fontWeight={600}>
-                {registration.area || "N/A"}
+                {registration.land_area + " sqm" || "N/A"}
               </Typography>
             </Box>
             <Box sx={{ textAlign: "right" }}>
@@ -230,7 +243,7 @@ const RegisterCard = ({
                 Type
               </Typography>
               <Typography variant="body2" fontWeight={600} color="primary.main">
-                {registration.landType || "N/A"}
+                {registration.property_type || "N/A"}
               </Typography>
             </Box>
           </Box>
@@ -248,9 +261,7 @@ const RegisterCard = ({
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
               <CalendarIcon sx={{ fontSize: 14, color: "text.secondary" }} />
               <Typography variant="caption" color="text.secondary">
-                {formatDate(
-                  registration.submissionDate || registration.createdAt
-                )}
+                {formatDate(registration.registration_date)}
               </Typography>
             </Box>
             <Typography variant="caption" color="text.secondary">
@@ -341,13 +352,12 @@ export default function RegisterQueue() {
 
   const handleApproveSubmit = async () => {
     try {
-      // Here you would call the API to approve the registration
-      // await apiClient.property.update(selectedRegistration.id, {
-      //   status: "approved",
-      //   approvalNotes: actionNotes,
-      //   approvedBy: currentUser.id,
-      //   approvalDate: new Date().toISOString()
-      // });
+      await apiClient.property.update(selectedRegistration.id, {
+        status: "approved",
+        approvalNotes: actionNotes,
+        approvedBy: currentUser.id,
+        approvalDate: new Date().toISOString(),
+      });
 
       setApproveDialogOpen(false);
       setActionNotes("");
@@ -361,19 +371,18 @@ export default function RegisterQueue() {
 
   const handleRejectSubmit = async () => {
     try {
-      // Here you would call the API to reject the registration
-      // await apiClient.property.update(selectedRegistration.id, {
-      //   status: "rejected",
-      //   rejectionNotes: actionNotes,
-      //   rejectedBy: currentUser.id,
-      //   rejectionDate: new Date().toISOString()
-      // });
+      await apiClient.property.update(selectedRegistration.id, {
+        status: "rejected",
+        rejectionNotes: actionNotes,
+        rejectedBy: currentUser.id,
+        rejectionDate: new Date().toISOString(),
+      });
 
       setRejectDialogOpen(false);
       setActionNotes("");
       setSelectedRegistration(null);
       // Refresh the list
-      // loadRegistrations();
+      loadRegistrations();
     } catch (error) {
       console.error("Failed to reject registration:", error);
     }
@@ -469,10 +478,10 @@ export default function RegisterQueue() {
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6}>
                     <Typography variant="subtitle2" color="text.secondary">
-                      Property Name
+                      Estimated Value
                     </Typography>
                     <Typography variant="body1" gutterBottom>
-                      {selectedRegistration.landName || "N/A"}
+                      {selectedRegistration.estimated_value || "N/A"}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -490,7 +499,7 @@ export default function RegisterQueue() {
                       Location
                     </Typography>
                     <Typography variant="body1" gutterBottom>
-                      {selectedRegistration.location || "N/A"}
+                      {selectedRegistration.address || "N/A"}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -498,7 +507,7 @@ export default function RegisterQueue() {
                       Area
                     </Typography>
                     <Typography variant="body1" gutterBottom>
-                      {selectedRegistration.area || "N/A"}
+                      {selectedRegistration.land_area + "sqm" || "N/A"}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -506,7 +515,7 @@ export default function RegisterQueue() {
                       Land Type
                     </Typography>
                     <Typography variant="body1" gutterBottom>
-                      {selectedRegistration.landType || "N/A"}
+                      {selectedRegistration.property_type || "N/A"}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -514,7 +523,7 @@ export default function RegisterQueue() {
                       Owner
                     </Typography>
                     <Typography variant="body1" gutterBottom>
-                      {selectedRegistration.ownerName || "N/A"}
+                      {selectedRegistration.owner_name || "N/A"}
                     </Typography>
                   </Grid>
                 </Grid>

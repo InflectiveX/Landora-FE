@@ -289,9 +289,20 @@ export default function VerifyPropertyPage() {
                         >
                           Search Results ({searchResults.length})
                         </Typography>
-                        <Grid container spacing={3} sx={{ alignItems: "stretch" }}>
+                        <Grid
+                          container
+                          spacing={3}
+                          sx={{ alignItems: "stretch" }}
+                        >
                           {searchResults.map((property) => (
-                            <Grid item xs={12} sm={6} lg={4} key={property.id} sx={{ display: "flex" }}>
+                            <Grid
+                              item
+                              xs={12}
+                              sm={6}
+                              lg={4}
+                              key={property.id}
+                              sx={{ display: "flex" }}
+                            >
                               <ModernCard
                                 variant="glass"
                                 interactive
@@ -338,7 +349,14 @@ export default function VerifyPropertyPage() {
                                   }}
                                 >
                                   {/* Main Content */}
-                                  <Box sx={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+                                  <Box
+                                    sx={{
+                                      flex: 1,
+                                      display: "flex",
+                                      flexDirection: "column",
+                                      overflow: "hidden",
+                                    }}
+                                  >
                                     {/* Property Title */}
                                     <Box sx={{ mb: 2, mt: 3, minHeight: 64 }}>
                                       <Typography

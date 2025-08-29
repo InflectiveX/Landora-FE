@@ -48,28 +48,28 @@ import LoadingSpinner, {
 import { createStaggerAnimation, createHoverLift } from "@/lib/animations";
 import { useApi } from "@/lib/api";
 
+const getStatusColor = (status) => {
+  switch (status?.toLowerCase()) {
+    case "verified":
+    case "approved":
+      return "success";
+    case "pending":
+    case "under_review":
+      return "warning";
+    case "processing":
+    case "in_progress":
+      return "info";
+    case "rejected":
+      return "error";
+    default:
+      return "default";
+  }
+};
+
 const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
   const theme = useTheme();
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState(null);
-
-  const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case "verified":
-      case "approved":
-        return "success";
-      case "pending":
-      case "under_review":
-        return "warning";
-      case "processing":
-      case "in_progress":
-        return "info";
-      case "rejected":
-        return "error";
-      default:
-        return "default";
-    }
-  };
 
   const getStatusIcon = (status) => {
     switch (status?.toLowerCase()) {

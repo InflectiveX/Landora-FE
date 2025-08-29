@@ -189,6 +189,7 @@ const TransferCard = ({
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
+            width: 250,
           }}
         >
           {/* Transfer Title & Details */}
@@ -215,7 +216,7 @@ const TransferCard = ({
             >
               <PersonIcon sx={{ fontSize: 16, color: "text.secondary" }} />
               <Typography variant="body2" color="text.secondary">
-                From: {transfer.currentOwner || transfer.sellerName || "N/A"}
+                From: {transfer.from_user_name || "N/A"}
               </Typography>
             </Box>
 
@@ -226,7 +227,7 @@ const TransferCard = ({
                 sx={{ fontSize: 16, color: "text.secondary" }}
               />
               <Typography variant="body2" color="text.secondary">
-                To: {transfer.newOwner || transfer.buyerName || "N/A"}
+                To: {transfer.to_user_name || "N/A"}
               </Typography>
             </Box>
           </Box>
@@ -238,7 +239,7 @@ const TransferCard = ({
                 Transfer Value
               </Typography>
               <Typography variant="body2" fontWeight={600}>
-                {transfer.transferValue || transfer.amount || "N/A"}
+                {transfer.amount || "N/A"}
               </Typography>
             </Box>
             <Box sx={{ textAlign: "right" }}>
@@ -246,7 +247,7 @@ const TransferCard = ({
                 Type
               </Typography>
               <Typography variant="body2" fontWeight={600} color="primary.main">
-                {transfer.transferType || "Ownership Transfer"}
+                {transfer.property_type || "Ownership Transfer"}
               </Typography>
             </Box>
           </Box>
@@ -264,7 +265,7 @@ const TransferCard = ({
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
               <CalendarIcon sx={{ fontSize: 14, color: "text.secondary" }} />
               <Typography variant="caption" color="text.secondary">
-                {formatDate(transfer.transferDate || transfer.createdAt)}
+                {formatDate(transfer.date)}
               </Typography>
             </Box>
             <Typography variant="caption" color="text.secondary">
@@ -548,9 +549,13 @@ export default function TransferQueue() {
                     Submitted Documents
                   </Typography>
                   {docsLoading ? (
-                    <Typography variant="body2" color="text.secondary">Loading documents...</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Loading documents...
+                    </Typography>
                   ) : documents.length === 0 ? (
-                    <Typography variant="body2" color="text.secondary">No documents found.</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      No documents found.
+                    </Typography>
                   ) : (
                     <List>
                       {documents.map((doc, idx) => (
@@ -559,12 +564,27 @@ export default function TransferQueue() {
                             <DescriptionIcon color="primary" />
                           </ListItemIcon>
                           <ListItemText
-                            primary={doc.name || doc.filename || `Document #${idx + 1}`}
-                            secondary={doc.uploadedAt ? `Uploaded ${new Date(doc.uploadedAt).toLocaleDateString()}` : null}
+                            primary={
+                              doc.name || doc.filename || `Document #${idx + 1}`
+                            }
+                            secondary={
+                              doc.uploadedAt
+                                ? `Uploaded ${new Date(
+                                    doc.uploadedAt
+                                  ).toLocaleDateString()}`
+                                : null
+                            }
                           />
                           {doc.url && (
                             <ListItemSecondaryAction>
-                              <IconButton size="small" color="primary" component="a" href={doc.url} target="_blank" rel="noopener noreferrer">
+                              <IconButton
+                                size="small"
+                                color="primary"
+                                component="a"
+                                href={doc.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
                                 <VisibilityIcon />
                               </IconButton>
                             </ListItemSecondaryAction>

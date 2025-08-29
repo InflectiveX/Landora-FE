@@ -38,7 +38,7 @@ import {
   AccountBalance as AccountBalanceIcon,
   Schedule as ScheduleIcon,
 } from "@mui/icons-material";
-import MainLayout from "@/components/layouts/MainLayout";
+import OfficerLayout from "@/components/layouts/OfficerLayout";
 import apiClient from "@/lib/api";
 
 const getStatusColor = (status) =>
@@ -140,7 +140,7 @@ export default function AdminPropertySearch() {
   };
 
   return (
-    <MainLayout>
+    <OfficerLayout>
       <Box
         sx={{
           minHeight: "100vh",
@@ -603,6 +603,6 @@ export default function AdminPropertySearch() {
           )}
         </Container>
       </Box>
-    </MainLayout>
+    </OfficerLayout>
   );
 }

@@ -240,6 +240,36 @@ const OfficerLayout = ({ children }) => {
             </ListItemButton>
           )
         )}
+
+        {/* Officer Management (Admin Only) */}
+        {isAdminUser && (
+          <ListItemButton
+            key="Officer Management"
+            onClick={() => router.push("/admin/officers")}
+            sx={{
+              borderRadius: theme.shape.borderRadius,
+              mx: 1,
+              mb: 0.5,
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+              "&:hover": {
+                backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                transform: "translateX(4px)",
+              },
+              ...(router.pathname === "/admin/officers" && {
+                backgroundColor: alpha(theme.palette.primary.main, 0.12),
+                borderLeft: `3px solid ${theme.palette.primary.main}`,
+              }),
+            }}
+          >
+            <ListItemIcon sx={{ color: theme.palette.text.primary }}>
+              <PersonIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="Officer Management"
+              primaryTypographyProps={{ fontWeight: 500 }}
+            />
+          </ListItemButton>
+        )}
       </List>
     </Box>
   );

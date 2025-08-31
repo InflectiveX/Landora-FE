@@ -176,9 +176,25 @@ export default function LandRegistration() {
         }
       }
 
-      enqueueSnackbar("Registration submitted successfully!", {
-        variant: "success",
-      });
+      // Handle blockchain registration response
+      if (res && res.blockchain) {
+        if (res.blockchain === "registered" && res.parcelId) {
+          enqueueSnackbar(
+            `🎉 Property registered on blockchain! Parcel ID: ${res.parcelId}`,
+            { variant: "success", persist: true }
+          );
+        } else if (res.blockchain === "pending") {
+          enqueueSnackbar(
+            "✅ Property registered in database. Blockchain registration is pending...",
+            { variant: "warning" }
+          );
+        }
+      } else {
+        enqueueSnackbar("Registration submitted successfully!", {
+          variant: "success",
+        });
+      }
+      
       setActiveStep(0);
       setUploadedFiles({});
     } catch (e) {

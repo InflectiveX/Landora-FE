@@ -43,9 +43,13 @@ import UsersTable from "./components/UsersTable";
 import UserDialogs from "./components/UserDialogs";
 import { apiClient } from "@/lib/api";
 import { enqueue } from "@/lib/snackbar";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function OfficerManagement() {
-  const [activeTab, setActiveTab] = useState("officers");
+  const { user } = useAuth();
+  // default tab: admins see officers tab, officers see citizens tab
+  const defaultTab = user && user.role === "admin" ? "officers" : "citizen";
+  const [activeTab, setActiveTab] = useState(defaultTab);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
@@ -56,6 +60,12 @@ export default function OfficerManagement() {
   const [editForm, setEditForm] = useState(null);
   const [users, setUsers] = useState([]);
   const [rawUsers, setRawUsers] = useState([]);
+  const [addOfficerOpen, setAddOfficerOpen] = useState(false);
+  const [newOfficer, setNewOfficer] = useState({
+    name: "",
+    email: "",
+    nic: "",
+  });
 
   const loadUsers = async () => {
     try {
@@ -124,6 +134,43 @@ export default function OfficerManagement() {
     return true;
   });
 
+  const handleToggleStatus = async (u) => {
+    // backend expects action 'blocked' to block, and 'active' to activate
+    const action = u.status === "active" ? "blocked" : "active";
+    try {
+      await apiClient.user.blockUnblockUser({ id: u.id, action });
+      enqueue(
+        `User ${action === "blocked" ? "blocked" : "activated"} successfully`,
+        { variant: "success" }
+      );
+      await loadUsers();
+    } catch (e) {
+      console.error("toggle status failed", e);
+      try {
+        enqueue("Failed to change user status", { variant: "error" });
+      } catch (e2) {}
+    }
+  };
+
+  const handleAddOfficer = async () => {
+    try {
+      await apiClient.user.addOfficer({
+        name: newOfficer.name,
+        email: newOfficer.email,
+        nic: newOfficer.nic,
+      });
+      enqueue("Officer added successfully", { variant: "success" });
+      setAddOfficerOpen(false);
+      setNewOfficer({ name: "", email: "", nic: "" });
+      await loadUsers();
+    } catch (e) {
+      console.error("addOfficer failed", e);
+      try {
+        enqueue("Failed to add officer", { variant: "error" });
+      } catch (e2) {}
+    }
+  };
+
   return (
     <OfficerLayout>
       <Box sx={{ p: 3 }}>
@@ -135,18 +182,39 @@ export default function OfficerManagement() {
           onChange={(_, v) => setActiveTab(v)}
           sx={{ mb: 2 }}
         >
-          <Tab label="Officers" value="officers" />
+          {user && user.role === "admin" && (
+            <Tab label="Officers" value="officers" />
+          )}
           <Tab label="Citizens" value="citizen" />
         </Tabs>
 
-        <Filters
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          filterStatus={filterStatus}
-          setFilterStatus={setFilterStatus}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-        />
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            mb: 2,
+          }}
+        >
+          <Filters
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            filterStatus={filterStatus}
+            setFilterStatus={setFilterStatus}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+          />
+          {user && user.role === "admin" && (
+            <Box sx={{ ml: 2 }}>
+              <Button
+                variant="contained"
+                onClick={() => setAddOfficerOpen(true)}
+              >
+                Add Officer
+              </Button>
+            </Box>
+          )}
+        </Box>
         <UsersTable
           users={filteredByTab}
           page={page}
@@ -170,7 +238,58 @@ export default function OfficerManagement() {
             });
             setEditDialog(true);
           }}
+          onToggleStatus={handleToggleStatus}
         />
+
+        {/* Add Officer Dialog (Admin only) */}
+        <Dialog
+          open={addOfficerOpen}
+          onClose={() => setAddOfficerOpen(false)}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle>Add Officer</DialogTitle>
+          <DialogContent>
+            <Grid container spacing={2} sx={{ pt: 1 }}>
+              <Grid xs={12}>
+                <TextField
+                  label="Name"
+                  fullWidth
+                  value={newOfficer.name}
+                  onChange={(e) =>
+                    setNewOfficer((s) => ({ ...s, name: e.target.value }))
+                  }
+                />
+              </Grid>
+              <Grid xs={12} md={6}>
+                <TextField
+                  label="Email"
+                  fullWidth
+                  value={newOfficer.email}
+                  onChange={(e) =>
+                    setNewOfficer((s) => ({ ...s, email: e.target.value }))
+                  }
+                />
+              </Grid>
+              <Grid xs={12} md={6}>
+                <TextField
+                  label="NIC"
+                  fullWidth
+                  value={newOfficer.nic}
+                  onChange={(e) =>
+                    setNewOfficer((s) => ({ ...s, nic: e.target.value }))
+                  }
+                />
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setAddOfficerOpen(false)}>Cancel</Button>
+            <Button variant="contained" onClick={handleAddOfficer}>
+              Add
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         <UserDialogs
           selectedUser={selectedUser}

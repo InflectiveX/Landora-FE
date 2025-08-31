@@ -30,6 +30,7 @@ export default function UsersTable({
   setRowsPerPage,
   onView,
   onEdit,
+  onToggleStatus,
 }) {
   const handleChangePage = (e, p) => setPage(p);
   const handleRowsPerPage = (e) => setRowsPerPage(parseInt(e.target.value, 10));
@@ -90,11 +91,14 @@ export default function UsersTable({
                         u.status === "active" ? "Block User" : "Activate User"
                       }
                     >
-                      <IconButton>
-                        {u.status === "active" ? (
-                          <BlockIcon />
+                      <IconButton
+                        onClick={() => onToggleStatus && onToggleStatus(u)}
+                      >
+                        {/* Show icon representing current status (blocked => BlockIcon, active => ActivateIcon)", previously icon represented the action which made blocked users appear without a visible icon */}
+                        {u.status === "blocked" ? (
+                          <BlockIcon color="error" />
                         ) : (
-                          <ActivateIcon />
+                          <ActivateIcon color="success" />
                         )}
                       </IconButton>
                     </Tooltip>

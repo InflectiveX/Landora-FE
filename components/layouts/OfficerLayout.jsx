@@ -105,7 +105,6 @@ const OfficerLayout = ({ children }) => {
 
   const { user, logout } = useAuth();
   const [anchorEl, setAnchorEl] = useState(null);
-
   const adminMenuItems = [
     { text: "Admin Dashboard", icon: <DashboardIcon />, path: "/admin" },
     {
@@ -125,6 +124,12 @@ const OfficerLayout = ({ children }) => {
     },
   ];
   const isAdminUser = !!user && user.role === "admin";
+  // allow officers and admins to access the User Management sidebar
+  const canManageUsers =
+    !!user &&
+    (user.role === "admin" ||
+      user.role === "government_officer" ||
+      user.role === "officer");
 
   // Officer sidebar nav with sub-items for Verification Queue
   const [openSubMenu, setOpenSubMenu] = useState(null);
@@ -248,8 +253,8 @@ const OfficerLayout = ({ children }) => {
             )
           )}
 
-          {/* Officer Management (Admin Only) */}
-          {isAdminUser && (
+          {/* Officer Management (Admins and Officers) */}
+          {canManageUsers && (
             <ListItemButton
               key="User Management"
               onClick={() => router.push("/officer/user-management")}

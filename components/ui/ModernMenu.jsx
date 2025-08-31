@@ -262,7 +262,7 @@ const EnhancedPopover = ({
 };
 
 // Context Menu Hook
-export const useContextMenu = () => {
+const useContextMenu = () => {
   const [contextMenu, setContextMenu] = useState(null);
 
   const handleContextMenu = (event) => {

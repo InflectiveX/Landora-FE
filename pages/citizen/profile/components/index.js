@@ -3,3 +3,8 @@ export { default as SecurityTab } from "./SecurityTab";
 export { default as WalletTab } from "./WalletTab";
 export { default as ActivityTab } from "./ActivityTab";
 export { default as SettingsTab } from "./SettingsTab";
+
+// Dummy default export to satisfy Next.js pages requirement
+export default function ComponentsIndex() {
+  return null;
+}

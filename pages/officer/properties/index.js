@@ -445,38 +445,52 @@ export default function PropertiesPage() {
     setDocsLoading(true);
     setRegisterDocuments([]);
     setTransferDocuments([]);
-    
+
     try {
       const propId = property.property_id || property.id || property.land_id;
-      
+
       if (propId) {
         // Fetch both register and transfer documents in parallel
         const [registerDocs, transferDocs] = await Promise.allSettled([
           getRegisterByLandId(propId),
-          getTransferByLandId(propId)
+          getTransferByLandId(propId),
         ]);
-        
+
         // Handle register documents
-        if (registerDocs.status === 'fulfilled') {
+        if (registerDocs.status === "fulfilled") {
           let regDocs = registerDocs.value;
-          if (regDocs && typeof regDocs === "object" && Array.isArray(regDocs.documents)) {
+          if (
+            regDocs &&
+            typeof regDocs === "object" &&
+            Array.isArray(regDocs.documents)
+          ) {
             regDocs = regDocs.documents;
           }
           setRegisterDocuments(Array.isArray(regDocs) ? regDocs : []);
         } else {
-          console.warn("Failed to fetch register documents:", registerDocs.reason);
+          console.warn(
+            "Failed to fetch register documents:",
+            registerDocs.reason
+          );
           setRegisterDocuments([]);
         }
-        
+
         // Handle transfer documents
-        if (transferDocs.status === 'fulfilled') {
+        if (transferDocs.status === "fulfilled") {
           let transDocs = transferDocs.value;
-          if (transDocs && typeof transDocs === "object" && Array.isArray(transDocs.documents)) {
+          if (
+            transDocs &&
+            typeof transDocs === "object" &&
+            Array.isArray(transDocs.documents)
+          ) {
             transDocs = transDocs.documents;
           }
           setTransferDocuments(Array.isArray(transDocs) ? transDocs : []);
         } else {
-          console.warn("Failed to fetch transfer documents:", transferDocs.reason);
+          console.warn(
+            "Failed to fetch transfer documents:",
+            transferDocs.reason
+          );
           setTransferDocuments([]);
         }
       }
@@ -944,19 +958,36 @@ export default function PropertiesPage() {
                 </Box>
 
                 {docsLoading ? (
-                  <Box sx={{ display: "flex", justifyContent: "center", py: 3 }}>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "center", py: 3 }}
+                  >
                     <LoadingSpinner size={24} />
                   </Box>
                 ) : (
                   <Box>
                     {/* Register Documents */}
                     <Box sx={{ mb: 3 }}>
-                      <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1, display: "flex", alignItems: "center", gap: 1 }}>
+                      <Typography
+                        variant="subtitle2"
+                        color="text.secondary"
+                        sx={{
+                          mb: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                        }}
+                      >
                         <AssignmentIcon fontSize="small" />
                         Registration Documents ({registerDocuments.length})
                       </Typography>
                       {registerDocuments.length > 0 ? (
-                        <List sx={{ py: 0, bgcolor: alpha(theme.palette.background.paper, 0.5), borderRadius: 1 }}>
+                        <List
+                          sx={{
+                            py: 0,
+                            bgcolor: alpha(theme.palette.background.paper, 0.5),
+                            borderRadius: 1,
+                          }}
+                        >
                           {registerDocuments.map((doc, index) => (
                             <ListItem
                               key={doc.id || index}
@@ -965,22 +996,35 @@ export default function PropertiesPage() {
                                 py: 1,
                                 borderRadius: 1,
                                 "&:hover": {
-                                  backgroundColor: alpha(theme.palette.action.hover, 0.05),
+                                  backgroundColor: alpha(
+                                    theme.palette.action.hover,
+                                    0.05
+                                  ),
                                 },
                               }}
                             >
                               <ListItemIcon sx={{ minWidth: 36 }}>
-                                <DescriptionIcon color="primary" fontSize="small" />
+                                <DescriptionIcon
+                                  color="primary"
+                                  fontSize="small"
+                                />
                               </ListItemIcon>
                               <ListItemText
                                 primary={
                                   <Typography variant="body2" fontWeight={500}>
-                                    {doc.name || doc.title || `Document ${index + 1}`}
+                                    {doc.name ||
+                                      doc.title ||
+                                      `Document ${index + 1}`}
                                   </Typography>
                                 }
                                 secondary={
-                                  <Typography variant="caption" color="text.secondary">
-                                    {doc.description || doc.type || "Registration document"}
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                  >
+                                    {doc.description ||
+                                      doc.type ||
+                                      "Registration document"}
                                   </Typography>
                                 }
                               />
@@ -991,20 +1035,44 @@ export default function PropertiesPage() {
                                   onClick={() => {
                                     const docUrl = doc.url || doc.path || "";
                                     try {
-                                      const lower = (docUrl || "").toLowerCase();
-                                      if (lower.endsWith(".pdf") || lower.includes("/pdf/")) {
-                                        window.open(`/pdf-viewer?url=${encodeURIComponent(docUrl)}`, "_blank");
+                                      const lower = (
+                                        docUrl || ""
+                                      ).toLowerCase();
+                                      if (
+                                        lower.endsWith(".pdf") ||
+                                        lower.includes("/pdf/")
+                                      ) {
+                                        window.open(
+                                          `/pdf-viewer?url=${encodeURIComponent(
+                                            docUrl
+                                          )}`,
+                                          "_blank"
+                                        );
                                       } else {
-                                        window.open(docUrl || "", "_blank", "noopener");
+                                        window.open(
+                                          docUrl || "",
+                                          "_blank",
+                                          "noopener"
+                                        );
                                       }
                                     } catch (e) {
-                                      window.open(docUrl || "", "_blank", "noopener");
+                                      window.open(
+                                        docUrl || "",
+                                        "_blank",
+                                        "noopener"
+                                      );
                                     }
                                   }}
                                   sx={{
-                                    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                                    backgroundColor: alpha(
+                                      theme.palette.primary.main,
+                                      0.1
+                                    ),
                                     "&:hover": {
-                                      backgroundColor: alpha(theme.palette.primary.main, 0.2),
+                                      backgroundColor: alpha(
+                                        theme.palette.primary.main,
+                                        0.2
+                                      ),
                                     },
                                   }}
                                 >
@@ -1015,13 +1083,18 @@ export default function PropertiesPage() {
                           ))}
                         </List>
                       ) : (
-                        <Box sx={{ 
-                          textAlign: "center", 
-                          py: 2, 
-                          bgcolor: alpha(theme.palette.background.paper, 0.3), 
-                          borderRadius: 1,
-                          border: `1px dashed ${alpha(theme.palette.divider, 0.3)}`
-                        }}>
+                        <Box
+                          sx={{
+                            textAlign: "center",
+                            py: 2,
+                            bgcolor: alpha(theme.palette.background.paper, 0.3),
+                            borderRadius: 1,
+                            border: `1px dashed ${alpha(
+                              theme.palette.divider,
+                              0.3
+                            )}`,
+                          }}
+                        >
                           <Typography variant="body2" color="text.secondary">
                             No registration documents found
                           </Typography>
@@ -1031,12 +1104,27 @@ export default function PropertiesPage() {
 
                     {/* Transfer Documents */}
                     <Box>
-                      <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1, display: "flex", alignItems: "center", gap: 1 }}>
+                      <Typography
+                        variant="subtitle2"
+                        color="text.secondary"
+                        sx={{
+                          mb: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                        }}
+                      >
                         <SwapHorizIcon fontSize="small" />
                         Transfer Documents ({transferDocuments.length})
                       </Typography>
                       {transferDocuments.length > 0 ? (
-                        <List sx={{ py: 0, bgcolor: alpha(theme.palette.background.paper, 0.5), borderRadius: 1 }}>
+                        <List
+                          sx={{
+                            py: 0,
+                            bgcolor: alpha(theme.palette.background.paper, 0.5),
+                            borderRadius: 1,
+                          }}
+                        >
                           {transferDocuments.map((doc, index) => (
                             <ListItem
                               key={doc.id || index}
@@ -1045,22 +1133,35 @@ export default function PropertiesPage() {
                                 py: 1,
                                 borderRadius: 1,
                                 "&:hover": {
-                                  backgroundColor: alpha(theme.palette.action.hover, 0.05),
+                                  backgroundColor: alpha(
+                                    theme.palette.action.hover,
+                                    0.05
+                                  ),
                                 },
                               }}
                             >
                               <ListItemIcon sx={{ minWidth: 36 }}>
-                                <DescriptionIcon color="secondary" fontSize="small" />
+                                <DescriptionIcon
+                                  color="secondary"
+                                  fontSize="small"
+                                />
                               </ListItemIcon>
                               <ListItemText
                                 primary={
                                   <Typography variant="body2" fontWeight={500}>
-                                    {doc.name || doc.title || `Document ${index + 1}`}
+                                    {doc.name ||
+                                      doc.title ||
+                                      `Document ${index + 1}`}
                                   </Typography>
                                 }
                                 secondary={
-                                  <Typography variant="caption" color="text.secondary">
-                                    {doc.description || doc.type || "Transfer document"}
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                  >
+                                    {doc.description ||
+                                      doc.type ||
+                                      "Transfer document"}
                                   </Typography>
                                 }
                               />
@@ -1071,20 +1172,44 @@ export default function PropertiesPage() {
                                   onClick={() => {
                                     const docUrl = doc.url || doc.path || "";
                                     try {
-                                      const lower = (docUrl || "").toLowerCase();
-                                      if (lower.endsWith(".pdf") || lower.includes("/pdf/")) {
-                                        window.open(`/pdf-viewer?url=${encodeURIComponent(docUrl)}`, "_blank");
+                                      const lower = (
+                                        docUrl || ""
+                                      ).toLowerCase();
+                                      if (
+                                        lower.endsWith(".pdf") ||
+                                        lower.includes("/pdf/")
+                                      ) {
+                                        window.open(
+                                          `/pdf-viewer?url=${encodeURIComponent(
+                                            docUrl
+                                          )}`,
+                                          "_blank"
+                                        );
                                       } else {
-                                        window.open(docUrl || "", "_blank", "noopener");
+                                        window.open(
+                                          docUrl || "",
+                                          "_blank",
+                                          "noopener"
+                                        );
                                       }
                                     } catch (e) {
-                                      window.open(docUrl || "", "_blank", "noopener");
+                                      window.open(
+                                        docUrl || "",
+                                        "_blank",
+                                        "noopener"
+                                      );
                                     }
                                   }}
                                   sx={{
-                                    backgroundColor: alpha(theme.palette.secondary.main, 0.1),
+                                    backgroundColor: alpha(
+                                      theme.palette.secondary.main,
+                                      0.1
+                                    ),
                                     "&:hover": {
-                                      backgroundColor: alpha(theme.palette.secondary.main, 0.2),
+                                      backgroundColor: alpha(
+                                        theme.palette.secondary.main,
+                                        0.2
+                                      ),
                                     },
                                   }}
                                 >
@@ -1095,13 +1220,18 @@ export default function PropertiesPage() {
                           ))}
                         </List>
                       ) : (
-                        <Box sx={{ 
-                          textAlign: "center", 
-                          py: 2, 
-                          bgcolor: alpha(theme.palette.background.paper, 0.3), 
-                          borderRadius: 1,
-                          border: `1px dashed ${alpha(theme.palette.divider, 0.3)}`
-                        }}>
+                        <Box
+                          sx={{
+                            textAlign: "center",
+                            py: 2,
+                            bgcolor: alpha(theme.palette.background.paper, 0.3),
+                            borderRadius: 1,
+                            border: `1px dashed ${alpha(
+                              theme.palette.divider,
+                              0.3
+                            )}`,
+                          }}
+                        >
                           <Typography variant="body2" color="text.secondary">
                             No transfer documents found
                           </Typography>

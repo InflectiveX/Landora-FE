@@ -110,7 +110,7 @@ export default function Login() {
       login(userInfo, token);
       enqueueSnackbar("Logged in successfully", { variant: "success" });
       // Redirect based on role
-      if (userInfo.role === "officer") {
+      if (userInfo.role === "officer" || userInfo.role === "admin") {
         router.push("/officer/dashboard");
       } else {
         router.push("/citizen/dashboard");

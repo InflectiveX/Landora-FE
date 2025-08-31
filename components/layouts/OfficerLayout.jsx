@@ -118,22 +118,110 @@ const OfficerLayout = ({ children }) => {
       icon: <SearchIcon />,
       path: "/admin/property-search",
     },
-    { text: "Manage Officers", icon: <PersonIcon />, path: "/admin/officers" },
+    {
+      text: "User Management",
+      icon: <PersonIcon />,
+      path: "/officer/user-management",
+    },
   ];
   const isAdminUser = !!user && user.role === "admin";
 
   // Officer sidebar nav with sub-items for Verification Queue
   const [openSubMenu, setOpenSubMenu] = useState(null);
   const drawer = (
-    <Box sx={{ height: "100%", mt: 1 }}>
-      <List>
-        {officerMenuItems.map((item) =>
-          item.subItems ? (
-            <Box key={item.text}>
+    <Box
+      sx={{ height: "100%", display: "flex", flexDirection: "column", mt: 1 }}
+    >
+      <Box sx={{ flex: 1 }}>
+        <List>
+          {officerMenuItems.map((item) =>
+            item.subItems ? (
+              <Box key={item.text}>
+                <ListItemButton
+                  onClick={() =>
+                    setOpenSubMenu(openSubMenu === item.text ? null : item.text)
+                  }
+                  sx={{
+                    borderRadius: theme.shape.borderRadius,
+                    mx: 1,
+                    mb: 0.5,
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    "&:hover": {
+                      backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                      transform: "translateX(4px)",
+                    },
+                  }}
+                >
+                  <ListItemIcon sx={{ color: theme.palette.text.primary }}>
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.text}
+                    primaryTypographyProps={{ fontWeight: 500 }}
+                  />
+                  <ExpandMoreIcon
+                    sx={{
+                      transform:
+                        openSubMenu === item.text
+                          ? "rotate(180deg)"
+                          : "rotate(0deg)",
+                      transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                      color: theme.palette.text.secondary,
+                    }}
+                  />
+                </ListItemButton>
+                <Fade in={openSubMenu === item.text} timeout={300}>
+                  <List component="div" disablePadding sx={{ pl: 2, mb: 1 }}>
+                    {openSubMenu === item.text &&
+                      item.subItems.map((sub) => (
+                        <ListItemButton
+                          key={sub.text}
+                          onClick={() => router.push(sub.path)}
+                          sx={{
+                            borderRadius: theme.shape.borderRadius,
+                            mx: 1,
+                            mb: 0.5,
+                            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                            "&:hover": {
+                              backgroundColor: alpha(
+                                theme.palette.primary.main,
+                                0.08
+                              ),
+                              transform: "translateX(4px)",
+                            },
+                            ...(router.pathname === sub.path && {
+                              backgroundColor: alpha(
+                                theme.palette.primary.main,
+                                0.12
+                              ),
+                              borderLeft: `3px solid ${theme.palette.primary.main}`,
+                            }),
+                          }}
+                        >
+                          <ListItemIcon
+                            sx={{
+                              color: theme.palette.text.primary,
+                              minWidth: 36,
+                            }}
+                          >
+                            {sub.icon}
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={sub.text}
+                            primaryTypographyProps={{
+                              fontWeight: 500,
+                              fontSize: "0.875rem",
+                            }}
+                          />
+                        </ListItemButton>
+                      ))}
+                  </List>
+                </Fade>
+              </Box>
+            ) : (
               <ListItemButton
-                onClick={() =>
-                  setOpenSubMenu(openSubMenu === item.text ? null : item.text)
-                }
+                key={item.text}
+                onClick={() => router.push(item.path)}
                 sx={{
                   borderRadius: theme.shape.borderRadius,
                   mx: 1,
@@ -143,6 +231,10 @@ const OfficerLayout = ({ children }) => {
                     backgroundColor: alpha(theme.palette.primary.main, 0.08),
                     transform: "translateX(4px)",
                   },
+                  ...(router.pathname === item.path && {
+                    backgroundColor: alpha(theme.palette.primary.main, 0.12),
+                    borderLeft: `3px solid ${theme.palette.primary.main}`,
+                  }),
                 }}
               >
                 <ListItemIcon sx={{ color: theme.palette.text.primary }}>
@@ -152,69 +244,15 @@ const OfficerLayout = ({ children }) => {
                   primary={item.text}
                   primaryTypographyProps={{ fontWeight: 500 }}
                 />
-                <ExpandMoreIcon
-                  sx={{
-                    transform:
-                      openSubMenu === item.text
-                        ? "rotate(180deg)"
-                        : "rotate(0deg)",
-                    transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                    color: theme.palette.text.secondary,
-                  }}
-                />
               </ListItemButton>
-              <Fade in={openSubMenu === item.text} timeout={300}>
-                <List component="div" disablePadding sx={{ pl: 2, mb: 1 }}>
-                  {openSubMenu === item.text &&
-                    item.subItems.map((sub) => (
-                      <ListItemButton
-                        key={sub.text}
-                        onClick={() => router.push(sub.path)}
-                        sx={{
-                          borderRadius: theme.shape.borderRadius,
-                          mx: 1,
-                          mb: 0.5,
-                          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                          "&:hover": {
-                            backgroundColor: alpha(
-                              theme.palette.primary.main,
-                              0.08
-                            ),
-                            transform: "translateX(4px)",
-                          },
-                          ...(router.pathname === sub.path && {
-                            backgroundColor: alpha(
-                              theme.palette.primary.main,
-                              0.12
-                            ),
-                            borderLeft: `3px solid ${theme.palette.primary.main}`,
-                          }),
-                        }}
-                      >
-                        <ListItemIcon
-                          sx={{
-                            color: theme.palette.text.primary,
-                            minWidth: 36,
-                          }}
-                        >
-                          {sub.icon}
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={sub.text}
-                          primaryTypographyProps={{
-                            fontWeight: 500,
-                            fontSize: "0.875rem",
-                          }}
-                        />
-                      </ListItemButton>
-                    ))}
-                </List>
-              </Fade>
-            </Box>
-          ) : (
+            )
+          )}
+
+          {/* Officer Management (Admin Only) */}
+          {isAdminUser && (
             <ListItemButton
-              key={item.text}
-              onClick={() => router.push(item.path)}
+              key="User Management"
+              onClick={() => router.push("/officer/user-management")}
               sx={{
                 borderRadius: theme.shape.borderRadius,
                 mx: 1,
@@ -224,53 +262,55 @@ const OfficerLayout = ({ children }) => {
                   backgroundColor: alpha(theme.palette.primary.main, 0.08),
                   transform: "translateX(4px)",
                 },
-                ...(router.pathname === item.path && {
+                ...(router.pathname === "/officer/user-management" && {
                   backgroundColor: alpha(theme.palette.primary.main, 0.12),
                   borderLeft: `3px solid ${theme.palette.primary.main}`,
                 }),
               }}
             >
               <ListItemIcon sx={{ color: theme.palette.text.primary }}>
-                {item.icon}
+                <PersonIcon />
               </ListItemIcon>
               <ListItemText
-                primary={item.text}
+                primary="User Management"
                 primaryTypographyProps={{ fontWeight: 500 }}
               />
             </ListItemButton>
-          )
-        )}
-
-        {/* Officer Management (Admin Only) */}
-        {isAdminUser && (
-          <ListItemButton
-            key="Officer Management"
-            onClick={() => router.push("/admin/officers")}
+          )}
+        </List>
+      </Box>
+      {/* Sidebar Footer: User Avatar and Name */}
+      <Box
+        sx={{
+          p: 2,
+          borderTop: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
+          backgroundColor:
+            theme.palette.mode === "light"
+              ? alpha(theme.palette.background.default, 0.5)
+              : alpha(theme.palette.background.paper, 0.3),
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, p: 1 }}>
+          <Avatar
             sx={{
-              borderRadius: theme.shape.borderRadius,
-              mx: 1,
-              mb: 0.5,
-              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-              "&:hover": {
-                backgroundColor: alpha(theme.palette.primary.main, 0.08),
-                transform: "translateX(4px)",
-              },
-              ...(router.pathname === "/admin/officers" && {
-                backgroundColor: alpha(theme.palette.primary.main, 0.12),
-                borderLeft: `3px solid ${theme.palette.primary.main}`,
-              }),
+              width: 36,
+              height: 36,
+              fontWeight: 600,
+              background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
             }}
           >
-            <ListItemIcon sx={{ color: theme.palette.text.primary }}>
-              <PersonIcon />
-            </ListItemIcon>
-            <ListItemText
-              primary="Officer Management"
-              primaryTypographyProps={{ fontWeight: 500 }}
-            />
-          </ListItemButton>
-        )}
-      </List>
+            {user?.name?.[0] || "U"}
+          </Avatar>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography variant="body2" fontWeight={600} noWrap>
+              {user?.name || "User"}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" noWrap>
+              {user?.role || "Officer"}
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
     </Box>
   );
 

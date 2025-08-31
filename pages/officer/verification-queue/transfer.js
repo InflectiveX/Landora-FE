@@ -42,6 +42,7 @@ import ModernCard, {
   ModernCardHeader,
 } from "@/components/ui/ModernCard";
 import ModernButton from "@/components/ui/ModernButton";
+import ModernDialog from "@/components/ui/ModernDialog";
 import { SearchField } from "@/components/ui/ModernForm";
 import LoadingSpinner, {
   CardSkeleton,
@@ -472,68 +473,141 @@ export default function TransferQueue() {
         )}
 
         {/* Details Dialog */}
-        <Dialog
+        <ModernDialog
           open={detailsDialogOpen}
           onClose={() => setDetailsDialogOpen(false)}
-          maxWidth="md"
-          fullWidth
+          title={`Transfer Details: ${
+            selectedTransfer?.propertyName ||
+            `Transfer #${selectedTransfer?.id}`
+          }`}
+          size="small"
+          variant="glass"
+          sx={{
+            "& .MuiDialog-paper": {
+              maxWidth: "1000px",
+              width: "100%",
+            },
+          }}
+          actions={
+            <>
+              <Button
+                onClick={() => setDetailsDialogOpen(false)}
+                sx={{
+                  color: "text.secondary",
+                  "&:hover": {
+                    backgroundColor: alpha(theme.palette.action.hover, 0.1),
+                  },
+                }}
+              >
+                Close
+              </Button>
+              <ModernButton
+                variant="outlined"
+                color="error"
+                onClick={() => {
+                  setDetailsDialogOpen(false);
+                  handleReject(selectedTransfer);
+                }}
+                sx={{ minWidth: 120 }}
+              >
+                Reject
+              </ModernButton>
+              <ModernButton
+                variant="gradient"
+                onClick={() => {
+                  setDetailsDialogOpen(false);
+                  handleApprove(selectedTransfer);
+                }}
+                sx={{ minWidth: 120 }}
+              >
+                Approve
+              </ModernButton>
+            </>
+          }
         >
-          <DialogTitle>
-            Transfer Details:{" "}
-            {selectedTransfer?.propertyName ||
-              `Transfer #${selectedTransfer?.id}`}
-          </DialogTitle>
-          <DialogContent>
-            {selectedTransfer && (
-              <Box sx={{ mt: 2 }}>
+          {selectedTransfer && (
+            <Box sx={{ py: 1 }}>
+              {/* Transfer Overview Card */}
+              <ModernCard variant="outlined" sx={{ mb: 3, p: 2 }}>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <SwapHorizIcon sx={{ mr: 1, color: "primary.main" }} />
+                  <Typography variant="h6" fontWeight={600}>
+                    Transfer Overview
+                  </Typography>
+                  <Chip
+                    label={selectedTransfer.status || "Unknown"}
+                    color={getStatusColor(selectedTransfer.status)}
+                    size="small"
+                    sx={{ ml: "auto" }}
+                  />
+                </Box>
+
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
+                  <Grid item xs={12}>
+                    <Typography
+                      variant="subtitle2"
+                      color="text.secondary"
+                      sx={{ mb: 0.5 }}
+                    >
                       Property Name
                     </Typography>
-                    <Typography variant="body1" gutterBottom>
+                    <Typography variant="body1" fontWeight={500} gutterBottom>
                       {selectedTransfer.propertyName || "N/A"}
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      Status
-                    </Typography>
-                    <Chip
-                      label={selectedTransfer.status || "Unknown"}
-                      color={getStatusColor(selectedTransfer.status)}
-                      size="small"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
+
+                  <Grid item xs={6}>
+                    <Typography
+                      variant="subtitle2"
+                      color="text.secondary"
+                      sx={{ mb: 0.5 }}
+                    >
                       Current Owner
                     </Typography>
-                    <Typography variant="body1" gutterBottom>
+                    <Typography variant="body2" gutterBottom>
                       {selectedTransfer.currentOwner || "N/A"}
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
+
+                  <Grid item xs={6}>
+                    <Typography
+                      variant="subtitle2"
+                      color="text.secondary"
+                      sx={{ mb: 0.5 }}
+                    >
                       New Owner
                     </Typography>
-                    <Typography variant="body1" gutterBottom>
+                    <Typography variant="body2" gutterBottom>
                       {selectedTransfer.newOwner || "N/A"}
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
+
+                  <Grid item xs={6}>
+                    <Typography
+                      variant="subtitle2"
+                      color="text.secondary"
+                      sx={{ mb: 0.5 }}
+                    >
                       Transfer Value
                     </Typography>
-                    <Typography variant="body1" gutterBottom>
+                    <Typography
+                      variant="body2"
+                      fontWeight={500}
+                      color="primary.main"
+                    >
                       {selectedTransfer.transferValue || "N/A"}
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
+
+                  <Grid item xs={6}>
+                    <Typography
+                      variant="subtitle2"
+                      color="text.secondary"
+                      sx={{ mb: 0.5 }}
+                    >
                       Transfer Date
                     </Typography>
-                    <Typography variant="body1" gutterBottom>
+                    <Typography variant="body2">
                       {selectedTransfer.transferDate
                         ? new Date(
                             selectedTransfer.transferDate
@@ -542,150 +616,267 @@ export default function TransferQueue() {
                     </Typography>
                   </Grid>
                 </Grid>
+              </ModernCard>
 
-                {/* Documents Section */}
-                <Box sx={{ mt: 3 }}>
-                  <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+              {/* Documents Section */}
+              <ModernCard variant="outlined" sx={{ p: 2 }}>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <DescriptionIcon sx={{ mr: 1, color: "primary.main" }} />
+                  <Typography variant="h6" fontWeight={600}>
                     Submitted Documents
                   </Typography>
-                  {docsLoading ? (
-                    <Typography variant="body2" color="text.secondary">
-                      Loading documents...
-                    </Typography>
-                  ) : documents.length === 0 ? (
-                    <Typography variant="body2" color="text.secondary">
-                      No documents found.
-                    </Typography>
-                  ) : (
-                    <List>
-                      {documents.map((doc, idx) => (
-                        <ListItem key={doc.id || idx}>
-                          <ListItemIcon>
-                            <DescriptionIcon color="primary" />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              doc.name || doc.filename || `Document #${idx + 1}`
-                            }
-                            secondary={
-                              doc.uploadedAt
-                                ? `Uploaded ${new Date(
-                                    doc.uploadedAt
-                                  ).toLocaleDateString()}`
-                                : null
-                            }
-                          />
-                          {doc.url && (
-                            <ListItemSecondaryAction>
-                              <IconButton
-                                size="small"
-                                color="primary"
-                                component="a"
-                                href={doc.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                <VisibilityIcon />
-                              </IconButton>
-                            </ListItemSecondaryAction>
-                          )}
-                        </ListItem>
-                      ))}
-                    </List>
-                  )}
                 </Box>
-              </Box>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setDetailsDialogOpen(false)}>Close</Button>
-            <ModernButton
-              variant="outlined"
-              color="error"
-              onClick={() => {
-                setDetailsDialogOpen(false);
-                handleReject(selectedTransfer);
-              }}
-            >
-              Reject
-            </ModernButton>
-            <ModernButton
-              variant="gradient"
-              onClick={() => {
-                setDetailsDialogOpen(false);
-                handleApprove(selectedTransfer);
-              }}
-            >
-              Approve
-            </ModernButton>
-          </DialogActions>
-        </Dialog>
+
+                {docsLoading ? (
+                  <Box
+                    sx={{ display: "flex", justifyContent: "center", py: 3 }}
+                  >
+                    <LoadingSpinner size={24} />
+                  </Box>
+                ) : documents.length === 0 ? (
+                  <Box sx={{ textAlign: "center", py: 3 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      No documents found for this transfer.
+                    </Typography>
+                  </Box>
+                ) : (
+                  <List sx={{ py: 0 }}>
+                    {documents.map((doc, idx) => (
+                      <ListItem
+                        key={doc.id || idx}
+                        sx={{
+                          px: 0,
+                          py: 1,
+                          borderRadius: 1,
+                          "&:hover": {
+                            backgroundColor: alpha(
+                              theme.palette.action.hover,
+                              0.05
+                            ),
+                          },
+                        }}
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>
+                          <DescriptionIcon color="primary" fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <Typography variant="body2" fontWeight={500}>
+                              {doc.name ||
+                                doc.filename ||
+                                `Document #${idx + 1}`}
+                            </Typography>
+                          }
+                          secondary={
+                            doc.uploadedAt && (
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                              >
+                                Uploaded{" "}
+                                {new Date(doc.uploadedAt).toLocaleDateString()}
+                              </Typography>
+                            )
+                          }
+                        />
+                        {doc.url && (
+                          <ListItemSecondaryAction>
+                            <IconButton
+                              size="small"
+                              color="primary"
+                              component="a"
+                              href={doc.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              sx={{
+                                backgroundColor: alpha(
+                                  theme.palette.primary.main,
+                                  0.1
+                                ),
+                                "&:hover": {
+                                  backgroundColor: alpha(
+                                    theme.palette.primary.main,
+                                    0.2
+                                  ),
+                                },
+                              }}
+                            >
+                              <VisibilityIcon fontSize="small" />
+                            </IconButton>
+                          </ListItemSecondaryAction>
+                        )}
+                      </ListItem>
+                    ))}
+                  </List>
+                )}
+              </ModernCard>
+            </Box>
+          )}
+        </ModernDialog>
 
         {/* Approve Dialog */}
-        <Dialog
+        <ModernDialog
           open={approveDialogOpen}
           onClose={() => setApproveDialogOpen(false)}
-          maxWidth="sm"
-          fullWidth
+          title="Approve Transfer"
+          size="small"
+          variant="glass"
+          actions={
+            <>
+              <Button
+                onClick={() => setApproveDialogOpen(false)}
+                sx={{
+                  color: "text.secondary",
+                  "&:hover": {
+                    backgroundColor: alpha(theme.palette.action.hover, 0.1),
+                  },
+                }}
+              >
+                Cancel
+              </Button>
+              <ModernButton
+                variant="gradient"
+                onClick={handleApproveSubmit}
+                sx={{ minWidth: 140 }}
+              >
+                Approve Transfer
+              </ModernButton>
+            </>
+          }
         >
-          <DialogTitle>Approve Transfer</DialogTitle>
-          <DialogContent>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              Are you sure you want to approve this property transfer?
+          <Box sx={{ py: 1 }}>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+              <CheckCircleIcon
+                sx={{ color: "success.main", mr: 2, fontSize: 28 }}
+              />
+              <Box>
+                <Typography variant="h6" fontWeight={600} color="success.main">
+                  Approve Property Transfer
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  This action will approve the transfer request
+                </Typography>
+              </Box>
+            </Box>
+
+            <Typography variant="body1" sx={{ mb: 3 }}>
+              Are you sure you want to approve this property transfer? This
+              action will:
             </Typography>
+
+            <Box sx={{ mb: 3, ml: 2 }}>
+              <Typography
+                variant="body2"
+                sx={{ mb: 1, display: "flex", alignItems: "center" }}
+              >
+                • Transfer ownership to the new buyer
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ mb: 1, display: "flex", alignItems: "center" }}
+              >
+                • Update property records in the system
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ display: "flex", alignItems: "center" }}
+              >
+                • Notify all parties involved
+              </Typography>
+            </Box>
+
             <TextField
               fullWidth
               multiline
               rows={3}
               label="Approval Notes (Optional)"
-              placeholder="Add any notes about the approval..."
+              placeholder="Add any notes about the approval decision..."
               value={actionNotes}
               onChange={(e) => setActionNotes(e.target.value)}
+              variant="outlined"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                },
+              }}
             />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setApproveDialogOpen(false)}>Cancel</Button>
-            <ModernButton variant="gradient" onClick={handleApproveSubmit}>
-              Approve Transfer
-            </ModernButton>
-          </DialogActions>
-        </Dialog>
+          </Box>
+        </ModernDialog>
 
         {/* Reject Dialog */}
-        <Dialog
+        <ModernDialog
           open={rejectDialogOpen}
           onClose={() => setRejectDialogOpen(false)}
-          maxWidth="sm"
-          fullWidth
+          title="Reject Transfer"
+          size="small"
+          variant="glass"
+          actions={
+            <>
+              <Button
+                onClick={() => setRejectDialogOpen(false)}
+                sx={{
+                  color: "text.secondary",
+                  "&:hover": {
+                    backgroundColor: alpha(theme.palette.action.hover, 0.1),
+                  },
+                }}
+              >
+                Cancel
+              </Button>
+              <ModernButton
+                variant="gradient"
+                color="error"
+                onClick={handleRejectSubmit}
+                disabled={!actionNotes.trim()}
+                sx={{ minWidth: 140 }}
+              >
+                Reject Transfer
+              </ModernButton>
+            </>
+          }
         >
-          <DialogTitle>Reject Transfer</DialogTitle>
-          <DialogContent>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              Are you sure you want to reject this property transfer?
+          <Box sx={{ py: 1 }}>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+              <CancelIcon sx={{ color: "error.main", mr: 2, fontSize: 28 }} />
+              <Box>
+                <Typography variant="h6" fontWeight={600} color="error.main">
+                  Reject Property Transfer
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  This action will reject the transfer request
+                </Typography>
+              </Box>
+            </Box>
+
+            <Typography variant="body1" sx={{ mb: 3 }}>
+              Are you sure you want to reject this property transfer? Please
+              provide a clear reason for rejection.
             </Typography>
+
             <TextField
               fullWidth
               multiline
-              rows={3}
-              label="Rejection Reason"
-              placeholder="Please provide a reason for rejection..."
+              rows={4}
+              label="Rejection Reason *"
+              placeholder="Please provide a detailed reason for rejection..."
               value={actionNotes}
               onChange={(e) => setActionNotes(e.target.value)}
               required
+              error={!actionNotes.trim()}
+              helperText={
+                !actionNotes.trim()
+                  ? "Rejection reason is required"
+                  : "This reason will be shared with the applicant"
+              }
+              variant="outlined"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                },
+              }}
             />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setRejectDialogOpen(false)}>Cancel</Button>
-            <ModernButton
-              variant="gradient"
-              color="error"
-              onClick={handleRejectSubmit}
-              disabled={!actionNotes.trim()}
-            >
-              Reject Transfer
-            </ModernButton>
-          </DialogActions>
-        </Dialog>
+          </Box>
+        </ModernDialog>
       </Box>
     </OfficerLayout>
   );

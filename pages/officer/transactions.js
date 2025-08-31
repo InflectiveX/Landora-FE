@@ -50,6 +50,20 @@ import { createStaggerAnimation, createHoverLift } from "@/lib/animations";
 import { useApi } from "@/lib/api";
 import OfficerLayout from "@/components/layouts/OfficerLayout";
 
+const getStatusColor = (status) => {
+  switch (status?.toLowerCase()) {
+    case "pending":
+    case "under_review":
+      return "warning";
+    case "approved":
+      return "success";
+    case "rejected":
+      return "error";
+    default:
+      return "default";
+  }
+};
+
 const TransferCard = ({
   transfer,
   index,
@@ -59,20 +73,6 @@ const TransferCard = ({
 }) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
-
-  const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case "pending":
-      case "under_review":
-        return "warning";
-      case "approved":
-        return "success";
-      case "rejected":
-        return "error";
-      default:
-        return "default";
-    }
-  };
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";

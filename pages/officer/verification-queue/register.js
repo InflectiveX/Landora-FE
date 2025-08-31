@@ -487,11 +487,27 @@ export default function RegisterQueue() {
             selectedRegistration?.landName ||
             `Registration #${selectedRegistration?.id}`
           }`}
-          size="large"
+          size="small"
           variant="glass"
+          sx={{
+            "& .MuiDialog-paper": {
+              maxWidth: "1000px",
+              width: "100%",
+            },
+          }}
           actions={
             <>
-              <Button onClick={() => setDetailsDialogOpen(false)}>Close</Button>
+              <Button
+                onClick={() => setDetailsDialogOpen(false)}
+                sx={{
+                  color: "text.secondary",
+                  "&:hover": {
+                    backgroundColor: alpha(theme.palette.action.hover, 0.1),
+                  },
+                }}
+              >
+                Close
+              </Button>
               <ModernButton
                 variant="outlined"
                 color="error"
@@ -499,6 +515,7 @@ export default function RegisterQueue() {
                   setDetailsDialogOpen(false);
                   handleReject(selectedRegistration);
                 }}
+                sx={{ minWidth: 100 }}
               >
                 Reject
               </ModernButton>
@@ -508,6 +525,7 @@ export default function RegisterQueue() {
                   setDetailsDialogOpen(false);
                   handleApprove(selectedRegistration);
                 }}
+                sx={{ minWidth: 100 }}
               >
                 Approve
               </ModernButton>
@@ -515,83 +533,158 @@ export default function RegisterQueue() {
           }
         >
           {selectedRegistration && (
-            <Box sx={{ mt: 2 }}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Estimated Value
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    {selectedRegistration.estimated_value || "N/A"}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Status
+            <Box sx={{ py: 1 }}>
+              {/* Property Overview Card */}
+              <ModernCard variant="outlined" sx={{ mb: 3, p: 2 }}>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <AssignmentIcon sx={{ mr: 1, color: "primary.main" }} />
+                  <Typography variant="h6" fontWeight={600}>
+                    Registration Overview
                   </Typography>
                   <Chip
                     label={selectedRegistration.status || "Unknown"}
                     color={getStatusColor(selectedRegistration.status)}
                     size="small"
+                    sx={{ ml: "auto" }}
                   />
+                </Box>
+
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <Typography
+                      variant="subtitle2"
+                      color="text.secondary"
+                      sx={{ mb: 0.5 }}
+                    >
+                      Property Name
+                    </Typography>
+                    <Typography variant="body1" fontWeight={500} gutterBottom>
+                      {selectedRegistration.landName || "N/A"}
+                    </Typography>
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <Typography
+                      variant="subtitle2"
+                      color="text.secondary"
+                      sx={{ mb: 0.5 }}
+                    >
+                      Estimated Value
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      fontWeight={500}
+                      color="primary.main"
+                    >
+                      {selectedRegistration.estimated_value || "N/A"}
+                    </Typography>
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <Typography
+                      variant="subtitle2"
+                      color="text.secondary"
+                      sx={{ mb: 0.5 }}
+                    >
+                      Land Type
+                    </Typography>
+                    <Typography variant="body2">
+                      {selectedRegistration.property_type || "N/A"}
+                    </Typography>
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <Typography
+                      variant="subtitle2"
+                      color="text.secondary"
+                      sx={{ mb: 0.5 }}
+                    >
+                      Location
+                    </Typography>
+                    <Typography variant="body2" gutterBottom>
+                      {selectedRegistration.address || "N/A"}
+                    </Typography>
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <Typography
+                      variant="subtitle2"
+                      color="text.secondary"
+                      sx={{ mb: 0.5 }}
+                    >
+                      Area
+                    </Typography>
+                    <Typography variant="body2">
+                      {selectedRegistration.land_area
+                        ? `${selectedRegistration.land_area} sqm`
+                        : "N/A"}
+                    </Typography>
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <Typography
+                      variant="subtitle2"
+                      color="text.secondary"
+                      sx={{ mb: 0.5 }}
+                    >
+                      Owner
+                    </Typography>
+                    <Typography variant="body2">
+                      {selectedRegistration.owner_name || "N/A"}
+                    </Typography>
+                  </Grid>
                 </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Location
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    {selectedRegistration.address || "N/A"}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Area
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    {selectedRegistration.land_area + "sqm" || "N/A"}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Land Type
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    {selectedRegistration.property_type || "N/A"}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Owner
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    {selectedRegistration.owner_name || "N/A"}
-                  </Typography>
-                </Grid>
-              </Grid>
+              </ModernCard>
 
               {/* Documents Section */}
-              <Box sx={{ mt: 3 }}>
-                <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-                  Submitted Documents
-                </Typography>
+              <ModernCard variant="outlined" sx={{ p: 2 }}>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <DescriptionIcon sx={{ mr: 1, color: "primary.main" }} />
+                  <Typography variant="h6" fontWeight={600}>
+                    Submitted Documents
+                  </Typography>
+                </Box>
+
                 {docsLoading ? (
                   <Box
-                    sx={{ display: "flex", justifyContent: "center", py: 2 }}
+                    sx={{ display: "flex", justifyContent: "center", py: 3 }}
                   >
                     <LoadingSpinner size={24} />
                   </Box>
                 ) : documents && documents.length ? (
-                  <List>
+                  <List sx={{ py: 0 }}>
                     {documents.map((doc) => (
-                      <ListItem key={doc.id} disablePadding>
-                        <ListItemIcon>
-                          <DescriptionIcon color="primary" />
+                      <ListItem
+                        key={doc.id}
+                        sx={{
+                          px: 0,
+                          py: 1,
+                          borderRadius: 1,
+                          "&:hover": {
+                            backgroundColor: alpha(
+                              theme.palette.action.hover,
+                              0.05
+                            ),
+                          },
+                        }}
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>
+                          <DescriptionIcon color="primary" fontSize="small" />
                         </ListItemIcon>
                         <ListItemText
                           primary={
-                            doc.name || doc.title || `Document ${doc.id}`
+                            <Typography variant="body2" fontWeight={500}>
+                              {doc.name || doc.title || `Document ${doc.id}`}
+                            </Typography>
                           }
-                          secondary={doc.description || doc.type || ""}
+                          secondary={
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
+                              {doc.description || doc.type || ""}
+                            </Typography>
+                          }
                         />
                         <ListItemSecondaryAction>
                           <IconButton
@@ -622,19 +715,33 @@ export default function RegisterQueue() {
                                 window.open(docUrl || "", "_blank", "noopener");
                               }
                             }}
+                            sx={{
+                              backgroundColor: alpha(
+                                theme.palette.primary.main,
+                                0.1
+                              ),
+                              "&:hover": {
+                                backgroundColor: alpha(
+                                  theme.palette.primary.main,
+                                  0.2
+                                ),
+                              },
+                            }}
                           >
-                            <VisibilityIcon />
+                            <VisibilityIcon fontSize="small" />
                           </IconButton>
                         </ListItemSecondaryAction>
                       </ListItem>
                     ))}
                   </List>
                 ) : (
-                  <Typography color="text.secondary">
-                    No documents found for this registration.
-                  </Typography>
+                  <Box sx={{ textAlign: "center", py: 3 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      No documents found for this registration.
+                    </Typography>
+                  </Box>
                 )}
-              </Box>
+              </ModernCard>
             </Box>
           )}
         </ModernDialog>
@@ -644,31 +751,82 @@ export default function RegisterQueue() {
           open={approveDialogOpen}
           onClose={() => setApproveDialogOpen(false)}
           title="Approve Registration"
-          size="medium"
+          size="small"
           variant="glass"
           actions={
             <>
-              <Button onClick={() => setApproveDialogOpen(false)}>
+              <Button
+                onClick={() => setApproveDialogOpen(false)}
+                sx={{
+                  color: "text.secondary",
+                  "&:hover": {
+                    backgroundColor: alpha(theme.palette.action.hover, 0.1),
+                  },
+                }}
+              >
                 Cancel
               </Button>
-              <ModernButton variant="gradient" onClick={handleApproveSubmit}>
+              <ModernButton
+                variant="gradient"
+                onClick={handleApproveSubmit}
+                sx={{ minWidth: 150 }}
+              >
                 Approve Registration
               </ModernButton>
             </>
           }
         >
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            Are you sure you want to approve this property registration?
-          </Typography>
-          <TextField
-            fullWidth
-            multiline
-            rows={3}
-            label="Approval Notes (Optional)"
-            placeholder="Add any notes about the approval..."
-            value={actionNotes}
-            onChange={(e) => setActionNotes(e.target.value)}
-          />
+          <Box sx={{ py: 1 }}>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+              <CheckCircleIcon
+                sx={{ color: "success.main", mr: 2, fontSize: 28 }}
+              />
+              <Box>
+                <Typography variant="h6" fontWeight={600} color="success.main">
+                  Approve Property Registration
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  This action will approve the registration request
+                </Typography>
+              </Box>
+            </Box>
+
+            <Typography variant="body1" sx={{ mb: 3 }}>
+              Are you sure you want to approve this property registration? This
+              action will:
+            </Typography>
+
+            <Box sx={{ mb: 3, ml: 2 }}>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                • Register the property in the official records
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                • Issue a property title deed
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                • Notify the property owner
+              </Typography>
+              <Typography variant="body2">
+                • Make the property available for future transactions
+              </Typography>
+            </Box>
+
+            <TextField
+              fullWidth
+              multiline
+              rows={3}
+              label="Approval Notes (Optional)"
+              placeholder="Add any notes about the approval decision..."
+              value={actionNotes}
+              onChange={(e) => setActionNotes(e.target.value)}
+              variant="outlined"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                },
+              }}
+            />
+          </Box>
         </ModernDialog>
 
         {/* Reject Dialog */}
@@ -676,39 +834,74 @@ export default function RegisterQueue() {
           open={rejectDialogOpen}
           onClose={() => setRejectDialogOpen(false)}
           title="Reject Registration"
-          size="medium"
+          size="small"
           variant="glass"
           actions={
             <>
-              <Button onClick={() => setRejectDialogOpen(false)}>Cancel</Button>
+              <Button
+                onClick={() => setRejectDialogOpen(false)}
+                sx={{
+                  color: "text.secondary",
+                  "&:hover": {
+                    backgroundColor: alpha(theme.palette.action.hover, 0.1),
+                  },
+                }}
+              >
+                Cancel
+              </Button>
               <ModernButton
                 variant="gradient"
                 color="error"
                 onClick={handleRejectSubmit}
                 disabled={!actionNotes.trim()}
+                sx={{ minWidth: 150 }}
               >
                 Reject Registration
               </ModernButton>
             </>
           }
         >
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            Are you sure you want to reject this property registration?
-          </Typography>
-          <TextField
-            fullWidth
-            multiline
-            rows={3}
-            label="Rejection Reason"
-            placeholder="Please provide a reason for rejection..."
-            value={actionNotes}
-            onChange={(e) => setActionNotes(e.target.value)}
-            required
-            error={!actionNotes.trim()}
-            helperText={
-              !actionNotes.trim() ? "Rejection reason is required" : ""
-            }
-          />
+          <Box sx={{ py: 1 }}>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+              <CancelIcon sx={{ color: "error.main", mr: 2, fontSize: 28 }} />
+              <Box>
+                <Typography variant="h6" fontWeight={600} color="error.main">
+                  Reject Property Registration
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  This action will reject the registration request
+                </Typography>
+              </Box>
+            </Box>
+
+            <Typography variant="body1" sx={{ mb: 3 }}>
+              Are you sure you want to reject this property registration? Please
+              provide a clear reason for rejection.
+            </Typography>
+
+            <TextField
+              fullWidth
+              multiline
+              rows={4}
+              label="Rejection Reason *"
+              placeholder="Please provide a detailed reason for rejection..."
+              value={actionNotes}
+              onChange={(e) => setActionNotes(e.target.value)}
+              required
+              error={!actionNotes.trim()}
+              helperText={
+                !actionNotes.trim()
+                  ? "Rejection reason is required"
+                  : "This reason will be shared with the applicant"
+              }
+              variant="outlined"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                },
+              }}
+            />
+          </Box>
         </ModernDialog>
       </Box>
     </OfficerLayout>

@@ -29,6 +29,12 @@ import {
   Help as HelpIcon,
   VerifiedUser as VerifiedUserIcon,
   Logout as LogoutIcon,
+  Notifications as NotificationsIcon,
+  CheckCircle as CheckCircleIcon,
+  Warning as WarningIcon,
+  Info as InfoIcon,
+  Schedule as ScheduleIcon,
+  Assignment as AssignmentIcon,
 } from "@mui/icons-material";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import {
@@ -66,10 +72,56 @@ const baseMenuItems = [
   { text: "Public Verification", icon: <SearchIcon />, path: "citizen/verify" },
 ];
 
+// Dummy notification data for citizens
+const citizenNotifications = [
+  {
+    id: 1,
+    type: "success",
+    title: "Property Registration Approved",
+    message: "Your property 'Sunset Villa' has been successfully registered and approved.",
+    time: "2 hours ago",
+    icon: <CheckCircleIcon />,
+  },
+  {
+    id: 2,
+    type: "warning",
+    title: "Document Verification Required",
+    message: "Additional documents are required for your property registration.",
+    time: "1 day ago",
+    icon: <WarningIcon />,
+  },
+  {
+    id: 3,
+    type: "info",
+    title: "Transfer Request Submitted",
+    message: "Your property transfer request has been submitted for review.",
+    time: "2 days ago",
+    icon: <AssignmentIcon />,
+  },
+  {
+    id: 4,
+    type: "success",
+    title: "Payment Confirmed",
+    message: "Registration fee payment has been confirmed for your property.",
+    time: "3 days ago",
+    icon: <CheckCircleIcon />,
+  },
+  {
+    id: 5,
+    type: "info",
+    title: "System Update",
+    message: "New features have been added to the land registry system.",
+    time: "1 week ago",
+    icon: <InfoIcon />,
+  },
+];
+
 const CitizenLayout = ({ children }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [open, setOpen] = useState(!isMobile);
+  const [notificationAnchor, setNotificationAnchor] = useState(null);
+  
   useEffect(() => {
     setOpen(!isMobile);
   }, [isMobile]);
@@ -286,9 +338,12 @@ const CitizenLayout = ({ children }) => {
           <ActionButtons>
             <ThemeToggle />
 
-            <ModernBadge badgeContent={3} color="error">
-              <ModernIconButton variant="glass">
-                <VerifiedUserIcon />
+            <ModernBadge badgeContent={citizenNotifications.length} color="error">
+              <ModernIconButton 
+                variant="glass"
+                onClick={(e) => setNotificationAnchor(e.currentTarget)}
+              >
+                <NotificationsIcon />
               </ModernIconButton>
             </ModernBadge>
 
@@ -356,6 +411,133 @@ const CitizenLayout = ({ children }) => {
               <LogoutIcon fontSize="small" />
               Logout
             </MenuItem>
+          </Menu>
+
+          {/* Notification Popup */}
+          <Menu
+            anchorEl={notificationAnchor}
+            open={Boolean(notificationAnchor)}
+            onClose={() => setNotificationAnchor(null)}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            transformOrigin={{ vertical: "top", horizontal: "right" }}
+            PaperProps={{
+              sx: {
+                mt: 1,
+                backgroundColor: alpha(theme.palette.background.paper, 0.95),
+                backdropFilter: "blur(20px)",
+                border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
+                borderRadius: 2,
+                minWidth: 380,
+                maxWidth: 400,
+                maxHeight: 500,
+                overflow: "hidden",
+              },
+            }}
+          >
+            {/* Header */}
+            <Box
+              sx={{
+                p: 2,
+                borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                backgroundColor: alpha(theme.palette.primary.main, 0.05),
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <Typography variant="h6" fontWeight={600}>
+                  Notifications
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {citizenNotifications.length} new
+                </Typography>
+              </Box>
+            </Box>
+
+            {/* Notifications List */}
+            <Box sx={{ maxHeight: 400, overflowY: "auto" }}>
+              {citizenNotifications.map((notification, index) => (
+                <Box
+                  key={notification.id}
+                  sx={{
+                    p: 2,
+                    borderBottom: index < citizenNotifications.length - 1 ? `1px solid ${alpha(theme.palette.divider, 0.1)}` : "none",
+                    transition: "all 0.2s ease",
+                    "&:hover": {
+                      backgroundColor: alpha(theme.palette.primary.main, 0.04),
+                    },
+                    cursor: "pointer",
+                  }}
+                  onClick={() => {
+                    // Handle notification click
+                    console.log("Notification clicked:", notification.title);
+                    setNotificationAnchor(null);
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "flex-start", gap: 2 }}>
+                    <Box
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: "50%",
+                        backgroundColor: 
+                          notification.type === "success" ? alpha(theme.palette.success.main, 0.1) :
+                          notification.type === "warning" ? alpha(theme.palette.warning.main, 0.1) :
+                          alpha(theme.palette.info.main, 0.1),
+                        color: 
+                          notification.type === "success" ? theme.palette.success.main :
+                          notification.type === "warning" ? theme.palette.warning.main :
+                          theme.palette.info.main,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {notification.icon}
+                    </Box>
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                        {notification.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                        {notification.message}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {notification.time}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+              ))}
+            </Box>
+
+            {/* Footer */}
+            <Box
+              sx={{
+                p: 2,
+                borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                backgroundColor: alpha(theme.palette.background.default, 0.5),
+              }}
+            >
+              <Typography
+                variant="body2"
+                color="primary"
+                sx={{
+                  textAlign: "center",
+                  cursor: "pointer",
+                  fontWeight: 500,
+                  "&:hover": {
+                    textDecoration: "underline",
+                  },
+                }}
+                onClick={() => {
+                  // Handle view all notifications
+                  console.log("View all notifications clicked");
+                  setNotificationAnchor(null);
+                }}
+              >
+                View All Notifications
+              </Typography>
+            </Box>
           </Menu>
         </ModernToolbar>
       </ModernAppBar>

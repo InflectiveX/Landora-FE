@@ -21,12 +21,15 @@ import {
   People as PeopleIcon,
   Assignment as AssignmentIcon,
   CheckCircle as CheckCircleIcon,
-  PendingActions as PendingActionsIcon,
+  Schedule as ScheduleIcon,
   Warning as WarningIcon,
   Notifications as NotificationsIcon,
   MoreVert as MoreVertIcon,
   ArrowUpward as ArrowUpwardIcon,
   ArrowDownward as ArrowDownwardIcon,
+  AccountBalance as AccountBalanceIcon,
+  Verified as VerifiedIcon,
+  PendingActions as PendingActionsIcon,
 } from "@mui/icons-material";
 import OfficerLayout from "@/components/layouts/OfficerLayout";
 import ModernCard, {
@@ -43,7 +46,7 @@ const dashboardStats = [
     value: "2,847",
     change: "+12%",
     trend: "up",
-    icon: <AssignmentIcon />,
+    icon: <AccountBalanceIcon sx={{ fontSize: 28 }} />,
     color: "primary",
   },
   {
@@ -51,7 +54,7 @@ const dashboardStats = [
     value: "23",
     change: "-8%",
     trend: "down",
-    icon: <PendingActionsIcon />,
+    icon: <ScheduleIcon sx={{ fontSize: 28 }} />,
     color: "warning",
   },
   {
@@ -59,7 +62,7 @@ const dashboardStats = [
     value: "15",
     change: "+25%",
     trend: "up",
-    icon: <CheckCircleIcon />,
+    icon: <VerifiedIcon sx={{ fontSize: 28 }} />,
     color: "success",
   },
   {
@@ -67,7 +70,7 @@ const dashboardStats = [
     value: "8",
     change: "0%",
     trend: "stable",
-    icon: <PeopleIcon />,
+    icon: <PeopleIcon sx={{ fontSize: 28 }} />,
     color: "info",
   },
 ];
@@ -107,31 +110,37 @@ const StatCard = ({ stat, index }) => {
       case "primary":
         return {
           main: theme.palette.primary.main,
-          light: alpha(theme.palette.primary.main, 0.1),
+          light: alpha(theme.palette.primary.main, 0.15),
           dark: theme.palette.primary.dark,
         };
       case "warning":
         return {
           main: theme.palette.warning.main,
-          light: alpha(theme.palette.warning.main, 0.1),
+          light: alpha(theme.palette.warning.main, 0.15),
           dark: theme.palette.warning.dark,
         };
       case "success":
         return {
           main: theme.palette.success.main,
-          light: alpha(theme.palette.success.main, 0.1),
+          light: alpha(theme.palette.success.main, 0.15),
           dark: theme.palette.success.dark,
         };
       case "info":
         return {
           main: theme.palette.info.main,
-          light: alpha(theme.palette.info.main, 0.1),
+          light: alpha(theme.palette.info.main, 0.15),
           dark: theme.palette.info.dark,
+        };
+      case "secondary":
+        return {
+          main: theme.palette.secondary.main,
+          light: alpha(theme.palette.secondary.main, 0.15),
+          dark: theme.palette.secondary.dark,
         };
       default:
         return {
           main: theme.palette.primary.main,
-          light: alpha(theme.palette.primary.main, 0.1),
+          light: alpha(theme.palette.primary.main, 0.15),
           dark: theme.palette.primary.dark,
         };
     }
@@ -201,16 +210,22 @@ const StatCard = ({ stat, index }) => {
                 </Typography>
               </Box>
             </Box>
-            <Avatar
-              sx={{
-                backgroundColor: colors.light,
-                color: colors.main,
-                width: 56,
-                height: 56,
-              }}
-            >
-              {stat.icon}
-            </Avatar>
+                    <Box
+          sx={{
+            width: 56,
+            height: 56,
+            borderRadius: '50%',
+            backgroundColor: colors.light,
+            color: colors.main,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: `2px solid ${alpha(colors.main, 0.2)}`,
+            boxShadow: `0 4px 12px ${alpha(colors.main, 0.15)}`,
+          }}
+        >
+          {stat.icon}
+        </Box>
           </Box>
         </ModernCardContent>
       </ModernCard>
@@ -256,21 +271,29 @@ const ActivityCard = ({ activity, index }) => {
           },
         }}
       >
-        <Avatar
-          sx={{
-            backgroundColor: alpha(getStatusColor(activity.status), 0.1),
-            color: getStatusColor(activity.status),
-            mr: 2,
-          }}
-        >
-          {activity.type === "verification" ? (
-            <CheckCircleIcon />
-          ) : activity.type === "registration" ? (
-            <AssignmentIcon />
-          ) : (
-            <TrendingUpIcon />
-          )}
-        </Avatar>
+                 <Box
+           sx={{
+             width: 40,
+             height: 40,
+             borderRadius: '50%',
+             backgroundColor: alpha(getStatusColor(activity.status), 0.15),
+             color: getStatusColor(activity.status),
+             display: 'flex',
+             alignItems: 'center',
+             justifyContent: 'center',
+             border: `2px solid ${alpha(getStatusColor(activity.status), 0.2)}`,
+             boxShadow: `0 2px 8px ${alpha(getStatusColor(activity.status), 0.15)}`,
+             mr: 2,
+           }}
+         >
+           {activity.type === "verification" ? (
+             <CheckCircleIcon sx={{ fontSize: 20 }} />
+           ) : activity.type === "registration" ? (
+             <AssignmentIcon sx={{ fontSize: 20 }} />
+           ) : (
+             <TrendingUpIcon sx={{ fontSize: 20 }} />
+           )}
+         </Box>
         <Box sx={{ flexGrow: 1 }}>
           <Typography variant="subtitle2" fontWeight={600}>
             {activity.title}

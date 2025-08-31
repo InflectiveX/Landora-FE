@@ -47,6 +47,10 @@ import {
   Person as PersonIcon,
   ExpandMore as ExpandMoreIcon,
   Notifications as NotificationsIcon,
+  CheckCircle as CheckCircleIcon,
+  Warning as WarningIcon,
+  Info as InfoIcon,
+  Schedule as ScheduleIcon,
 } from "@mui/icons-material";
 
 const officerMenuItems = [
@@ -94,10 +98,57 @@ const officerMenuItems = [
   { text: "Help & Support", icon: <HelpIcon />, path: "/officer/help" },
 ];
 
+// Dummy notification data
+const dummyNotifications = [
+  {
+    id: 1,
+    type: "success",
+    title: "Property Verification Completed",
+    message: "Sunset Villa has been successfully verified and approved.",
+    time: "5 minutes ago",
+    icon: <CheckCircleIcon />,
+  },
+  {
+    id: 2,
+    type: "warning",
+    title: "Pending Verification Alert",
+    message: "3 new properties are waiting for verification in the queue.",
+    time: "15 minutes ago",
+    icon: <WarningIcon />,
+  },
+  {
+    id: 3,
+    type: "info",
+    title: "System Maintenance",
+    message: "Scheduled maintenance will occur tonight at 2:00 AM.",
+    time: "1 hour ago",
+    icon: <InfoIcon />,
+  },
+  {
+    id: 4,
+    type: "info",
+    title: "New Registration",
+    message: "Green Acres Farm has been registered and added to queue.",
+    time: "2 hours ago",
+    icon: <ScheduleIcon />,
+  },
+  {
+    id: 5,
+    type: "success",
+    title: "Transfer Request Approved",
+    message: "City Center Apartment transfer has been approved.",
+    time: "3 hours ago",
+    icon: <CheckCircleIcon />,
+  },
+];
+
 const OfficerLayout = ({ children }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [open, setOpen] = useState(!isMobile);
+  const [navIconFocused, setNavIconFocused] = useState(false);
+  const [notificationAnchor, setNotificationAnchor] = useState(null);
+  
   useEffect(() => {
     setOpen(!isMobile);
   }, [isMobile]);
@@ -135,6 +186,7 @@ const OfficerLayout = ({ children }) => {
   const [openSubMenu, setOpenSubMenu] = useState(null);
   const drawer = (
     <Box
+      id="navigation-drawer"
       sx={{ height: "100%", display: "flex", flexDirection: "column", mt: 1 }}
     >
       <Box sx={{ flex: 1 }}>
@@ -333,12 +385,34 @@ const OfficerLayout = ({ children }) => {
           <IconButton
             color="inherit"
             edge="start"
-            onClick={() => setOpen((v) => !v)}
+            onClick={() => {
+              setOpen((v) => !v);
+              // Maintain focus on the button when clicked
+              setTimeout(() => {
+                const button = document.querySelector('[aria-label="Toggle navigation menu"]');
+                if (button) button.focus();
+              }, 100);
+            }}
+            onFocus={() => setNavIconFocused(true)}
+            onBlur={() => setNavIconFocused(false)}
+            aria-label="Toggle navigation menu"
+            aria-expanded={open}
+            aria-controls="navigation-drawer"
             sx={{
               mr: 2,
               display: { md: "none" },
               "&:hover": {
                 backgroundColor: alpha(theme.palette.primary.main, 0.08),
+              },
+              "&:focus": {
+                backgroundColor: alpha(theme.palette.primary.main, 0.12),
+                outline: `2px solid ${theme.palette.primary.main}`,
+                outlineOffset: "2px",
+              },
+              "&:focus-visible": {
+                backgroundColor: alpha(theme.palette.primary.main, 0.12),
+                outline: `2px solid ${theme.palette.primary.main}`,
+                outlineOffset: "2px",
               },
             }}
           >
@@ -347,12 +421,34 @@ const OfficerLayout = ({ children }) => {
           <IconButton
             color="inherit"
             edge="start"
-            onClick={() => setOpen((v) => !v)}
+            onClick={() => {
+              setOpen((v) => !v);
+              // Maintain focus on the button when clicked
+              setTimeout(() => {
+                const button = document.querySelector('[aria-label="Toggle navigation menu"]');
+                if (button) button.focus();
+              }, 100);
+            }}
+            onFocus={() => setNavIconFocused(true)}
+            onBlur={() => setNavIconFocused(false)}
+            aria-label="Toggle navigation menu"
+            aria-expanded={open}
+            aria-controls="navigation-drawer"
             sx={{
               mr: 2,
               display: { xs: "none", md: "flex" },
               "&:hover": {
                 backgroundColor: alpha(theme.palette.primary.main, 0.08),
+              },
+              "&:focus": {
+                backgroundColor: alpha(theme.palette.primary.main, 0.12),
+                outline: `2px solid ${theme.palette.primary.main}`,
+                outlineOffset: "2px",
+              },
+              "&:focus-visible": {
+                backgroundColor: alpha(theme.palette.primary.main, 0.12),
+                outline: `2px solid ${theme.palette.primary.main}`,
+                outlineOffset: "2px",
               },
             }}
           >
@@ -382,14 +478,29 @@ const OfficerLayout = ({ children }) => {
 
           <IconButton
             color="inherit"
+            onClick={(e) => setNotificationAnchor(e.currentTarget)}
             sx={{
               mx: 1,
+              position: "relative",
               "&:hover": {
                 backgroundColor: alpha(theme.palette.primary.main, 0.08),
               },
             }}
           >
             <NotificationsIcon />
+            {/* Notification badge */}
+            <Box
+              sx={{
+                position: "absolute",
+                top: 8,
+                right: 8,
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                backgroundColor: theme.palette.error.main,
+                border: `2px solid ${theme.palette.background.paper}`,
+              }}
+            />
           </IconButton>
 
           <IconButton
@@ -458,9 +569,136 @@ const OfficerLayout = ({ children }) => {
             >
               Logout
             </MenuItem>
-          </Menu>
-        </ModernToolbar>
-      </ModernAppBar>
+                     </Menu>
+
+           {/* Notification Popup */}
+           <Menu
+             anchorEl={notificationAnchor}
+             open={Boolean(notificationAnchor)}
+             onClose={() => setNotificationAnchor(null)}
+             anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+             transformOrigin={{ vertical: "top", horizontal: "right" }}
+             PaperProps={{
+               sx: {
+                 mt: 1,
+                 backgroundColor: alpha(theme.palette.background.paper, 0.95),
+                 backdropFilter: "blur(20px)",
+                 border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
+                 borderRadius: 2,
+                 minWidth: 380,
+                 maxWidth: 400,
+                 maxHeight: 500,
+                 overflow: "hidden",
+               },
+             }}
+           >
+             {/* Header */}
+             <Box
+               sx={{
+                 p: 2,
+                 borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                 backgroundColor: alpha(theme.palette.primary.main, 0.05),
+               }}
+             >
+               <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                 <Typography variant="h6" fontWeight={600}>
+                   Notifications
+                 </Typography>
+                 <Typography variant="caption" color="text.secondary">
+                   {dummyNotifications.length} new
+                 </Typography>
+               </Box>
+             </Box>
+
+             {/* Notifications List */}
+             <Box sx={{ maxHeight: 400, overflowY: "auto" }}>
+               {dummyNotifications.map((notification, index) => (
+                 <Box
+                   key={notification.id}
+                   sx={{
+                     p: 2,
+                     borderBottom: index < dummyNotifications.length - 1 ? `1px solid ${alpha(theme.palette.divider, 0.1)}` : "none",
+                     transition: "all 0.2s ease",
+                     "&:hover": {
+                       backgroundColor: alpha(theme.palette.primary.main, 0.04),
+                     },
+                     cursor: "pointer",
+                   }}
+                   onClick={() => {
+                     // Handle notification click
+                     console.log("Notification clicked:", notification.title);
+                     setNotificationAnchor(null);
+                   }}
+                 >
+                   <Box sx={{ display: "flex", alignItems: "flex-start", gap: 2 }}>
+                     <Box
+                       sx={{
+                         width: 40,
+                         height: 40,
+                         borderRadius: "50%",
+                         backgroundColor: 
+                           notification.type === "success" ? alpha(theme.palette.success.main, 0.1) :
+                           notification.type === "warning" ? alpha(theme.palette.warning.main, 0.1) :
+                           alpha(theme.palette.info.main, 0.1),
+                         color: 
+                           notification.type === "success" ? theme.palette.success.main :
+                           notification.type === "warning" ? theme.palette.warning.main :
+                           theme.palette.info.main,
+                         display: "flex",
+                         alignItems: "center",
+                         justifyContent: "center",
+                         flexShrink: 0,
+                       }}
+                     >
+                       {notification.icon}
+                     </Box>
+                     <Box sx={{ flex: 1, minWidth: 0 }}>
+                       <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                         {notification.title}
+                       </Typography>
+                       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                         {notification.message}
+                       </Typography>
+                       <Typography variant="caption" color="text.secondary">
+                         {notification.time}
+                       </Typography>
+                     </Box>
+                   </Box>
+                 </Box>
+               ))}
+             </Box>
+
+             {/* Footer */}
+             <Box
+               sx={{
+                 p: 2,
+                 borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                 backgroundColor: alpha(theme.palette.background.default, 0.5),
+               }}
+             >
+               <Typography
+                 variant="body2"
+                 color="primary"
+                 sx={{
+                   textAlign: "center",
+                   cursor: "pointer",
+                   fontWeight: 500,
+                   "&:hover": {
+                     textDecoration: "underline",
+                   },
+                 }}
+                 onClick={() => {
+                   // Handle view all notifications
+                   console.log("View all notifications clicked");
+                   setNotificationAnchor(null);
+                 }}
+               >
+                 View All Notifications
+               </Typography>
+             </Box>
+           </Menu>
+         </ModernToolbar>
+       </ModernAppBar>
       <Box
         component="nav"
         sx={{

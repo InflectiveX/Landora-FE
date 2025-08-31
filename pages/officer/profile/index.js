@@ -84,12 +84,17 @@ export default function OfficerProfile() {
             mb: 3,
             borderRadius: 2,
             border: 1,
-            borderColor: 'divider',
-            bgcolor: 'background.paper',
+            borderColor: "divider",
+            bgcolor: "background.paper",
           }}
         >
-          <Box sx={{ p: 4, borderBottom: 1, borderColor: 'divider' }}>
-            <Typography variant="h4" fontWeight={600} color="text.primary" gutterBottom>
+          <Box sx={{ p: 4, borderBottom: 1, borderColor: "divider" }}>
+            <Typography
+              variant="h4"
+              fontWeight={600}
+              color="text.primary"
+              gutterBottom
+            >
               Officer Profile
             </Typography>
             <Typography variant="body1" color="text.secondary">
@@ -99,10 +104,7 @@ export default function OfficerProfile() {
         </Paper>
 
         {/* Professional Tabs */}
-        <Paper
-          elevation={1}
-          sx={{ borderRadius: 2 }}
-        >
+        <Paper elevation={1} sx={{ borderRadius: 2 }}>
           <Box
             sx={{ borderBottom: 1, borderColor: "divider", bgcolor: "grey.50" }}
           >

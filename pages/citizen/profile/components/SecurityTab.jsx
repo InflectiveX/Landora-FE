@@ -52,10 +52,10 @@ export default function SecurityTab() {
     confirmPassword: "",
   });
   const [securitySettings, setSecuritySettings] = useState({
-    twoFactor: true,
+    twoFactor: false,
     loginAlerts: true,
     sessionTimeout: true,
-    deviceTracking: true,
+    deviceTracking: false,
   });
 
   const handleChangePassword = async () => {
@@ -76,24 +76,24 @@ export default function SecurityTab() {
   const securityItems = [
     {
       title: "Password Strength",
-      status: "Strong",
-      color: "success",
+      status: "Good",
+      color: "warning",
       icon: <LockIcon />,
-      description: "Last changed 30 days ago",
+      description: "Last changed 45 days ago",
     },
     {
       title: "Two-Factor Authentication",
-      status: "Enabled",
-      color: "success",
+      status: "Disabled",
+      color: "error",
       icon: <ShieldIcon />,
-      description: "SMS + Authenticator App",
+      description: "Recommended for better security",
     },
     {
       title: "Login Sessions",
-      status: "2 Active",
+      status: "1 Active",
       color: "info",
       icon: <FingerprintIcon />,
-      description: "Desktop + Mobile",
+      description: "Current device only",
     },
     {
       title: "Security Alerts",
@@ -106,21 +106,21 @@ export default function SecurityTab() {
 
   const recentActivity = [
     {
-      action: "Password Changed",
-      date: "2024-08-01",
+      action: "Account Login",
+      date: "2024-08-31",
       location: "Colombo, Sri Lanka",
       status: "success",
     },
     {
-      action: "New Device Login",
-      date: "2024-07-28",
-      location: "Kandy, Sri Lanka",
-      status: "warning",
+      action: "Password Changed",
+      date: "2024-07-15",
+      location: "Colombo, Sri Lanka",
+      status: "success",
     },
     {
-      action: "2FA Enabled",
-      date: "2024-07-25",
-      location: "Colombo, Sri Lanka",
+      action: "Profile Updated",
+      date: "2024-07-10",
+      location: "Kandy, Sri Lanka",
       status: "success",
     },
   ];
@@ -186,11 +186,9 @@ export default function SecurityTab() {
           </Grid>
           <Grid item>
             <Chip
-              label="Secure Account"
-              color="success"
-              sx={{
-                fontWeight: 600,
-              }}
+              label="Security Score: 7/10"
+              color="warning"
+              sx={{ fontWeight: 600 }}
             />
           </Grid>
         </Grid>
@@ -260,9 +258,9 @@ export default function SecurityTab() {
                 variant="outlined"
                 fullWidth
                 startIcon={<ShieldIcon />}
-                disabled
+                color="warning"
               >
-                Setup 2FA
+                Enable 2FA
               </Button>
               <Button
                 variant="outlined"
@@ -295,7 +293,7 @@ export default function SecurityTab() {
                     }
                   />
                 }
-                label="Two-Factor Authentication"
+                label="Two-Factor Authentication (Recommended)"
               />
               <FormControlLabel
                 control={
@@ -354,11 +352,7 @@ export default function SecurityTab() {
               {recentActivity.map((activity, index) => (
                 <ListItem key={index} sx={{ px: 0 }}>
                   <ListItemIcon>
-                    {activity.status === "success" ? (
-                      <CheckCircleIcon color="success" />
-                    ) : (
-                      <WarningIcon color="warning" />
-                    )}
+                    <CheckCircleIcon color="success" />
                   </ListItemIcon>
                   <ListItemText
                     primary={activity.action}
@@ -370,21 +364,20 @@ export default function SecurityTab() {
           </InfoCard>
         </Grid>
 
-        {/* Password Requirements */}
+        {/* Security Recommendations */}
         <Grid item xs={12}>
           <Alert severity="info" sx={{ borderRadius: 2 }}>
             <Typography variant="subtitle2" fontWeight={600} gutterBottom>
-              Password Security Requirements
+              Security Recommendations
             </Typography>
             <Typography variant="body2">
-              • Minimum 8 characters with uppercase, lowercase, numbers, and
-              special characters
+              • Enable two-factor authentication for enhanced security
               <br />
-              • Must be changed every 90 days for officers
+              • Use a strong password with at least 8 characters
               <br />
-              • Cannot reuse last 5 passwords
-              <br />• Two-factor authentication is mandatory for all officer
-              accounts
+              • Regularly review your account activity
+              <br />• Keep your contact information up to date for security
+              alerts
             </Typography>
           </Alert>
         </Grid>

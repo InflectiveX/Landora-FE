@@ -137,22 +137,22 @@ export default function PersonalInfoTab({ userInfo, setUserInfo, user }) {
               {userInfo.name}
             </Typography>
             <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-              {userInfo.position}
+              Citizen Account
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              {userInfo.department}
+              {userInfo.email}
             </Typography>
             <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
               <Chip
-                label={`ID: ${userInfo.employeeId}`}
-                variant="outlined"
+                label="Verified Account"
+                color="success"
                 sx={{
                   fontWeight: 600,
                 }}
               />
               <Chip
-                label="Active Officer"
-                color="success"
+                label="Active"
+                variant="outlined"
                 sx={{
                   fontWeight: 600,
                 }}
@@ -232,7 +232,7 @@ export default function PersonalInfoTab({ userInfo, setUserInfo, user }) {
           </InfoCard>
         </Grid>
 
-        {/* Quick Stats */}
+        {/* Quick Info */}
         <Grid item xs={12} md={4}>
           <InfoCard icon={<BadgeIcon color="primary" />} title="Quick Info">
             <Stack spacing={2}>

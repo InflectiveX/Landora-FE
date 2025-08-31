@@ -157,7 +157,6 @@ export default function SignUp() {
                 </Typography>
               </Box>
 
-              {/* Form Section */}
               <Box
                 component="form"
                 onSubmit={handleSubmit(onSubmit)}
@@ -217,8 +216,9 @@ export default function SignUp() {
                   {...register("nicNumber", {
                     required: "NIC number is required",
                     pattern: {
-                      value: /^[0-9]{9}[VX]$/,
-                      message: "Invalid NIC format (e.g., 123456789V)",
+                      value: /^([0-9]{9}[VXvx]|[0-9]{12})$/,
+                      message:
+                        "Invalid NIC format (e.g., 123456789V or 20012345695)",
                     },
                   })}
                   error={!!errors.nicNumber}
@@ -298,7 +298,6 @@ export default function SignUp() {
                   )}
                 </ModernButton>
               </Box>
-
               {/* Footer Section */}
               <Box sx={{ textAlign: "center" }}>
                 <Typography

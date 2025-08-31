@@ -228,22 +228,6 @@ export default function Profile() {
                           }
                         />
                       </Grid>
-                      <Grid xs={12}>
-                        <TextField
-                          fullWidth
-                          label="Address"
-                          value={userInfo.address}
-                          disabled={!editMode}
-                          multiline
-                          rows={3}
-                          onChange={(e) =>
-                            setUserInfo({
-                              ...userInfo,
-                              address: e.target.value,
-                            })
-                          }
-                        />
-                      </Grid>
                     </Grid>
                     {editMode && (
                       <Box sx={{ mt: 2, display: "flex", gap: 2 }}>

@@ -19,6 +19,13 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  ListItemSecondaryAction,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import {
   LocationOn as LocationIcon,
@@ -32,6 +39,9 @@ import {
   Visibility as VisibilityIcon,
   Edit as EditIcon,
   CheckCircle as CheckCircleIcon,
+  Description as DescriptionIcon,
+  Assignment as AssignmentIcon,
+  SwapHoriz as SwapHorizIcon,
 } from "@mui/icons-material";
 import CalendarIcon from "@mui/icons-material/CalendarMonth";
 
@@ -41,6 +51,7 @@ import ModernCard, {
   ModernCardHeader,
 } from "@/components/ui/ModernCard";
 import ModernButton from "@/components/ui/ModernButton";
+import ModernDialog from "@/components/ui/ModernDialog";
 import { SearchField } from "@/components/ui/ModernForm";
 import LoadingSpinner, {
   CardSkeleton,
@@ -109,14 +120,16 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
         variant="glass"
         interactive
         sx={{
-          height: 300,
-          width: 300,
+          height: "100%",
+          minHeight: 420,
+          maxHeight: 420,
           display: "flex",
+          minWidth: 300,
           flexDirection: "column",
           position: "relative",
           overflow: "hidden",
           cursor: "pointer",
-          ...createHoverLift(-8),
+          ...createHoverLift(-4),
         }}
       >
         {/* Status Badge */}
@@ -202,22 +215,15 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
             flex: 1,
             display: "flex",
             flexDirection: "column",
-            height: "100%",
-            p: 2,
-            pt: 1,
+            justifyContent: "space-between",
+            p: 3,
+            pt: 2,
           }}
         >
           {/* Main Content */}
-          <Box
-            sx={{
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              overflow: "hidden",
-            }}
-          >
+          <Box>
             {/* Property Title & Location */}
-            <Box sx={{ mb: 2, mt: 3, minHeight: 64 }}>
+            <Box sx={{ mb: 3, mt: 4 }}>
               <Typography
                 variant="h6"
                 fontWeight={600}
@@ -226,8 +232,9 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
-                  lineHeight: 1.2,
-                  height: 24,
+                  lineHeight: 1.3,
+                  mb: 1.5,
+                  fontSize: "1.1rem",
                 }}
               >
                 {property.landName ||
@@ -238,11 +245,11 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 0.5,
-                  height: 24,
+                  gap: 1,
+                  mb: 1,
                 }}
               >
-                <LocationIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                <LocationIcon sx={{ fontSize: 18, color: "text.secondary" }} />
                 <Typography
                   variant="body2"
                   color="text.secondary"
@@ -251,6 +258,7 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
                     flex: 1,
+                    lineHeight: 1.4,
                   }}
                 >
                   {property.location ||
@@ -265,12 +273,16 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
               sx={{
                 display: "flex",
                 justifyContent: "space-between",
-                mb: 2,
-                height: 60,
+                mb: 3,
+                gap: 2,
               }}
             >
-              <Box sx={{ flex: 1, mr: 1 }}>
-                <Typography variant="caption" color="text.secondary">
+              <Box sx={{ flex: 1 }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ fontSize: "0.75rem" }}
+                >
                   Area
                 </Typography>
                 <Typography
@@ -280,15 +292,19 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
-                    height: 20,
-                    lineHeight: "20px",
+                    mt: 0.5,
+                    lineHeight: 1.4,
                   }}
                 >
-                  {property.land_area + " purchases" || "N/A"}
+                  {property.land_area ? `${property.land_area} sqm` : "N/A"}
                 </Typography>
               </Box>
-              <Box sx={{ flex: 1, textAlign: "right", ml: 1 }}>
-                <Typography variant="caption" color="text.secondary">
+              <Box sx={{ flex: 1, textAlign: "right" }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ fontSize: "0.75rem" }}
+                >
                   Type
                 </Typography>
                 <Typography
@@ -299,8 +315,8 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
-                    height: 20,
-                    lineHeight: "20px",
+                    mt: 0.5,
+                    lineHeight: 1.4,
                   }}
                 >
                   {property.property_type || "N/A"}
@@ -309,8 +325,12 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
             </Box>
 
             {/* Owner Information */}
-            <Box sx={{ mb: 2, height: 40 }}>
-              <Typography variant="caption" color="text.secondary">
+            <Box sx={{ mb: 3 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ fontSize: "0.75rem" }}
+              >
                 Owner
               </Typography>
               <Typography
@@ -320,8 +340,8 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
-                  height: 20,
-                  lineHeight: "20px",
+                  mt: 0.5,
+                  lineHeight: 1.4,
                 }}
               >
                 {property.owner_name || "N/A"}
@@ -336,18 +356,26 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
               alignItems: "center",
               justifyContent: "space-between",
               pt: 2,
-              height: 32,
+              mt: 2,
               borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
               flexShrink: 0,
             }}
           >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <CalendarIcon sx={{ fontSize: 14, color: "text.secondary" }} />
-              <Typography variant="caption" color="text.secondary">
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <CalendarIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ fontSize: "0.75rem" }}
+              >
                 {formatDate(property.registration_date)}
               </Typography>
             </Box>
-            <Typography variant="caption" color="text.secondary">
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ fontSize: "0.75rem", fontWeight: 500 }}
+            >
               ID: {property.id}
             </Typography>
           </Box>
@@ -360,7 +388,7 @@ const PropertyCard = ({ property, index, onVerify, onViewDetails }) => {
 export default function PropertiesPage() {
   const theme = useTheme();
   const router = useRouter();
-  const { getProperties } = useApi();
+  const { getProperties, getRegisterByLandId, getTransferByLandId } = useApi();
 
   const [loading, setLoading] = useState(true);
   const [properties, setProperties] = useState([]);
@@ -369,6 +397,9 @@ export default function PropertiesPage() {
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [verifyDialogOpen, setVerifyDialogOpen] = useState(false);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [registerDocuments, setRegisterDocuments] = useState([]);
+  const [transferDocuments, setTransferDocuments] = useState([]);
+  const [docsLoading, setDocsLoading] = useState(false);
 
   // Load properties
   useEffect(() => {
@@ -408,9 +439,68 @@ export default function PropertiesPage() {
     setVerifyDialogOpen(true);
   };
 
-  const handleViewDetails = (property) => {
+  const handleViewDetails = async (property) => {
     setSelectedProperty(property);
     setDetailsDialogOpen(true);
+    setDocsLoading(true);
+    setRegisterDocuments([]);
+    setTransferDocuments([]);
+
+    try {
+      const propId = property.property_id || property.id || property.land_id;
+
+      if (propId) {
+        // Fetch both register and transfer documents in parallel
+        const [registerDocs, transferDocs] = await Promise.allSettled([
+          getRegisterByLandId(propId),
+          getTransferByLandId(propId),
+        ]);
+
+        // Handle register documents
+        if (registerDocs.status === "fulfilled") {
+          let regDocs = registerDocs.value;
+          if (
+            regDocs &&
+            typeof regDocs === "object" &&
+            Array.isArray(regDocs.documents)
+          ) {
+            regDocs = regDocs.documents;
+          }
+          setRegisterDocuments(Array.isArray(regDocs) ? regDocs : []);
+        } else {
+          console.warn(
+            "Failed to fetch register documents:",
+            registerDocs.reason
+          );
+          setRegisterDocuments([]);
+        }
+
+        // Handle transfer documents
+        if (transferDocs.status === "fulfilled") {
+          let transDocs = transferDocs.value;
+          if (
+            transDocs &&
+            typeof transDocs === "object" &&
+            Array.isArray(transDocs.documents)
+          ) {
+            transDocs = transDocs.documents;
+          }
+          setTransferDocuments(Array.isArray(transDocs) ? transDocs : []);
+        } else {
+          console.warn(
+            "Failed to fetch transfer documents:",
+            transferDocs.reason
+          );
+          setTransferDocuments([]);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching documents:", error);
+      setRegisterDocuments([]);
+      setTransferDocuments([]);
+    } finally {
+      setDocsLoading(false);
+    }
   };
 
   const handleVerifySubmit = async () => {
@@ -528,7 +618,10 @@ export default function PropertiesPage() {
           <Grid container spacing={3}>
             {Array.from(new Array(6)).map((_, index) => (
               <Grid item xs={12} sm={6} lg={4} key={index}>
-                <ModernCard variant="glass">
+                <ModernCard
+                  variant="glass"
+                  sx={{ minHeight: 420, maxHeight: 420 }}
+                >
                   <CardSkeleton lines={4} hasActions />
                 </ModernCard>
               </Grid>
@@ -598,121 +691,559 @@ export default function PropertiesPage() {
         )}
 
         {/* Verification Dialog */}
-        <Dialog
+        <ModernDialog
           open={verifyDialogOpen}
           onClose={() => setVerifyDialogOpen(false)}
-          maxWidth="md"
-          fullWidth
+          title={`Verify Property: ${
+            selectedProperty?.landName || `Property #${selectedProperty?.id}`
+          }`}
+          size="small"
+          variant="glass"
+          actions={
+            <>
+              <Button
+                onClick={() => setVerifyDialogOpen(false)}
+                sx={{
+                  color: "text.secondary",
+                  "&:hover": {
+                    backgroundColor: alpha(theme.palette.action.hover, 0.1),
+                  },
+                }}
+              >
+                Cancel
+              </Button>
+              <ModernButton
+                variant="gradient"
+                onClick={handleVerifySubmit}
+                sx={{ minWidth: 140 }}
+              >
+                Verify Property
+              </ModernButton>
+            </>
+          }
         >
-          <DialogTitle>
-            Verify Property:{" "}
-            {selectedProperty?.landName || `Property #${selectedProperty?.id}`}
-          </DialogTitle>
-          <DialogContent>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              Are you sure you want to verify this property? This action will
-              mark the property as verified and approved.
-            </Typography>
-            <Box sx={{ mt: 2 }}>
-              <TextField
-                fullWidth
-                multiline
-                rows={3}
-                label="Verification Notes (Optional)"
-                placeholder="Add any notes about the verification process..."
+          <Box sx={{ py: 1 }}>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+              <VerifiedIcon
+                sx={{ color: "success.main", mr: 2, fontSize: 28 }}
               />
+              <Box>
+                <Typography variant="h6" fontWeight={600} color="success.main">
+                  Verify Property Registration
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  This action will mark the property as verified and approved
+                </Typography>
+              </Box>
             </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setVerifyDialogOpen(false)}>Cancel</Button>
-            <ModernButton variant="gradient" onClick={handleVerifySubmit}>
-              Verify Property
-            </ModernButton>
-          </DialogActions>
-        </Dialog>
+
+            <Typography variant="body1" sx={{ mb: 3 }}>
+              Are you sure you want to verify this property? This action will:
+            </Typography>
+
+            <Box sx={{ mb: 3, ml: 2 }}>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                • Mark the property as officially verified
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                • Update the property status to "Approved"
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                • Notify the property owner
+              </Typography>
+              <Typography variant="body2">
+                • Make the property available for transfers
+              </Typography>
+            </Box>
+
+            <TextField
+              fullWidth
+              multiline
+              rows={3}
+              label="Verification Notes (Optional)"
+              placeholder="Add any notes about the verification process..."
+              variant="outlined"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                },
+              }}
+            />
+          </Box>
+        </ModernDialog>
 
         {/* Details Dialog */}
-        <Dialog
+        <ModernDialog
           open={detailsDialogOpen}
           onClose={() => setDetailsDialogOpen(false)}
-          maxWidth="md"
-          fullWidth
+          title={`Property Details: ${
+            selectedProperty?.landName || `Property #${selectedProperty?.id}`
+          }`}
+          size="small"
+          variant="glass"
+          sx={{
+            "& .MuiDialog-paper": {
+              maxWidth: "1000px",
+              width: "100%",
+            },
+          }}
+          actions={
+            <>
+              <Button
+                onClick={() => setDetailsDialogOpen(false)}
+                sx={{
+                  color: "text.secondary",
+                  "&:hover": {
+                    backgroundColor: alpha(theme.palette.action.hover, 0.1),
+                  },
+                }}
+              >
+                Close
+              </Button>
+              <ModernButton
+                variant="outlined"
+                onClick={() => {
+                  setDetailsDialogOpen(false);
+                  handleVerify(selectedProperty);
+                }}
+                sx={{ minWidth: 120 }}
+              >
+                Verify Property
+              </ModernButton>
+            </>
+          }
         >
-          <DialogTitle>
-            Property Details:{" "}
-            {selectedProperty?.landName || `Property #${selectedProperty?.id}`}
-          </DialogTitle>
-          <DialogContent>
-            {selectedProperty && (
-              <Box sx={{ mt: 2 }}>
+          {selectedProperty && (
+            <Box sx={{ py: 1 }}>
+              {/* Property Overview Card */}
+              <ModernCard variant="outlined" sx={{ mb: 3, p: 2 }}>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <LocationIcon sx={{ mr: 1, color: "primary.main" }} />
+                  <Typography variant="h6" fontWeight={600}>
+                    Property Overview
+                  </Typography>
+                  <Chip
+                    label={selectedProperty.status || "Unknown"}
+                    color={getStatusColor(selectedProperty.status)}
+                    size="small"
+                    sx={{ ml: "auto" }}
+                  />
+                </Box>
+
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
+                  <Grid item xs={12}>
+                    <Typography
+                      variant="subtitle2"
+                      color="text.secondary"
+                      sx={{ mb: 0.5 }}
+                    >
                       Property Name
                     </Typography>
-                    <Typography variant="body1" gutterBottom>
+                    <Typography variant="body1" fontWeight={500} gutterBottom>
                       {selectedProperty.landName || "N/A"}
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      Status
-                    </Typography>
-                    <Chip
-                      label={selectedProperty.status || "Unknown"}
-                      color={getStatusColor(selectedProperty.status)}
-                      size="small"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
+
+                  <Grid item xs={12}>
+                    <Typography
+                      variant="subtitle2"
+                      color="text.secondary"
+                      sx={{ mb: 0.5 }}
+                    >
                       Location
                     </Typography>
-                    <Typography variant="body1" gutterBottom>
-                      {selectedProperty.location || "N/A"}
+                    <Typography variant="body2" gutterBottom>
+                      {selectedProperty.location ||
+                        selectedProperty.address ||
+                        "N/A"}
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
+
+                  <Grid item xs={6}>
+                    <Typography
+                      variant="subtitle2"
+                      color="text.secondary"
+                      sx={{ mb: 0.5 }}
+                    >
                       Area
                     </Typography>
-                    <Typography variant="body1" gutterBottom>
-                      {selectedProperty.area || "N/A"}
+                    <Typography variant="body2" gutterBottom>
+                      {selectedProperty.land_area
+                        ? `${selectedProperty.land_area} sqm`
+                        : "N/A"}
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      Land Type
+
+                  <Grid item xs={6}>
+                    <Typography
+                      variant="subtitle2"
+                      color="text.secondary"
+                      sx={{ mb: 0.5 }}
+                    >
+                      Property Type
                     </Typography>
-                    <Typography variant="body1" gutterBottom>
-                      {selectedProperty.landType || "N/A"}
+                    <Typography
+                      variant="body2"
+                      fontWeight={500}
+                      color="primary.main"
+                    >
+                      {selectedProperty.property_type || "N/A"}
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
+
+                  <Grid item xs={12}>
+                    <Typography
+                      variant="subtitle2"
+                      color="text.secondary"
+                      sx={{ mb: 0.5 }}
+                    >
                       Owner
                     </Typography>
-                    <Typography variant="body1" gutterBottom>
-                      {selectedProperty.ownerName || "N/A"}
+                    <Typography variant="body2" gutterBottom>
+                      {selectedProperty.owner_name || "N/A"}
                     </Typography>
                   </Grid>
                 </Grid>
-              </Box>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setDetailsDialogOpen(false)}>Close</Button>
-            <ModernButton
-              variant="outlined"
-              onClick={() => {
-                setDetailsDialogOpen(false);
-                handleVerify(selectedProperty);
-              }}
-            >
-              Verify Property
-            </ModernButton>
-          </DialogActions>
-        </Dialog>
+              </ModernCard>
+
+              {/* Additional Information */}
+              <ModernCard variant="outlined" sx={{ p: 2 }}>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <CalendarIcon sx={{ mr: 1, color: "primary.main" }} />
+                  <Typography variant="h6" fontWeight={600}>
+                    Registration Information
+                  </Typography>
+                </Box>
+
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Typography
+                      variant="subtitle2"
+                      color="text.secondary"
+                      sx={{ mb: 0.5 }}
+                    >
+                      Registration Date
+                    </Typography>
+                    <Typography variant="body2">
+                      {selectedProperty.registration_date
+                        ? new Date(
+                            selectedProperty.registration_date
+                          ).toLocaleDateString()
+                        : "N/A"}
+                    </Typography>
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <Typography
+                      variant="subtitle2"
+                      color="text.secondary"
+                      sx={{ mb: 0.5 }}
+                    >
+                      Property ID
+                    </Typography>
+                    <Typography variant="body2" fontWeight={500}>
+                      #{selectedProperty.id}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </ModernCard>
+
+              {/* Documents Section */}
+              <ModernCard variant="outlined" sx={{ p: 2, mt: 3 }}>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <DescriptionIcon sx={{ mr: 1, color: "primary.main" }} />
+                  <Typography variant="h6" fontWeight={600}>
+                    Property Documents
+                  </Typography>
+                </Box>
+
+                {docsLoading ? (
+                  <Box
+                    sx={{ display: "flex", justifyContent: "center", py: 3 }}
+                  >
+                    <LoadingSpinner size={24} />
+                  </Box>
+                ) : (
+                  <Box>
+                    {/* Register Documents */}
+                    <Box sx={{ mb: 3 }}>
+                      <Typography
+                        variant="subtitle2"
+                        color="text.secondary"
+                        sx={{
+                          mb: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                        }}
+                      >
+                        <AssignmentIcon fontSize="small" />
+                        Registration Documents ({registerDocuments.length})
+                      </Typography>
+                      {registerDocuments.length > 0 ? (
+                        <List
+                          sx={{
+                            py: 0,
+                            bgcolor: alpha(theme.palette.background.paper, 0.5),
+                            borderRadius: 1,
+                          }}
+                        >
+                          {registerDocuments.map((doc, index) => (
+                            <ListItem
+                              key={doc.id || index}
+                              sx={{
+                                px: 2,
+                                py: 1,
+                                borderRadius: 1,
+                                "&:hover": {
+                                  backgroundColor: alpha(
+                                    theme.palette.action.hover,
+                                    0.05
+                                  ),
+                                },
+                              }}
+                            >
+                              <ListItemIcon sx={{ minWidth: 36 }}>
+                                <DescriptionIcon
+                                  color="primary"
+                                  fontSize="small"
+                                />
+                              </ListItemIcon>
+                              <ListItemText
+                                primary={
+                                  <Typography variant="body2" fontWeight={500}>
+                                    {doc.name ||
+                                      doc.title ||
+                                      `Document ${index + 1}`}
+                                  </Typography>
+                                }
+                                secondary={
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                  >
+                                    {doc.description ||
+                                      doc.type ||
+                                      "Registration document"}
+                                  </Typography>
+                                }
+                              />
+                              <ListItemSecondaryAction>
+                                <IconButton
+                                  size="small"
+                                  color="primary"
+                                  onClick={() => {
+                                    const docUrl = doc.url || doc.path || "";
+                                    try {
+                                      const lower = (
+                                        docUrl || ""
+                                      ).toLowerCase();
+                                      if (
+                                        lower.endsWith(".pdf") ||
+                                        lower.includes("/pdf/")
+                                      ) {
+                                        window.open(
+                                          `/pdf-viewer?url=${encodeURIComponent(
+                                            docUrl
+                                          )}`,
+                                          "_blank"
+                                        );
+                                      } else {
+                                        window.open(
+                                          docUrl || "",
+                                          "_blank",
+                                          "noopener"
+                                        );
+                                      }
+                                    } catch (e) {
+                                      window.open(
+                                        docUrl || "",
+                                        "_blank",
+                                        "noopener"
+                                      );
+                                    }
+                                  }}
+                                  sx={{
+                                    backgroundColor: alpha(
+                                      theme.palette.primary.main,
+                                      0.1
+                                    ),
+                                    "&:hover": {
+                                      backgroundColor: alpha(
+                                        theme.palette.primary.main,
+                                        0.2
+                                      ),
+                                    },
+                                  }}
+                                >
+                                  <VisibilityIcon fontSize="small" />
+                                </IconButton>
+                              </ListItemSecondaryAction>
+                            </ListItem>
+                          ))}
+                        </List>
+                      ) : (
+                        <Box
+                          sx={{
+                            textAlign: "center",
+                            py: 2,
+                            bgcolor: alpha(theme.palette.background.paper, 0.3),
+                            borderRadius: 1,
+                            border: `1px dashed ${alpha(
+                              theme.palette.divider,
+                              0.3
+                            )}`,
+                          }}
+                        >
+                          <Typography variant="body2" color="text.secondary">
+                            No registration documents found
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
+
+                    {/* Transfer Documents */}
+                    <Box>
+                      <Typography
+                        variant="subtitle2"
+                        color="text.secondary"
+                        sx={{
+                          mb: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                        }}
+                      >
+                        <SwapHorizIcon fontSize="small" />
+                        Transfer Documents ({transferDocuments.length})
+                      </Typography>
+                      {transferDocuments.length > 0 ? (
+                        <List
+                          sx={{
+                            py: 0,
+                            bgcolor: alpha(theme.palette.background.paper, 0.5),
+                            borderRadius: 1,
+                          }}
+                        >
+                          {transferDocuments.map((doc, index) => (
+                            <ListItem
+                              key={doc.id || index}
+                              sx={{
+                                px: 2,
+                                py: 1,
+                                borderRadius: 1,
+                                "&:hover": {
+                                  backgroundColor: alpha(
+                                    theme.palette.action.hover,
+                                    0.05
+                                  ),
+                                },
+                              }}
+                            >
+                              <ListItemIcon sx={{ minWidth: 36 }}>
+                                <DescriptionIcon
+                                  color="secondary"
+                                  fontSize="small"
+                                />
+                              </ListItemIcon>
+                              <ListItemText
+                                primary={
+                                  <Typography variant="body2" fontWeight={500}>
+                                    {doc.name ||
+                                      doc.title ||
+                                      `Document ${index + 1}`}
+                                  </Typography>
+                                }
+                                secondary={
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                  >
+                                    {doc.description ||
+                                      doc.type ||
+                                      "Transfer document"}
+                                  </Typography>
+                                }
+                              />
+                              <ListItemSecondaryAction>
+                                <IconButton
+                                  size="small"
+                                  color="secondary"
+                                  onClick={() => {
+                                    const docUrl = doc.url || doc.path || "";
+                                    try {
+                                      const lower = (
+                                        docUrl || ""
+                                      ).toLowerCase();
+                                      if (
+                                        lower.endsWith(".pdf") ||
+                                        lower.includes("/pdf/")
+                                      ) {
+                                        window.open(
+                                          `/pdf-viewer?url=${encodeURIComponent(
+                                            docUrl
+                                          )}`,
+                                          "_blank"
+                                        );
+                                      } else {
+                                        window.open(
+                                          docUrl || "",
+                                          "_blank",
+                                          "noopener"
+                                        );
+                                      }
+                                    } catch (e) {
+                                      window.open(
+                                        docUrl || "",
+                                        "_blank",
+                                        "noopener"
+                                      );
+                                    }
+                                  }}
+                                  sx={{
+                                    backgroundColor: alpha(
+                                      theme.palette.secondary.main,
+                                      0.1
+                                    ),
+                                    "&:hover": {
+                                      backgroundColor: alpha(
+                                        theme.palette.secondary.main,
+                                        0.2
+                                      ),
+                                    },
+                                  }}
+                                >
+                                  <VisibilityIcon fontSize="small" />
+                                </IconButton>
+                              </ListItemSecondaryAction>
+                            </ListItem>
+                          ))}
+                        </List>
+                      ) : (
+                        <Box
+                          sx={{
+                            textAlign: "center",
+                            py: 2,
+                            bgcolor: alpha(theme.palette.background.paper, 0.3),
+                            borderRadius: 1,
+                            border: `1px dashed ${alpha(
+                              theme.palette.divider,
+                              0.3
+                            )}`,
+                          }}
+                        >
+                          <Typography variant="body2" color="text.secondary">
+                            No transfer documents found
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
+                  </Box>
+                )}
+              </ModernCard>
+            </Box>
+          )}
+        </ModernDialog>
       </Box>
     </OfficerLayout>
   );

@@ -12,31 +12,32 @@ import {
 import {
   Person as PersonIcon,
   Security as SecurityIcon,
-  Wallet as WalletIcon,
+  Work as WorkIcon,
   Settings as SettingsIcon,
   History as HistoryIcon,
 } from "@mui/icons-material";
 import { useAuth } from "@/contexts/AuthContext";
-import CitizenLayout from "@/components/layouts/CitizenLayout";
+import OfficerLayout from "@/components/layouts/OfficerLayout";
 
 // Import the new component tabs
 import PersonalInfoTab from "./components/PersonalInfoTab";
+import OfficialInfoTab from "./components/OfficialInfoTab";
 import SecurityTab from "./components/SecurityTab";
-import WalletTab from "./components/WalletTab";
 import ActivityTab from "./components/ActivityTab";
 import SettingsTab from "./components/SettingsTab";
 
-export default function Profile() {
+export default function OfficerProfile() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState(0);
-  const [walletConnected, setWalletConnected] = useState(true);
   const [userInfo, setUserInfo] = useState({
-    name: user?.name || "John Doe",
-    email: user?.email || "john.doe@example.com",
+    name: user?.name || "Officer John Smith",
+    email: user?.email || "john.smith@landora.gov.lk",
     phone: "+94 77 123 4567",
     nicNumber: user?.nic || "912345678V",
-    address: "123 Main Street, Colombo 01",
-    walletAddress: "0x742d35Cc6543C11532435FD5645454445354323d",
+    employeeId: user?.employeeId || "OFF001",
+    department: user?.department || "Land Registry Department",
+    position: user?.position || "Senior Land Officer",
+    address: "123 Government Quarter, Colombo 07",
   });
 
   const tabs = [
@@ -52,20 +53,14 @@ export default function Profile() {
       ),
     },
     {
+      label: "Official Info",
+      icon: <WorkIcon />,
+      component: <OfficialInfoTab userInfo={userInfo} user={user} />,
+    },
+    {
       label: "Security",
       icon: <SecurityIcon />,
       component: <SecurityTab />,
-    },
-    {
-      label: "Wallet",
-      icon: <WalletIcon />,
-      component: (
-        <WalletTab
-          userInfo={userInfo}
-          walletConnected={walletConnected}
-          setWalletConnected={setWalletConnected}
-        />
-      ),
     },
     {
       label: "Activity",
@@ -80,7 +75,7 @@ export default function Profile() {
   ];
 
   return (
-    <CitizenLayout>
+    <OfficerLayout>
       <Container maxWidth="xl" sx={{ py: 2 }}>
         {/* Professional Header */}
         <Paper
@@ -100,10 +95,10 @@ export default function Profile() {
               color="text.primary"
               gutterBottom
             >
-              Citizen Profile
+              Officer Profile
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Manage your profile information, wallet, and account settings
+              Manage your profile information and account settings
             </Typography>
           </Box>
         </Paper>
@@ -164,6 +159,6 @@ export default function Profile() {
           </Box>
         </Paper>
       </Container>
-    </CitizenLayout>
+    </OfficerLayout>
   );
 }

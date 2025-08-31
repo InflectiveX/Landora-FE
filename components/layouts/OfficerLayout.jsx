@@ -95,6 +95,7 @@ const officerMenuItems = [
     path: "/officer/transactions",
   },
   { text: "Reports", icon: <BarChartIcon />, path: "/officer/reports" },
+  { text: "Profile", icon: <PersonIcon />, path: "/officer/profile" },
   { text: "Help & Support", icon: <HelpIcon />, path: "/officer/help" },
 ];
 
@@ -544,7 +545,7 @@ const OfficerLayout = ({ children }) => {
             <MenuItem
               onClick={() => {
                 setAnchorEl(null);
-                router.push("/profile");
+                router.push("/officer/profile");
               }}
               sx={{
                 "&:hover": {

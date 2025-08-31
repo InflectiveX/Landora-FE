@@ -3,21 +3,24 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import {
   Box,
-  Paper,
   Typography,
   Stepper,
   Step,
   StepLabel,
   Button,
   TextField,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   CircularProgress,
+  alpha,
+  useTheme,
+  Fade,
+  Grow,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import CitizenLayout from "@/components/layouts/CitizenLayout";
+import ModernCard, { ModernCardContent } from "@/components/ui/ModernCard";
+import ModernButton from "@/components/ui/ModernButton";
+import ModernDialog from "@/components/ui/ModernDialog";
+
 // Step components
 import BuyerInfo from "./components/BuyerInfo";
 import DocumentsStep from "./components/DocumentsStep";
@@ -38,6 +41,7 @@ const steps = [
 ];
 
 export default function PropertyTransfer() {
+  const theme = useTheme();
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -412,77 +416,193 @@ export default function PropertyTransfer() {
   return (
     <CitizenLayout>
       <Box>
-        <Typography variant="h4" gutterBottom>
-          Transfer Property #{id}
-        </Typography>
-        <Paper sx={{ p: 3 }}>
-          <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
+        {/* Header Section */}
+        <Fade in timeout={800}>
+          <Box sx={{ mb: 4 }}>
+            <Typography
+              variant="h3"
+              fontWeight="bold"
+              sx={{
+                background: `linear-gradient(135deg, ${theme.palette.text.primary}, ${theme.palette.primary.main})`,
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                mb: 1,
+              }}
+            >
+              Transfer Property #{id}
+            </Typography>
+            <Typography
+              variant="h6"
+              color="text.secondary"
+              sx={{ opacity: 0.8, mb: 3 }}
+            >
+              Complete the steps below to transfer your property ownership
+            </Typography>
+          </Box>
+        </Fade>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
-            {renderStep()}
-            <Box sx={{ display: "flex", flexDirection: "row", pt: 4 }}>
-              <Button
-                color="inherit"
-                disabled={activeStep === 0}
-                onClick={handleBack}
-                sx={{ mr: 1 }}
-              >
-                Back
-              </Button>
-              <Box sx={{ flex: "1 1 auto" }} />
-              {activeStep === steps.length - 1 ? (
-                <Button
-                  variant="contained"
-                  onClick={handleOpenConfirm}
-                  disabled={loading || !isValid}
+        {/* Main Content */}
+        <Grow in timeout={600} style={{ transitionDelay: "200ms" }}>
+          <ModernCard variant="glass" sx={{ p: 4 }}>
+            {/* Progress Stepper */}
+            <Stepper
+              activeStep={activeStep}
+              sx={{
+                mb: 4,
+                "& .MuiStepLabel-root .Mui-completed": {
+                  color: theme.palette.success.main,
+                },
+                "& .MuiStepLabel-root .Mui-active": {
+                  color: theme.palette.primary.main,
+                },
+                "& .MuiStepConnector-line": {
+                  borderColor: alpha(theme.palette.divider, 0.3),
+                },
+              }}
+            >
+              {steps.map((label, index) => (
+                <Step key={label}>
+                  <StepLabel>
+                    <Typography
+                      variant="body2"
+                      fontWeight={activeStep === index ? 600 : 400}
+                      color={
+                        activeStep === index ? "primary.main" : "text.secondary"
+                      }
+                    >
+                      {label}
+                    </Typography>
+                  </StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+
+            {/* Step Content */}
+            <Box sx={{ minHeight: 400 }}>
+              <form onSubmit={handleSubmit(onSubmit)}>
+                {renderStep()}
+
+                {/* Navigation Buttons */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    pt: 4,
+                    mt: 4,
+                    borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                  }}
                 >
-                  {loading ? "Submitting..." : "Submit Transfer"}
-                </Button>
-              ) : (
-                <Button
-                  variant="contained"
-                  onClick={handleNext}
-                  // For step 0, ensure form fields are valid. For step 1, ensure required documents uploaded.
-                  disabled={
-                    (activeStep === 0 &&
-                      (buyerInvalid || ownerConflict || !isValid)) ||
-                    (activeStep === 1 && docsMissing)
-                  }
-                >
-                  Next
-                </Button>
-              )}
+                  <ModernButton
+                    variant="outlined"
+                    disabled={activeStep === 0}
+                    onClick={handleBack}
+                    sx={{ minWidth: 120 }}
+                  >
+                    Back
+                  </ModernButton>
+
+                  {activeStep === steps.length - 1 ? (
+                    <ModernButton
+                      variant="gradient"
+                      onClick={handleOpenConfirm}
+                      disabled={loading || !isValid}
+                      sx={{ minWidth: 160 }}
+                    >
+                      {loading ? "Submitting..." : "Submit Transfer"}
+                    </ModernButton>
+                  ) : (
+                    <ModernButton
+                      variant="gradient"
+                      onClick={handleNext}
+                      disabled={
+                        (activeStep === 0 &&
+                          (buyerInvalid || ownerConflict || !isValid)) ||
+                        (activeStep === 1 && docsMissing)
+                      }
+                      sx={{ minWidth: 120 }}
+                    >
+                      Next
+                    </ModernButton>
+                  )}
+                </Box>
+              </form>
             </Box>
-          </form>
-        </Paper>
-      </Box>
+          </ModernCard>
+        </Grow>
 
-      {/* Confirmation Dialog */}
-      <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
-        <DialogTitle>Confirm Transfer</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to submit this property transfer?
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmOpen(false)}>Cancel</Button>
-          <Button
-            variant="contained"
-            disabled={loading}
-            startIcon={loading && <CircularProgress size={20} />}
-            onClick={handleSubmit(onSubmit)}
-          >
-            {loading ? "Submitting..." : "Confirm & Submit"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        {/* Confirmation Dialog */}
+        <ModernDialog
+          open={confirmOpen}
+          onClose={() => setConfirmOpen(false)}
+          title="Confirm Property Transfer"
+          size="small"
+          variant="glass"
+          actions={
+            <>
+              <Button
+                onClick={() => setConfirmOpen(false)}
+                sx={{
+                  color: "text.secondary",
+                  "&:hover": {
+                    backgroundColor: alpha(theme.palette.action.hover, 0.1),
+                  },
+                }}
+              >
+                Cancel
+              </Button>
+              <ModernButton
+                variant="gradient"
+                disabled={loading}
+                startIcon={loading && <CircularProgress size={20} />}
+                onClick={handleSubmit(onSubmit)}
+                sx={{ minWidth: 160 }}
+              >
+                {loading ? "Submitting..." : "Confirm & Submit"}
+              </ModernButton>
+            </>
+          }
+        >
+          <Box sx={{ py: 2 }}>
+            <Typography variant="h6" fontWeight={600} gutterBottom>
+              Review Transfer Details
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 3 }}>
+              Are you sure you want to submit this property transfer? This
+              action cannot be undone.
+            </Typography>
+
+            <ModernCard variant="outlined" sx={{ p: 2, mb: 3 }}>
+              <Typography
+                variant="subtitle2"
+                color="text.secondary"
+                gutterBottom
+              >
+                Transfer Summary:
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                • Property ID: #{id}
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                • Buyer NIC: {watch("buyerNIC")}
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                • Transfer Amount: {watch("amount")}
+              </Typography>
+              <Typography variant="body2">
+                • Documents:{" "}
+                {Object.keys(docs).filter((key) => docs[key]).length} uploaded
+              </Typography>
+            </ModernCard>
+
+            <Typography variant="body2" color="text.secondary">
+              By confirming, you acknowledge that all information is correct and
+              complete.
+            </Typography>
+          </Box>
+        </ModernDialog>
+      </Box>
     </CitizenLayout>
   );
 }

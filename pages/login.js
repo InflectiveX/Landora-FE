@@ -63,10 +63,13 @@ export default function Login() {
       if (typeof raw === "string") {
         const s = raw.trim();
         // If looks like JSON, try parse
-        if ((s.startsWith('{') && s.endsWith('}')) || (s.startsWith('[') && s.endsWith(']'))) {
+        if (
+          (s.startsWith("{") && s.endsWith("}")) ||
+          (s.startsWith("[") && s.endsWith("]"))
+        ) {
           try {
             const obj = JSON.parse(s);
-            return obj?.message || obj?.msg || obj?.error || '';
+            return obj?.message || obj?.msg || obj?.error || "";
           } catch (err) {
             // fallback to regex
           }
@@ -77,10 +80,11 @@ export default function Login() {
         // Last resort: return the raw string
         return s;
       }
-      if (typeof raw === 'object') return raw?.message || raw?.msg || raw?.error || '';
+      if (typeof raw === "object")
+        return raw?.message || raw?.msg || raw?.error || "";
       return String(raw);
     } catch (e) {
-      return '';
+      return "";
     }
   };
 

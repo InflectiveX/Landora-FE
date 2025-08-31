@@ -21,6 +21,7 @@ import {
   Block as BlockIcon,
   CheckCircle as ActivateIcon,
 } from "@mui/icons-material";
+import Actions from "./Actions";
 
 export default function UsersTable({
   users,
@@ -31,6 +32,7 @@ export default function UsersTable({
   onView,
   onEdit,
   onToggleStatus,
+  onDelete,
 }) {
   const handleChangePage = (e, p) => setPage(p);
   const handleRowsPerPage = (e) => setRowsPerPage(parseInt(e.target.value, 10));
@@ -76,32 +78,13 @@ export default function UsersTable({
                   <TableCell>{u.joinDate}</TableCell>
                   <TableCell>{u.lastLogin}</TableCell>
                   <TableCell>
-                    <Tooltip title="View Details">
-                      <IconButton onClick={() => onView(u)}>
-                        <ViewIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Edit User">
-                      <IconButton onClick={() => onEdit(u)}>
-                        <EditIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip
-                      title={
-                        u.status === "active" ? "Block User" : "Activate User"
-                      }
-                    >
-                      <IconButton
-                        onClick={() => onToggleStatus && onToggleStatus(u)}
-                      >
-                        {/* Show icon representing current status (blocked => BlockIcon, active => ActivateIcon)", previously icon represented the action which made blocked users appear without a visible icon */}
-                        {u.status === "blocked" ? (
-                          <BlockIcon color="error" />
-                        ) : (
-                          <ActivateIcon color="success" />
-                        )}
-                      </IconButton>
-                    </Tooltip>
+                    <Actions
+                      user={u}
+                      onView={onView}
+                      onEdit={onEdit}
+                      onToggleStatus={onToggleStatus}
+                      onDelete={onDelete}
+                    />
                   </TableCell>
                 </TableRow>
               ))}

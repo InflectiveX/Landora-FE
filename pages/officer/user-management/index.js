@@ -176,6 +176,35 @@ export default function OfficerManagement() {
     });
   };
 
+  const handleDeleteUser = async (u) => {
+    // Prevent deleting currently authenticated user
+    if (user && u && user.id === u.id) {
+      try {
+        enqueue("You cannot delete your own account", { variant: "warning" });
+      } catch (e) {}
+      return;
+    }
+
+    showConfirm({
+      title: "Delete user",
+      description: `Are you sure you want to delete ${
+        u.name || u.email || "this user"
+      }? This action cannot be undone.`,
+      onConfirm: async () => {
+        try {
+          await apiClient.user.delete(u.id);
+          enqueue("User deleted successfully", { variant: "success" });
+          await loadUsers();
+        } catch (e) {
+          console.error("delete user failed", e);
+          try {
+            enqueue("Failed to delete user", { variant: "error" });
+          } catch (e2) {}
+        }
+      },
+    });
+  };
+
   const handleAddOfficer = async () => {
     showConfirm({
       title: "Add officer",
@@ -183,7 +212,7 @@ export default function OfficerManagement() {
       onConfirm: async () => {
         try {
           await apiClient.user.addOfficer({
-            name: newOfficer.name,
+            fullname: newOfficer.name,
             email: newOfficer.email,
             nic: newOfficer.nic,
           });
@@ -260,15 +289,16 @@ export default function OfficerManagement() {
             const raw = rawUsers.find((r) => r.id === u.id) || u;
             setEditForm({
               id: raw.id,
-              name: raw.name || "",
+              fullname: raw.name || "",
               email: raw.email || "",
               nic: raw.nic || "",
-              role: raw.role || "government_officer",
-              status: raw.status || "active",
+              role: raw.role || "officer",
+              status: raw.status || "pending",
             });
             setEditDialog(true);
           }}
           onToggleStatus={handleToggleStatus}
+          onDelete={handleDeleteUser}
         />
 
         {/* Add Officer Dialog (Admin only) */}

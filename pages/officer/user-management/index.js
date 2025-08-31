@@ -66,6 +66,18 @@ export default function OfficerManagement() {
     email: "",
     nic: "",
   });
+  // confirmation dialog state (MUI)
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmOpts, setConfirmOpts] = useState({
+    title: "",
+    description: "",
+    onConfirm: null,
+  });
+
+  const showConfirm = ({ title, description, onConfirm }) => {
+    setConfirmOpts({ title, description, onConfirm });
+    setConfirmOpen(true);
+  };
 
   const loadUsers = async () => {
     try {
@@ -137,38 +149,56 @@ export default function OfficerManagement() {
   const handleToggleStatus = async (u) => {
     // backend expects action 'blocked' to block, and 'active' to activate
     const action = u.status === "active" ? "blocked" : "active";
-    try {
-      await apiClient.user.blockUnblockUser({ id: u.id, action });
-      enqueue(
-        `User ${action === "blocked" ? "blocked" : "activated"} successfully`,
-        { variant: "success" }
-      );
-      await loadUsers();
-    } catch (e) {
-      console.error("toggle status failed", e);
-      try {
-        enqueue("Failed to change user status", { variant: "error" });
-      } catch (e2) {}
-    }
+
+    showConfirm({
+      title: action === "blocked" ? "Block user" : "Activate user",
+      description:
+        action === "blocked"
+          ? `Are you sure you want to block ${u.name || u.email}?`
+          : `Are you sure you want to activate ${u.name || u.email}?`,
+      onConfirm: async () => {
+        try {
+          await apiClient.user.blockUnblockUser({ id: u.id, action });
+          enqueue(
+            `User ${
+              action === "blocked" ? "blocked" : "activated"
+            } successfully`,
+            { variant: "success" }
+          );
+          await loadUsers();
+        } catch (e) {
+          console.error("toggle status failed", e);
+          try {
+            enqueue("Failed to change user status", { variant: "error" });
+          } catch (e2) {}
+        }
+      },
+    });
   };
 
   const handleAddOfficer = async () => {
-    try {
-      await apiClient.user.addOfficer({
-        name: newOfficer.name,
-        email: newOfficer.email,
-        nic: newOfficer.nic,
-      });
-      enqueue("Officer added successfully", { variant: "success" });
-      setAddOfficerOpen(false);
-      setNewOfficer({ name: "", email: "", nic: "" });
-      await loadUsers();
-    } catch (e) {
-      console.error("addOfficer failed", e);
-      try {
-        enqueue("Failed to add officer", { variant: "error" });
-      } catch (e2) {}
-    }
+    showConfirm({
+      title: "Add officer",
+      description: `Add officer ${newOfficer.name || newOfficer.email || ""}?`,
+      onConfirm: async () => {
+        try {
+          await apiClient.user.addOfficer({
+            name: newOfficer.name,
+            email: newOfficer.email,
+            nic: newOfficer.nic,
+          });
+          enqueue("Officer added successfully", { variant: "success" });
+          setAddOfficerOpen(false);
+          setNewOfficer({ name: "", email: "", nic: "" });
+          await loadUsers();
+        } catch (e) {
+          console.error("addOfficer failed", e);
+          try {
+            enqueue("Failed to add officer", { variant: "error" });
+          } catch (e2) {}
+        }
+      },
+    });
   };
 
   return (
@@ -301,6 +331,12 @@ export default function OfficerManagement() {
           editDialogOpen={editDialog}
           setEditDialogOpen={setEditDialog}
           onSave={async () => {
+            // ask for confirmation before saving edits
+            const confirmed = window.confirm(
+              `Save changes to ${editForm?.name || editForm?.email || "user"}?`
+            );
+            if (!confirmed) return;
+
             try {
               await apiClient.user.update(editForm.id, {
                 name: editForm.name,
@@ -327,6 +363,34 @@ export default function OfficerManagement() {
             }
           }}
         />
+        {/* Confirmation dialog (MUI) */}
+        <Dialog
+          open={confirmOpen}
+          onClose={() => setConfirmOpen(false)}
+          maxWidth="xs"
+          fullWidth
+        >
+          <DialogTitle>{confirmOpts.title}</DialogTitle>
+          <DialogContent>
+            <Typography>{confirmOpts.description}</Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setConfirmOpen(false)}>Cancel</Button>
+            <Button
+              variant="contained"
+              onClick={async () => {
+                setConfirmOpen(false);
+                try {
+                  if (confirmOpts.onConfirm) await confirmOpts.onConfirm();
+                } catch (e) {
+                  console.error("confirm action failed", e);
+                }
+              }}
+            >
+              Confirm
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </OfficerLayout>
   );

@@ -15,8 +15,6 @@ import {
 import { alpha } from "@mui/material/styles";
 import {
   AccountBalance as AccountBalanceIcon,
-  Visibility,
-  VisibilityOff,
   Lock as LockIcon,
   Email as EmailIcon,
 } from "@mui/icons-material";
@@ -57,6 +55,34 @@ export default function Login() {
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+  // Helper: extract concise message from various backend shapes (stringified JSON or plain string)
+  const extractMessage = (raw) => {
+    try {
+      if (!raw && raw !== 0) return "";
+      if (typeof raw === "string") {
+        const s = raw.trim();
+        // If looks like JSON, try parse
+        if ((s.startsWith('{') && s.endsWith('}')) || (s.startsWith('[') && s.endsWith(']'))) {
+          try {
+            const obj = JSON.parse(s);
+            return obj?.message || obj?.msg || obj?.error || '';
+          } catch (err) {
+            // fallback to regex
+          }
+        }
+        // Regex: find "message":"..."
+        const m = s.match(/"message"\s*:\s*"([^\"]+)"/i);
+        if (m && m[1]) return m[1];
+        // Last resort: return the raw string
+        return s;
+      }
+      if (typeof raw === 'object') return raw?.message || raw?.msg || raw?.error || '';
+      return String(raw);
+    } catch (e) {
+      return '';
+    }
+  };
 
   const onSubmit = async (data) => {
     setLoading(true);
@@ -116,7 +142,11 @@ export default function Login() {
         router.push("/citizen/dashboard");
       }
     } catch (e) {
-      enqueueSnackbar(e.message || "Login failed", { variant: "error" });
+      // If api client already enqueued a concise message, skip duplicate
+      if (e && e._apiEnqueued) return;
+      const raw = e?.message || e || "Login failed";
+      const userMsg = extractMessage(raw) || "Login failed";
+      enqueueSnackbar(userMsg, { variant: "error" });
     } finally {
       setLoading(false);
     }

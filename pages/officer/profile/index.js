@@ -247,7 +247,10 @@ export default function OfficerProfile() {
                           multiline
                           rows={2}
                           onChange={(e) =>
-                            setUserInfo({ ...userInfo, address: e.target.value })
+                            setUserInfo({
+                              ...userInfo,
+                              address: e.target.value,
+                            })
                           }
                         />
                       </Grid>
@@ -380,7 +383,11 @@ export default function OfficerProfile() {
                       control={<Switch defaultChecked />}
                       label="Enable 2FA"
                     />
-                    <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                    <Typography
+                      variant="caption"
+                      display="block"
+                      sx={{ mt: 1 }}
+                    >
                       Required for all officer accounts
                     </Typography>
                   </CardContent>

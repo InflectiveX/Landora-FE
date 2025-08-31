@@ -10,7 +10,11 @@ export default function ProfileRedirect() {
   useEffect(() => {
     if (!loading && user) {
       // Redirect based on user role
-      if (user.role === "officer" || user.role === "government_officer" || user.role === "admin") {
+      if (
+        user.role === "officer" ||
+        user.role === "government_officer" ||
+        user.role === "admin"
+      ) {
         router.replace("/officer/profile");
       } else {
         router.replace("/citizen/profile");

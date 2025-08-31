@@ -10,10 +10,6 @@ import {
   Menu,
   MenuItem,
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   TextField,
   List,
   ListItem,
@@ -45,6 +41,7 @@ import { SearchField } from "@/components/ui/ModernForm";
 import LoadingSpinner, {
   CardSkeleton,
 } from "@/components/ui/LoadingComponents";
+import ModernDialog from "@/components/ui/ModernDialog";
 import { createStaggerAnimation, createHoverLift } from "@/lib/animations";
 import { useApi } from "@/lib/api";
 import OfficerLayout from "@/components/layouts/OfficerLayout";
@@ -483,235 +480,236 @@ export default function RegisterQueue() {
         )}
 
         {/* Details Dialog */}
-        <Dialog
+        <ModernDialog
           open={detailsDialogOpen}
           onClose={() => setDetailsDialogOpen(false)}
-          maxWidth="md"
-          fullWidth
+          title={`Registration Details: ${
+            selectedRegistration?.landName ||
+            `Registration #${selectedRegistration?.id}`
+          }`}
+          size="large"
+          variant="glass"
+          actions={
+            <>
+              <Button onClick={() => setDetailsDialogOpen(false)}>Close</Button>
+              <ModernButton
+                variant="outlined"
+                color="error"
+                onClick={() => {
+                  setDetailsDialogOpen(false);
+                  handleReject(selectedRegistration);
+                }}
+              >
+                Reject
+              </ModernButton>
+              <ModernButton
+                variant="gradient"
+                onClick={() => {
+                  setDetailsDialogOpen(false);
+                  handleApprove(selectedRegistration);
+                }}
+              >
+                Approve
+              </ModernButton>
+            </>
+          }
         >
-          <DialogTitle>
-            Registration Details:{" "}
-            {selectedRegistration?.landName ||
-              `Registration #${selectedRegistration?.id}`}
-          </DialogTitle>
-          <DialogContent>
-            {selectedRegistration && (
-              <Box sx={{ mt: 2 }}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      Estimated Value
-                    </Typography>
-                    <Typography variant="body1" gutterBottom>
-                      {selectedRegistration.estimated_value || "N/A"}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      Status
-                    </Typography>
-                    <Chip
-                      label={selectedRegistration.status || "Unknown"}
-                      color={getStatusColor(selectedRegistration.status)}
-                      size="small"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      Location
-                    </Typography>
-                    <Typography variant="body1" gutterBottom>
-                      {selectedRegistration.address || "N/A"}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      Area
-                    </Typography>
-                    <Typography variant="body1" gutterBottom>
-                      {selectedRegistration.land_area + "sqm" || "N/A"}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      Land Type
-                    </Typography>
-                    <Typography variant="body1" gutterBottom>
-                      {selectedRegistration.property_type || "N/A"}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      Owner
-                    </Typography>
-                    <Typography variant="body1" gutterBottom>
-                      {selectedRegistration.owner_name || "N/A"}
-                    </Typography>
-                  </Grid>
-                </Grid>
-
-                {/* Documents Section */}
-                <Box sx={{ mt: 3 }}>
-                  <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-                    Submitted Documents
+          {selectedRegistration && (
+            <Box sx={{ mt: 2 }}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Estimated Value
                   </Typography>
-                  {docsLoading ? (
-                    <Box
-                      sx={{ display: "flex", justifyContent: "center", py: 2 }}
-                    >
-                      <LoadingSpinner size={24} />
-                    </Box>
-                  ) : documents && documents.length ? (
-                    <List>
-                      {documents.map((doc) => (
-                        <ListItem key={doc.id} disablePadding>
-                          <ListItemIcon>
-                            <DescriptionIcon color="primary" />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              doc.name || doc.title || `Document ${doc.id}`
-                            }
-                            secondary={doc.description || doc.type || ""}
-                          />
-                          <ListItemSecondaryAction>
-                            <IconButton
-                              size="small"
-                              color="primary"
-                              onClick={() => {
-                                const docUrl = doc.url || doc.path || "";
-                                try {
-                                  const lower = (docUrl || "").toLowerCase();
-                                  if (
-                                    lower.endsWith(".pdf") ||
-                                    lower.includes("/pdf/")
-                                  ) {
-                                    window.open(
-                                      `/pdf-viewer?url=${encodeURIComponent(
-                                        docUrl
-                                      )}`,
-                                      "_blank"
-                                    );
-                                  } else {
-                                    window.open(
-                                      docUrl || "",
-                                      "_blank",
-                                      "noopener"
-                                    );
-                                  }
-                                } catch (e) {
+                  <Typography variant="body1" gutterBottom>
+                    {selectedRegistration.estimated_value || "N/A"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Status
+                  </Typography>
+                  <Chip
+                    label={selectedRegistration.status || "Unknown"}
+                    color={getStatusColor(selectedRegistration.status)}
+                    size="small"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Location
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    {selectedRegistration.address || "N/A"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Area
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    {selectedRegistration.land_area + "sqm" || "N/A"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Land Type
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    {selectedRegistration.property_type || "N/A"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Owner
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    {selectedRegistration.owner_name || "N/A"}
+                  </Typography>
+                </Grid>
+              </Grid>
+
+              {/* Documents Section */}
+              <Box sx={{ mt: 3 }}>
+                <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+                  Submitted Documents
+                </Typography>
+                {docsLoading ? (
+                  <Box
+                    sx={{ display: "flex", justifyContent: "center", py: 2 }}
+                  >
+                    <LoadingSpinner size={24} />
+                  </Box>
+                ) : documents && documents.length ? (
+                  <List>
+                    {documents.map((doc) => (
+                      <ListItem key={doc.id} disablePadding>
+                        <ListItemIcon>
+                          <DescriptionIcon color="primary" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            doc.name || doc.title || `Document ${doc.id}`
+                          }
+                          secondary={doc.description || doc.type || ""}
+                        />
+                        <ListItemSecondaryAction>
+                          <IconButton
+                            size="small"
+                            color="primary"
+                            onClick={() => {
+                              const docUrl = doc.url || doc.path || "";
+                              try {
+                                const lower = (docUrl || "").toLowerCase();
+                                if (
+                                  lower.endsWith(".pdf") ||
+                                  lower.includes("/pdf/")
+                                ) {
+                                  window.open(
+                                    `/pdf-viewer?url=${encodeURIComponent(
+                                      docUrl
+                                    )}`,
+                                    "_blank"
+                                  );
+                                } else {
                                   window.open(
                                     docUrl || "",
                                     "_blank",
                                     "noopener"
                                   );
                                 }
-                              }}
-                            >
-                              <VisibilityIcon />
-                            </IconButton>
-                          </ListItemSecondaryAction>
-                        </ListItem>
-                      ))}
-                    </List>
-                  ) : (
-                    <Typography color="text.secondary">
-                      No documents found for this registration.
-                    </Typography>
-                  )}
-                </Box>
+                              } catch (e) {
+                                window.open(docUrl || "", "_blank", "noopener");
+                              }
+                            }}
+                          >
+                            <VisibilityIcon />
+                          </IconButton>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    ))}
+                  </List>
+                ) : (
+                  <Typography color="text.secondary">
+                    No documents found for this registration.
+                  </Typography>
+                )}
               </Box>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setDetailsDialogOpen(false)}>Close</Button>
-            <ModernButton
-              variant="outlined"
-              color="error"
-              onClick={() => {
-                setDetailsDialogOpen(false);
-                handleReject(selectedRegistration);
-              }}
-            >
-              Reject
-            </ModernButton>
-            <ModernButton
-              variant="gradient"
-              onClick={() => {
-                setDetailsDialogOpen(false);
-                handleApprove(selectedRegistration);
-              }}
-            >
-              Approve
-            </ModernButton>
-          </DialogActions>
-        </Dialog>
+            </Box>
+          )}
+        </ModernDialog>
 
         {/* Approve Dialog */}
-        <Dialog
+        <ModernDialog
           open={approveDialogOpen}
           onClose={() => setApproveDialogOpen(false)}
-          maxWidth="sm"
-          fullWidth
+          title="Approve Registration"
+          size="medium"
+          variant="glass"
+          actions={
+            <>
+              <Button onClick={() => setApproveDialogOpen(false)}>
+                Cancel
+              </Button>
+              <ModernButton variant="gradient" onClick={handleApproveSubmit}>
+                Approve Registration
+              </ModernButton>
+            </>
+          }
         >
-          <DialogTitle>Approve Registration</DialogTitle>
-          <DialogContent>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              Are you sure you want to approve this property registration?
-            </Typography>
-            <TextField
-              fullWidth
-              multiline
-              rows={3}
-              label="Approval Notes (Optional)"
-              placeholder="Add any notes about the approval..."
-              value={actionNotes}
-              onChange={(e) => setActionNotes(e.target.value)}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setApproveDialogOpen(false)}>Cancel</Button>
-            <ModernButton variant="gradient" onClick={handleApproveSubmit}>
-              Approve Registration
-            </ModernButton>
-          </DialogActions>
-        </Dialog>
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            Are you sure you want to approve this property registration?
+          </Typography>
+          <TextField
+            fullWidth
+            multiline
+            rows={3}
+            label="Approval Notes (Optional)"
+            placeholder="Add any notes about the approval..."
+            value={actionNotes}
+            onChange={(e) => setActionNotes(e.target.value)}
+          />
+        </ModernDialog>
 
         {/* Reject Dialog */}
-        <Dialog
+        <ModernDialog
           open={rejectDialogOpen}
           onClose={() => setRejectDialogOpen(false)}
-          maxWidth="sm"
-          fullWidth
+          title="Reject Registration"
+          size="medium"
+          variant="glass"
+          actions={
+            <>
+              <Button onClick={() => setRejectDialogOpen(false)}>Cancel</Button>
+              <ModernButton
+                variant="gradient"
+                color="error"
+                onClick={handleRejectSubmit}
+                disabled={!actionNotes.trim()}
+              >
+                Reject Registration
+              </ModernButton>
+            </>
+          }
         >
-          <DialogTitle>Reject Registration</DialogTitle>
-          <DialogContent>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              Are you sure you want to reject this property registration?
-            </Typography>
-            <TextField
-              fullWidth
-              multiline
-              rows={3}
-              label="Rejection Reason"
-              placeholder="Please provide a reason for rejection..."
-              value={actionNotes}
-              onChange={(e) => setActionNotes(e.target.value)}
-              required
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setRejectDialogOpen(false)}>Cancel</Button>
-            <ModernButton
-              variant="gradient"
-              color="error"
-              onClick={handleRejectSubmit}
-              disabled={!actionNotes.trim()}
-            >
-              Reject Registration
-            </ModernButton>
-          </DialogActions>
-        </Dialog>
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            Are you sure you want to reject this property registration?
+          </Typography>
+          <TextField
+            fullWidth
+            multiline
+            rows={3}
+            label="Rejection Reason"
+            placeholder="Please provide a reason for rejection..."
+            value={actionNotes}
+            onChange={(e) => setActionNotes(e.target.value)}
+            required
+            error={!actionNotes.trim()}
+            helperText={
+              !actionNotes.trim() ? "Rejection reason is required" : ""
+            }
+          />
+        </ModernDialog>
       </Box>
     </OfficerLayout>
   );
